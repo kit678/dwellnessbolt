@@ -1,0 +1,229 @@
+import React, { useState } from 'react';
+import { Dialog } from '@headlessui/react';
+import { m } from 'framer-motion';
+import { Calendar, Clock, Users, DollarSign, CreditCard } from 'lucide-react';
+import { RecurringSession } from '../types';
+import { format } from 'date-fns';
+import { useBookings } from '../hooks/useBookings';
+import { getNextDayOccurrence } from '../utils/dateUtils';
+import toast from 'react-hot-toast';
+
+interface BookingModalProps {
+  session: RecurringSession;
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export default function BookingModal({ session, isOpen, onClose }: BookingModalProps) {
+  const { bookSession, loading } = useBookings();
+  const [selectedDate, setSelectedDate] = useState<string>('');
+  const [showPayment, setShowPayment] = useState(false);
+  const [paymentDetails, setPaymentDetails] = useState({
+    cardNumber: '',
+    expiry: '',
+    cvc: '',
+    name: ''
+  });
+
+  // Generate next 4 available dates
+  const getAvailableDates = () => {
+    const dates: Date[] = [];
+    session.recurringDays.forEach(day => {
+      for (let i = 0; i < 4; i++) {
+        const date = getNextDayOccurrence(day, 
+          parseInt(session.startTime.split(':')[0]), 
+          parseInt(session.startTime.split(':')[1])
+        );
+        date.setDate(date.getDate() + (i * 7));
+        dates.push(date);
+      }
+    });
+    return dates.sort((a, b) => a.getTime() - b.getTime());
+  };
+
+  const availableDates = getAvailableDates();
+
+  const handleContinueToPayment = () => {
+    if (!selectedDate) {
+      toast.error('Please select a date');
+      return;
+    }
+    setShowPayment(true);
+  };
+
+  const handlePayment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    try {
+      await bookSession(session, selectedDate);
+      toast.success('Booking confirmed! Check your email for confirmation.');
+      onClose();
+    } catch (error) {
+      console.error('Booking failed:', error);
+      toast.error('Failed to process booking');
+    }
+  };
+
+  return (
+    <Dialog
+      open={isOpen}
+      onClose={onClose}
+      className="fixed inset-0 z-50 overflow-y-auto"
+    >
+      <div className="flex items-center justify-center min-h-screen">
+        <Dialog.Overlay className="fixed inset-0 bg-black opacity-30" />
+
+        <m.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="relative bg-white rounded-lg p-8 max-w-md w-full mx-4"
+        >
+          <Dialog.Title className="text-2xl font-bold text-gray-900 mb-4">
+            {showPayment ? 'Payment Details' : 'Book Session'}
+          </Dialog.Title>
+
+          {!showPayment ? (
+            <>
+              <div className="space-y-4 mb-6">
+                <h3 className="text-xl font-semibold">{session.title}</h3>
+                <p className="text-gray-600">{session.description}</p>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex items-center text-gray-600">
+                    <Clock className="h-5 w-5 mr-2" />
+                    <span>
+                      {session.startTime} - {session.endTime} MST
+                    </span>
+                  </div>
+                  <div className="flex items-center text-gray-600">
+                    <Users className="h-5 w-5 mr-2" />
+                    <span>
+                      {session.capacity - session.enrolled} spots available
+                    </span>
+                  </div>
+                  <div className="flex items-center text-gray-600">
+                    <DollarSign className="h-5 w-5 mr-2" />
+                    <span>${session.price}</span>
+                  </div>
+                </div>
+
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Select Date
+                  </label>
+                  <select
+                    value={selectedDate}
+                    onChange={(e) => setSelectedDate(e.target.value)}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  >
+                    <option value="">Choose a date</option>
+                    {availableDates.map((date) => (
+                      <option key={date.toISOString()} value={date.toISOString()}>
+                        {format(date, 'EEEE, MMMM d, yyyy')}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex space-x-4">
+                <button
+                  onClick={onClose}
+                  className="flex-1 py-2 px-4 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleContinueToPayment}
+                  disabled={loading || !selectedDate}
+                  className="flex-1 py-2 px-4 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50"
+                >
+                  Continue to Payment
+                </button>
+              </div>
+            </>
+          ) : (
+            <form onSubmit={handlePayment} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Card Number
+                </label>
+                <div className="mt-1 relative">
+                  <CreditCard className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="text"
+                    required
+                    placeholder="4242 4242 4242 4242"
+                    className="pl-10 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                    value={paymentDetails.cardNumber}
+                    onChange={(e) => setPaymentDetails({...paymentDetails, cardNumber: e.target.value})}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Expiry Date
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="MM/YY"
+                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                    value={paymentDetails.expiry}
+                    onChange={(e) => setPaymentDetails({...paymentDetails, expiry: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    CVC
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="123"
+                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                    value={paymentDetails.cvc}
+                    onChange={(e) => setPaymentDetails({...paymentDetails, cvc: e.target.value})}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Name on Card
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="John Doe"
+                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                  value={paymentDetails.name}
+                  onChange={(e) => setPaymentDetails({...paymentDetails, name: e.target.value})}
+                />
+              </div>
+
+              <div className="mt-6 flex space-x-4">
+                <button
+                  type="button"
+                  onClick={() => setShowPayment(false)}
+                  className="flex-1 py-2 px-4 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                >
+                  Back
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="flex-1 py-2 px-4 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50"
+                >
+                  {loading ? 'Processing...' : `Pay $${session.price}`}
+                </button>
+              </div>
+            </form>
+          )}
+        </m.div>
+      </div>
+    </Dialog>
+  );
+}

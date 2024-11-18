@@ -1,0 +1,68 @@
+Dwellness Platform - Alpha Version Requirements
+
+Objective: Develop a Progressive Web App (PWA) for a wellness platform with a modern, minimalist design, focusing on browsing and booking wellness offerings. Include user authentication to enable a user dashboard for managing bookings.
+
+Core Features
+Modern Design and Responsiveness
+
+Minimal design with premium startup aesthetics.
+Use animations for enhanced user experience.
+Ensure responsiveness across desktops, tablets, and mobile devices.
+Service Offerings
+
+Display wellness offerings in a card-like interface.
+Each card includes:
+Offering image.
+Instructor’s name and profile image (use "Dwellness").
+Details: title, description, schedule, capacity, and price.
+A "Book Now" button for bookings.
+Booking System
+
+Allow users to book time slots for individual offerings.
+Include calendar integration to display available slots.
+Manage capacity to prevent overbooking.
+User Authentication
+
+Enable users to sign up, log in, and manage their accounts.
+Secure authentication system for accessing the user dashboard.
+User Dashboard
+
+Allow users to view and manage their upcoming bookings.
+Include booking details such as offering title, date, time, and status.
+Payment Integration
+
+Integrate with Stripe for secure payment processing.
+Support payments for individual bookings.
+Notifications
+
+Send email notifications for booking confirmations and reminders for upcoming bookings.
+Admin Page
+
+Enable the instructor (Dwellness admin) to add, edit, and delete offerings.
+Manage schedules, prices, capacities, and descriptions.
+Offering Details for Display
+General Class
+
+Schedule:
+Sunday: 8:00 AM - 9:00 AM MST.
+Monday & Wednesday: 7:00 PM - 8:00 PM MST.
+Capacity: 20 participants.
+Price: $15 per session.
+Specialized Workshop
+
+Schedule: Sunday: 9:30 AM - 11:00 AM MST.
+Focus Areas: Stress Management, Diabetes & Hypertension, Weight Loss, PCOS/Women’s Health (rotating topics).
+Capacity: 15 participants.
+Price: $20 per session.
+Meditation & Breathwork
+
+Schedule: Monday & Wednesday: 8:00 PM - 9:00 PM MST.
+Capacity: 25 participants.
+Price: $10 per session.
+Development Notes for Bolt.new
+Use modern frameworks and libraries for scalability (e.g., React, Tailwind CSS).
+Ensure authentication routes and functionality are included.
+Integrate Stripe for payments and handle calendar integration for booking slots.
+Implement user and admin dashboards with the required features.
+Optimize for responsiveness and accessibility across devices.
+Focus on delivering the core features outlined above. Avoid overcomplicating functionality and ensure a seamless user experience.
