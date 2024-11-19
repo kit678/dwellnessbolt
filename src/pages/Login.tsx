@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { m } from 'framer-motion';
-import { User, Lock, Mail, LogIn } from 'lucide-react';
+import { Lock, Mail, LogIn } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 
 export default function Login() {

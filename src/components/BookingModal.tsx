@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Dialog } from '@headlessui/react';
 import { m } from 'framer-motion';
-import { Calendar, Clock, Users, DollarSign, CreditCard } from 'lucide-react';
+import { Clock, Users, DollarSign, CreditCard } from 'lucide-react';
 import { RecurringSession } from '../types';
 import { format } from 'date-fns';
 import { useBookings } from '../hooks/useBookings';
@@ -25,20 +25,29 @@ export default function BookingModal({ session, isOpen, onClose }: BookingModalP
     name: ''
   });
 
-  // Generate next 4 available dates
+  // Generate next 4 available dates based on rotation
   const getAvailableDates = () => {
     const dates: Date[] = [];
-    session.recurringDays.forEach(day => {
-      for (let i = 0; i < 4; i++) {
-        const date = getNextDayOccurrence(day, 
-          parseInt(session.startTime.split(':')[0]), 
-          parseInt(session.startTime.split(':')[1])
-        );
-        date.setDate(date.getDate() + (i * 7));
-        dates.push(date);
-      }
-    });
-    return dates.sort((a, b) => a.getTime() - b.getTime());
+    const topicsOrder = [
+      'PCOS/Women\'s Health',
+      'Diabetes & Hypertension',
+      'Weight Loss',
+      'Stress Management'
+    ];
+
+    const topicIndex = topicsOrder.indexOf(session.specializedTopic || '');
+    if (topicIndex === -1) return dates;
+
+    const firstSunday = getNextDayOccurrence(0, 9, 30); // Next Sunday at 9:30 AM
+
+    for (let i = 0; i < 4; i++) {
+      const weeksToAdd = topicIndex + (i * 4);
+      const date = new Date(firstSunday);
+      date.setDate(firstSunday.getDate() + (weeksToAdd * 7));
+      dates.push(date);
+    }
+
+    return dates;
   };
 
   const availableDates = getAvailableDates();

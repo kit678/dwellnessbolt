@@ -5,9 +5,7 @@ dotenv.config();
 
 const TEST_USER = {
   email: 'test@example.com',
-  password: 'testpass123',
-  name: 'Test User',
-  role: 'user'
+  password: 'testpass123'
 };
 
 async function getAccessToken() {

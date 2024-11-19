@@ -26,6 +26,7 @@ export interface RecurringSession {
   endTime: string; // HH:mm format
   specializedTopic?: SpecializedTopic;
   nextOccurrence?: string; // ISO date string
+  rotationIndex?: number; // New property for rotation logic
 }
 
 export interface Booking {

@@ -1,7 +1,6 @@
 import { 
   collection, 
   getDocs, 
-  deleteDoc, 
   writeBatch,
   doc 
 } from 'firebase/firestore';
@@ -37,34 +36,6 @@ const offerings = [
     endTime: getNextDayOccurrence(1, 20, 0).toISOString(), // Monday 8:00 PM
     instructor: 'Dwellness',
     image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&q=80',
-    recurringDays: [1, 3]
-  },
-  // Specialized Workshops
-  {
-    title: 'Specialized Workshop',
-    type: 'specialized',
-    description: 'Expert-led workshops focusing on various health topics.',
-    price: 20,
-    capacity: 15,
-    enrolled: 0,
-    startTime: getNextDayOccurrence(0, 9, 30).toISOString(), // Sunday 9:30 AM
-    endTime: getNextDayOccurrence(0, 11, 0).toISOString(), // Sunday 11:00 AM
-    instructor: 'Dwellness',
-    image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80',
-    recurringDays: [0]
-  },
-  // Meditation Sessions
-  {
-    title: 'Meditation & Breathwork',
-    type: 'meditation',
-    description: 'Guided meditation and breathwork session for inner peace and relaxation.',
-    price: 10,
-    capacity: 25,
-    enrolled: 0,
-    startTime: getNextDayOccurrence(1, 20, 0).toISOString(), // Monday 8:00 PM
-    endTime: getNextDayOccurrence(1, 21, 0).toISOString(), // Monday 9:00 PM
-    instructor: 'Dwellness',
-    image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&q=80',
     recurringDays: [1, 3]
   }
 ];

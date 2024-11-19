@@ -1,5 +1,5 @@
-import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider } from 'firebase/auth';
+import { initializeApp, getApps } from 'firebase/app';
+import { getAuth, setPersistence, browserSessionPersistence, GoogleAuthProvider } from 'firebase/auth';
 import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from 'firebase/firestore';
 
 const firebaseConfig = {
@@ -11,22 +11,30 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+// Initialize Firebase only if no apps are already initialized
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
+console.log('Firebase initialized with config:', firebaseConfig);
 
 // Initialize Firestore with REST configuration
 const db = initializeFirestore(app, {
-  // Force REST API usage
   experimentalForceLongPolling: true,
-  useFetchStreams: false,
-  // Cache configuration
   localCache: persistentLocalCache({
     tabManager: persistentMultipleTabManager()
   })
 });
+console.log('Firestore initialized with persistent local cache');
 
 // Initialize Auth
 const auth = getAuth(app);
+
+// Set auth persistence to browserSessionPersistence
+setPersistence(auth, browserSessionPersistence)
+  .then(() => {
+    console.log('Firebase Auth persistence set to browserSessionPersistence');
+  })
+  .catch((error) => {
+    console.error('Error setting auth persistence:', error);
+  });
 
 // Configure Google Provider
 const googleProvider = new GoogleAuthProvider();

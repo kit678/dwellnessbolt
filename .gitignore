@@ -22,6 +22,7 @@ dist
 # Firebase
 serviceAccount.json
 src/scripts/serviceAccount.json
+config/dwellness-93630-firebase-adminsdk-44foe-90bd8101c9.json
 
 npm-debug.log*
 yarn-debug.log*

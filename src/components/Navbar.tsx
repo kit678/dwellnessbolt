@@ -2,14 +2,12 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { Menu, X, User as UserIcon, LogOut, Calendar } from 'lucide-react';
-import { useTestAuth } from '../hooks/useTestAuth';
 
 export default function Navbar() {
   const { user, logout } = useAuthStore();
   const [isOpen, setIsOpen] = React.useState(false);
   
-  // This will automatically sign in the test user in development
-  useTestAuth();
+  console.log('Navbar rendering. User:', user);
 
   return (
     <nav className="bg-white shadow-lg fixed w-full z-50">

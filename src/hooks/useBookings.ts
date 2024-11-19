@@ -87,10 +87,18 @@ export function useBookings() {
     }
   };
 
+  const getNextSpecializedTopic = (currentDate: Date): string => {
+    const topics = ['Stress Management', 'Diabetes & Hypertension', 'Weight Loss', 'PCOS/Women\'s Health'];
+    const startDate = new Date('2023-01-01'); // Example start date
+    const weeksSinceStart = Math.floor((currentDate.getTime() - startDate.getTime()) / (7 * 24 * 60 * 60 * 1000));
+    return topics[weeksSinceStart % topics.length];
+  };
+
   return {
     loading,
     bookSession,
     getUserBookings,
-    cancelBooking
+    cancelBooking,
+    getNextSpecializedTopic
   };
 }

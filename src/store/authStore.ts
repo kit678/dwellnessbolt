@@ -12,5 +12,8 @@ export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   isAuthenticated: false,
   setUser: (user) => set({ user, isAuthenticated: !!user }),
-  logout: () => set({ user: null, isAuthenticated: false }),
+  logout: () => {
+    console.log('Logging out user from auth store');
+    set({ user: null, isAuthenticated: false });
+  },
 }));

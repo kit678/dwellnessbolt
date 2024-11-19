@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { m } from 'framer-motion';
 import { Calendar, Clock, DollarSign, User } from 'lucide-react';
 import { format } from 'date-fns';
@@ -10,24 +10,55 @@ export default function Dashboard() {
   const { user } = useAuthStore();
   const { getUserBookings, loading } = useBookings();
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    console.log('Dashboard mounted. User:', user);
     const fetchBookings = async () => {
       if (user) {
-        const userBookings = await getUserBookings();
-        setBookings(userBookings);
+        console.log('Fetching bookings for user:', user);
+        try {
+          const userBookings = await getUserBookings();
+          console.log('Fetched bookings:', userBookings);
+          setBookings(userBookings);
+        } catch (err) {
+          console.error('Failed to fetch bookings:', err);
+          setError('Failed to load bookings. Please try again later.');
+        }
+      } else {
+        console.log('No user is logged in.');
       }
     };
     fetchBookings();
-  }, [user]);
+  }, [user, getUserBookings]);
 
   if (loading) {
+    console.log('Loading bookings...');
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600" />
       </div>
     );
   }
+
+  if (error) {
+    console.log('Error loading bookings:', error);
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-red-600">{error}</p>
+      </div>
+    );
+  }
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return isNaN(date.getTime()) ? 'Invalid date' : format(date, 'MMMM d, yyyy');
+  };
+
+  const formatTime = (timeString: string) => {
+    const time = new Date(timeString);
+    return isNaN(time.getTime()) ? 'Invalid time' : format(time, 'h:mm a');
+  };
 
   return (
     <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
@@ -79,14 +110,14 @@ export default function Dashboard() {
                 <div className="flex items-center text-gray-600">
                   <Calendar className="h-5 w-5 mr-2" />
                   <span>
-                    {format(new Date(booking.session.startTime), 'MMMM d, yyyy')}
+                    {formatDate(booking.scheduledDate)}
                   </span>
                 </div>
                 <div className="flex items-center text-gray-600">
                   <Clock className="h-5 w-5 mr-2" />
                   <span>
-                    {format(new Date(booking.session.startTime), 'h:mm a')} -{' '}
-                    {format(new Date(booking.session.endTime), 'h:mm a')}
+                    {formatTime(booking.session.startTime)} -{' '}
+                    {formatTime(booking.session.endTime)}
                   </span>
                 </div>
                 <div className="flex items-center text-gray-600">

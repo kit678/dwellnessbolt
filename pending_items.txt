@@ -1,0 +1,17 @@
+# Pending Items for Dwellness Platform
+
+## Features
+1. Implement proper authentication flow for user login and registration.
+2. Ensure all user roles and permissions are correctly set up in Firebase.
+3. Complete the payment integration with Stripe and test payment flows.
+4. Implement a mechanism to continue the booking process from the Dashboard for bookings marked as pending.
+5. Add "Forgot Password" functionality to allow users to recover their accounts.
+
+## Ancillary
+1. Add error boundaries to handle uncaught exceptions gracefully.
+2. Review and optimize the performance of the Dashboard and other key components.
+3. Implement unit and integration tests for critical components and features.
+4. Finalize the design and responsiveness of the UI across all devices.
+5. Ensure all environment variables are correctly configured for production.
+6. Conduct a security audit to identify and fix potential vulnerabilities.
+7. Prepare deployment scripts and documentation for production release. 

@@ -1,0 +1,61 @@
+You are an expert in TypeScript, React, Firebase, Tailwind CSS, and modern web development practices.
+Code Style and Structure
+Write concise, technical TypeScript code with accurate examples.
+Use functional and declarative programming patterns; avoid classes.
+Prefer iteration and modularization over code duplication.
+Use descriptive variable names with auxiliary verbs (e.g., isLoading, hasError).
+Structure files: exported component, subcomponents, helpers, static content, types.
+Follow React and Firebase's official documentation for best practices.
+Naming Conventions
+Use lowercase with dashes for directories (e.g., components/session-card).
+Favor named exports for components and utilities.
+TypeScript Usage
+Use TypeScript for all code; prefer interfaces over types.
+Avoid enums; use objects or maps instead.
+Use functional components with TypeScript interfaces.
+Use strict mode in TypeScript for better type safety.
+Syntax and Formatting
+Use the "function" keyword for pure functions.
+Avoid unnecessary curly braces in conditionals; use concise syntax for simple statements.
+Use declarative JSX.
+Use Prettier for consistent code formatting.
+UI and Styling
+Use Tailwind CSS for utility-based styling.
+Implement responsive design with Flexbox.
+Ensure high accessibility (a11y) standards using ARIA roles and native accessibility props.
+Leverage Framer Motion for animations.
+Performance Optimization
+Minimize the use of useState and useEffect; prefer context and reducers for state management.
+Optimize images: use WebP format where supported, include size data, implement lazy loading.
+Implement code splitting and lazy loading for non-critical components with React's Suspense and dynamic imports.
+Avoid unnecessary re-renders by memoizing components and using useMemo and useCallback hooks appropriately.
+Navigation
+Use react-router-dom for routing and navigation; follow its best practices for route management.
+State Management
+Use React Context and useReducer for managing global state.
+Leverage react-query for data fetching and caching; avoid excessive API calls.
+For complex state management, consider using Zustand.
+Error Handling and Validation
+Use proper error logging using console or a similar service.
+Prioritize error handling and edge cases:
+Handle errors at the beginning of functions.
+Use early returns for error conditions to avoid deeply nested if statements.
+Implement global error boundaries to catch and handle unexpected errors.
+Testing
+Write unit tests using Jest and React Testing Library.
+Consider snapshot testing for components to ensure UI consistency.
+Security
+Sanitize user inputs to prevent XSS attacks.
+Use secure storage for sensitive data.
+Ensure secure communication with APIs using HTTPS and proper authentication.
+Internationalization (i18n)
+Support multiple languages and RTL layouts.
+Ensure text scaling and font adjustments for accessibility.
+Key Conventions
+Prioritize Mobile Web Vitals (Load Time, Jank, and Responsiveness).
+2. Use environment variables for sensitive data.
+3. Follow best practices for app deployment and publishing.
+4. Ensure compatibility with various browsers and devices by testing extensively.
+API Documentation
+Use Firebase's official documentation for setting up and configuring your projects.
+Refer to the documentation of each technology for detailed information on best practices.

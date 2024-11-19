@@ -3,18 +3,28 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
   signInWithRedirect,
-  getRedirectResult,
-  signOut,
   onAuthStateChanged,
   createUserWithEmailAndPassword,
+  signOut,
   browserPopupRedirectResolver
 } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
-import { auth, db } from '../lib/firebase';
+import { auth, db, googleProvider } from '../lib/firebase';
 import { useAuthStore } from '../store/authStore';
 import { User } from '../types';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
+
+function clearCookies() {
+  const cookies = document.cookie.split(";");
+
+  for (let i = 0; i < cookies.length; i++) {
+    const cookie = cookies[i];
+    const eqPos = cookie.indexOf("=");
+    const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+    document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+  }
+}
 
 export function useAuth() {
   const [loading, setLoading] = useState(false);
@@ -22,33 +32,18 @@ export function useAuth() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const checkRedirectResult = async () => {
-      try {
-        const result = await getRedirectResult(auth);
-        if (result) {
-          const user = result.user;
-          await createUserDocument(user);
-          toast.success('Signed in with Google successfully!');
-          navigate('/dashboard');
-        }
-      } catch (error: any) {
-        console.error('Redirect result error:', error);
-        handleAuthError(error);
-      }
-    };
-
-    checkRedirectResult();
-  }, [navigate]);
-
-  useEffect(() => {
+    console.log('Setting up onAuthStateChanged listener');
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
+        console.log('Auth state changed: User is signed in:', firebaseUser.uid);
         try {
           const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
           if (userDoc.exists()) {
             const userData = userDoc.data() as Omit<User, 'id'>;
             setUser({ id: firebaseUser.uid, ...userData });
+            console.log('User document found. User set in auth store:', userData);
           } else {
+            console.log('User document does not exist. Creating user document.');
             await createUserDocument(firebaseUser);
           }
         } catch (error: any) {
@@ -56,11 +51,15 @@ export function useAuth() {
           toast.error('Error loading user data');
         }
       } else {
+        console.log('Auth state changed: No user is signed in.');
         setUser(null);
       }
     });
 
-    return () => unsubscribe();
+    return () => {
+      console.log('Cleaning up onAuthStateChanged listener');
+      unsubscribe();
+    };
   }, [setUser]);
 
   const handleAuthError = (error: any) => {
@@ -106,6 +105,7 @@ export function useAuth() {
       };
       await setDoc(doc(db, 'users', user.uid), userData);
       setUser({ id: user.uid, ...userData });
+      console.log('User document created and user set in auth store:', userData);
     } catch (error) {
       console.error('Error creating user document:', error);
       toast.error('Failed to create user profile');
@@ -115,18 +115,22 @@ export function useAuth() {
   const signInWithGoogle = async () => {
     setLoading(true);
     try {
+      console.log('Initiating Google sign-in...');
       if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        console.log('Detected mobile device. Using Google sign-in with redirect.');
         await signInWithRedirect(auth, googleProvider);
         return;
       }
 
       const result = await signInWithPopup(auth, googleProvider, browserPopupRedirectResolver);
+      console.log('Google sign-in successful:', result.user.uid);
       await createUserDocument(result.user);
       toast.success('Signed in successfully!');
       navigate('/dashboard');
     } catch (error: any) {
       if (error.code === 'auth/popup-blocked') {
         toast.loading('Redirecting to Google Sign-in...');
+        console.log('Popup blocked. Redirecting to Google sign-in.');
         await signInWithRedirect(auth, googleProvider);
       } else {
         handleAuthError(error);
@@ -139,7 +143,9 @@ export function useAuth() {
   const login = async (email: string, password: string) => {
     setLoading(true);
     try {
+      console.log('Attempting to log in with email:', email);
       await signInWithEmailAndPassword(auth, email, password);
+      console.log('Logged in successfully with email:', email);
       toast.success('Logged in successfully!');
       navigate('/dashboard');
     } catch (error: any) {
@@ -152,8 +158,10 @@ export function useAuth() {
   const signup = async (email: string, password: string, name: string) => {
     setLoading(true);
     try {
+      console.log('Creating account for email:', email);
       const { user: firebaseUser } = await createUserWithEmailAndPassword(auth, email, password);
       await createUserDocument({ ...firebaseUser, displayName: name });
+      console.log('Account created successfully for:', email);
       toast.success('Account created successfully!');
       navigate('/dashboard');
     } catch (error: any) {
@@ -165,10 +173,15 @@ export function useAuth() {
 
   const logout = async () => {
     try {
+      console.log('Initiating logout...');
       await signOut(auth);
       setUser(null);
+      localStorage.clear();
+      sessionStorage.clear();
+      clearCookies();
       toast.success('Logged out successfully');
       navigate('/');
+      console.log('User signed out successfully');
     } catch (error: any) {
       handleAuthError(error);
     }
