@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Dialog } from '@headlessui/react';
 import { m } from 'framer-motion';
 import { Clock, Users, DollarSign, CreditCard } from 'lucide-react';
-import { RecurringSession } from '../types';
+import { RecurringSession } from '../types/index';
 import { format } from 'date-fns';
 import { useBookings } from '../hooks/useBookings';
 import { getNextDayOccurrence } from '../utils/dateUtils';

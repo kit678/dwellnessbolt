@@ -14,19 +14,14 @@ export type SpecializedTopic =
 export interface RecurringSession {
   id: string;
   title: string;
-  type: 'general' | 'specialized' | 'meditation';
   description: string;
-  price: number;
+  startTime: string;
+  endTime: string;
   capacity: number;
   enrolled: number;
-  instructor: string;
-  image: string;
-  recurringDays: number[]; // 0 = Sunday, 1 = Monday, etc.
-  startTime: string; // HH:mm format
-  endTime: string; // HH:mm format
-  specializedTopic?: SpecializedTopic;
-  nextOccurrence?: string; // ISO date string
-  rotationIndex?: number; // New property for rotation logic
+  price: number;
+  specializedTopic?: string;
+  // Add other properties as needed
 }
 
 export interface Booking {

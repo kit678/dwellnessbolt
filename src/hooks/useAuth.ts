@@ -11,7 +11,7 @@ import {
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { auth, db, googleProvider } from '../lib/firebase';
 import { useAuthStore } from '../store/authStore';
-import { User } from '../types';
+import { User } from '../types/index';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 
