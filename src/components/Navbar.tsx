@@ -1,12 +1,17 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { Menu, X, User as UserIcon, LogOut, Calendar } from 'lucide-react';
+import { useAuth } from '../hooks/useAuth';
 
 export default function Navbar() {
-  const { user, logout } = useAuthStore();
+  const { logout } = useAuth();
+  const { user } = useAuthStore();
   const [isOpen, setIsOpen] = React.useState(false);
-  
+  const location = useLocation();
+
+  const isActive = (path: string) => location.pathname === path ? 'text-indigo-600' : 'text-gray-700';
+
   console.log('Navbar rendering. User:', user);
 
   return (
@@ -22,16 +27,16 @@ export default function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden sm:flex sm:items-center sm:space-x-8">
-            <Link to="/sessions" className="text-gray-700 hover:text-indigo-600">
+            <Link to="/sessions" className={`${isActive('/sessions')} hover:text-indigo-600`}>
               Sessions
             </Link>
             {user ? (
               <>
-                <Link to="/dashboard" className="text-gray-700 hover:text-indigo-600">
+                <Link to="/dashboard" className={`${isActive('/dashboard')} hover:text-indigo-600`}>
                   Dashboard
                 </Link>
                 {user.role === 'admin' && (
-                  <Link to="/admin" className="text-gray-700 hover:text-indigo-600">
+                  <Link to="/admin" className={`${isActive('/admin')} hover:text-indigo-600`}>
                     Admin
                   </Link>
                 )}
@@ -72,7 +77,7 @@ export default function Navbar() {
           <div className="pt-2 pb-3 space-y-1">
             <Link
               to="/sessions"
-              className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-indigo-600"
+              className={`block px-3 py-2 text-base font-medium ${isActive('/sessions')} hover:text-indigo-600`}
             >
               Sessions
             </Link>
@@ -80,14 +85,14 @@ export default function Navbar() {
               <>
                 <Link
                   to="/dashboard"
-                  className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-indigo-600"
+                  className={`block px-3 py-2 text-base font-medium ${isActive('/dashboard')} hover:text-indigo-600`}
                 >
                   Dashboard
                 </Link>
                 {user.role === 'admin' && (
                   <Link
                     to="/admin"
-                    className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-indigo-600"
+                    className={`block px-3 py-2 text-base font-medium ${isActive('/admin')} hover:text-indigo-600`}
                   >
                     Admin
                   </Link>

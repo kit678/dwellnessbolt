@@ -1,19 +1,17 @@
 import { useState, useEffect } from 'react';
 import { 
   signInWithEmailAndPassword,
-  signInWithPopup,
-  signInWithRedirect,
   onAuthStateChanged,
   createUserWithEmailAndPassword,
   signOut,
-  browserPopupRedirectResolver
+  signInWithPopup,
+  signInWithRedirect,
 } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { auth, db, googleProvider } from '../lib/firebase';
 import { useAuthStore } from '../store/authStore';
 import { User } from '../types/index';
 import toast from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
 
 function clearCookies() {
   const cookies = document.cookie.split(";");
@@ -26,33 +24,67 @@ function clearCookies() {
   }
 }
 
+function handleAuthError(error: any) {
+  console.error('Auth error:', error);
+  switch (error.code) {
+    case 'auth/popup-blocked':
+      toast.error('Popup was blocked. Please allow popups or try using redirect.');
+      break;
+    case 'auth/unauthorized-domain':
+      toast.error('This domain is not authorized for authentication.');
+      break;
+    case 'auth/operation-not-allowed':
+      toast.error('This authentication method is not enabled.');
+      break;
+    case 'auth/email-already-in-use':
+      toast.error('An account with this email already exists.');
+      break;
+    case 'auth/invalid-email':
+      toast.error('Invalid email address.');
+      break;
+    case 'auth/weak-password':
+      toast.error('Password should be at least 6 characters.');
+      break;
+    case 'auth/user-disabled':
+      toast.error('This account has been disabled.');
+      break;
+    case 'auth/user-not-found':
+    case 'auth/wrong-password':
+      toast.error('Invalid email or password.');
+      break;
+    default:
+      toast.error('Authentication failed. Please try again.');
+  }
+}
+
 export function useAuth() {
   const [loading, setLoading] = useState(false);
-  const { setUser } = useAuthStore();
-  const navigate = useNavigate();
+  const [user, setUser] = useState<User | null>(null);
+  const { setUser: setAuthUser } = useAuthStore();
 
   useEffect(() => {
     console.log('Setting up onAuthStateChanged listener');
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
-        console.log('Auth state changed: User is signed in:', firebaseUser.uid);
         try {
           const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
           if (userDoc.exists()) {
             const userData = userDoc.data() as Omit<User, 'id'>;
-            setUser({ id: firebaseUser.uid, ...userData });
+            const completeUser = { id: firebaseUser.uid, ...userData };
+            setUser(completeUser);
+            setAuthUser(completeUser);
             console.log('User document found. User set in auth store:', userData);
           } else {
             console.log('User document does not exist. Creating user document.');
             await createUserDocument(firebaseUser);
           }
-        } catch (error: any) {
-          console.error('Error fetching user data:', error);
+        } catch (error) {
+          console.error('Error fetching user document:', error);
           toast.error('Error loading user data');
         }
       } else {
-        console.log('Auth state changed: No user is signed in.');
         setUser(null);
+        setAuthUser(null);
       }
     });
 
@@ -60,48 +92,17 @@ export function useAuth() {
       console.log('Cleaning up onAuthStateChanged listener');
       unsubscribe();
     };
-  }, [setUser]);
-
-  const handleAuthError = (error: any) => {
-    console.error('Auth error:', error);
-    switch (error.code) {
-      case 'auth/popup-blocked':
-        toast.error('Popup was blocked. Please allow popups or try using redirect.');
-        break;
-      case 'auth/unauthorized-domain':
-        toast.error('This domain is not authorized for authentication.');
-        break;
-      case 'auth/operation-not-allowed':
-        toast.error('This authentication method is not enabled.');
-        break;
-      case 'auth/email-already-in-use':
-        toast.error('An account with this email already exists.');
-        navigate('/login');
-        break;
-      case 'auth/invalid-email':
-        toast.error('Invalid email address.');
-        break;
-      case 'auth/weak-password':
-        toast.error('Password should be at least 6 characters.');
-        break;
-      case 'auth/user-disabled':
-        toast.error('This account has been disabled.');
-        break;
-      case 'auth/user-not-found':
-      case 'auth/wrong-password':
-        toast.error('Invalid email or password.');
-        break;
-      default:
-        toast.error('Authentication failed. Please try again.');
-    }
-  };
+  }, [setAuthUser]);
 
   const createUserDocument = async (user: any) => {
     try {
       const userData: Omit<User, 'id'> = {
         email: user.email!,
         name: user.displayName || user.email?.split('@')[0] || 'User',
-        role: 'user'
+        role: 'user',
+        uid: user.uid,
+        displayName: user.displayName || '',
+        quizCompleted: false
       };
       await setDoc(doc(db, 'users', user.uid), userData);
       setUser({ id: user.uid, ...userData });
@@ -122,19 +123,19 @@ export function useAuth() {
         return;
       }
 
-      const result = await signInWithPopup(auth, googleProvider, browserPopupRedirectResolver);
+      const result = await signInWithPopup(auth, googleProvider);
       console.log('Google sign-in successful:', result.user.uid);
       await createUserDocument(result.user);
       toast.success('Signed in successfully!');
-      navigate('/dashboard');
     } catch (error: any) {
       if (error.code === 'auth/popup-blocked') {
         toast.loading('Redirecting to Google Sign-in...');
         console.log('Popup blocked. Redirecting to Google sign-in.');
         await signInWithRedirect(auth, googleProvider);
-      } else {
+      } else if (error.code !== 'auth/popup-closed-by-user') {
         handleAuthError(error);
       }
+      // Note: 'auth/popup-closed-by-user' is ignored as it's a user-initiated event
     } finally {
       setLoading(false);
     }
@@ -147,9 +148,9 @@ export function useAuth() {
       await signInWithEmailAndPassword(auth, email, password);
       console.log('Logged in successfully with email:', email);
       toast.success('Logged in successfully!');
-      navigate('/dashboard');
     } catch (error: any) {
       handleAuthError(error);
+      throw error; // Re-throw to let the component handle navigation
     } finally {
       setLoading(false);
     }
@@ -163,9 +164,9 @@ export function useAuth() {
       await createUserDocument({ ...firebaseUser, displayName: name });
       console.log('Account created successfully for:', email);
       toast.success('Account created successfully!');
-      navigate('/dashboard');
     } catch (error: any) {
       handleAuthError(error);
+      throw error; // Re-throw to let the component handle navigation
     } finally {
       setLoading(false);
     }
@@ -176,22 +177,33 @@ export function useAuth() {
       console.log('Initiating logout...');
       await signOut(auth);
       setUser(null);
+      setAuthUser(null);
       localStorage.clear();
       sessionStorage.clear();
       clearCookies();
       toast.success('Logged out successfully');
-      navigate('/');
       console.log('User signed out successfully');
     } catch (error: any) {
       handleAuthError(error);
     }
   };
 
+  const updateQuizCompletion = async (userId: string) => {
+    try {
+      await setDoc(doc(db, 'users', userId), { quizCompleted: true }, { merge: true });
+      console.log('Quiz completion status updated.');
+    } catch (error) {
+      console.error('Error updating quiz completion status:', error);
+    }
+  };
+
   return {
     loading,
+    user,
     signup,
     login,
     signInWithGoogle,
-    logout
+    logout,
+    updateQuizCompletion
   };
 }

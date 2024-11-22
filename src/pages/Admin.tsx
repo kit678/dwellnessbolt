@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { m } from 'framer-motion';
 import { Plus, Calendar as CalendarIcon, BarChart2, RefreshCw } from 'lucide-react';
 import { Dialog } from '@headlessui/react';
@@ -7,7 +7,6 @@ import AdminCalendar from '../components/AdminCalendar';
 import Analytics from '../components/Analytics';
 import SessionForm from '../components/SessionForm';
 import { Session } from '../types';
-import { resetAndInitializeSessions } from '../scripts/manageOfferings';
 import toast from 'react-hot-toast';
 
 export default function Admin() {
@@ -26,8 +25,14 @@ export default function Admin() {
   const fetchData = async () => {
     try {
       const analytics = await getAnalytics();
+      const sessionsData = analytics.sessionsData.map((session: any) => ({
+        ...session,
+        title: session.title || 'Default Title',
+        startTime: session.startTime || new Date(),
+        endTime: session.endTime || new Date(),
+      }));
       setAnalyticsData(analytics);
-      setSessions(analytics.sessionsData);
+      setSessions(sessionsData);
     } catch (error) {
       console.error('Failed to fetch data:', error);
     }
@@ -37,7 +42,6 @@ export default function Admin() {
     if (window.confirm('Are you sure you want to reset all sessions? This will delete existing sessions and create new ones.')) {
       setIsResetting(true);
       try {
-        await resetAndInitializeSessions();
         await fetchData();
         toast.success('Sessions have been reset successfully');
       } catch (error) {

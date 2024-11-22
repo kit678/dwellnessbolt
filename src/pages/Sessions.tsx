@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { m } from 'framer-motion';
 import SessionCard from '../components/SessionCard';
 import BookingModal from '../components/BookingModal';
-import { RecurringSession } from '../types';
+import { RecurringSession } from '../types/index';
 import { useSessions } from '../hooks/useSessions';
 import { useAuthStore } from '../store/authStore';
 

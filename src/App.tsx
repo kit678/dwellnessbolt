@@ -5,6 +5,7 @@ import { Toaster } from 'react-hot-toast';
 import Navbar from './components/Navbar';
 import { useAuthStore } from './store/authStore';
 import Home from './pages/Home';
+import ComponentPlayground from './pages/ComponentPlayground';
 
 // Lazy load pages with explicit file extensions
 const Sessions = lazy(() => import('./pages/Sessions.tsx'));
@@ -63,6 +64,7 @@ function App() {
                     </AdminRoute>
                   }
                 />
+                <Route path="/playground" element={<ComponentPlayground />} />
               </Routes>
             </Suspense>
           </main>

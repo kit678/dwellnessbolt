@@ -1,7 +1,8 @@
 import { initializeApp, getApps } from 'firebase/app';
-import { getAuth, setPersistence, browserSessionPersistence, GoogleAuthProvider } from 'firebase/auth';
-import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from 'firebase/firestore';
+import { getAuth, GoogleAuthProvider } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
 
+// Use Vite's environment variables
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
@@ -15,28 +16,13 @@ const firebaseConfig = {
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
 console.log('Firebase initialized with config:', firebaseConfig);
 
-// Initialize Firestore with REST configuration
-const db = initializeFirestore(app, {
-  experimentalForceLongPolling: true,
-  localCache: persistentLocalCache({
-    tabManager: persistentMultipleTabManager()
-  })
-});
-console.log('Firestore initialized with persistent local cache');
-
-// Initialize Auth
+// Initialize Firebase Authentication
 const auth = getAuth(app);
 
-// Set auth persistence to browserSessionPersistence
-setPersistence(auth, browserSessionPersistence)
-  .then(() => {
-    console.log('Firebase Auth persistence set to browserSessionPersistence');
-  })
-  .catch((error) => {
-    console.error('Error setting auth persistence:', error);
-  });
+// Initialize Firestore
+const db = getFirestore(app);
 
-// Configure Google Provider
+// Configure Google Auth Provider
 const googleProvider = new GoogleAuthProvider();
 googleProvider.addScope('https://www.googleapis.com/auth/userinfo.email');
 googleProvider.addScope('https://www.googleapis.com/auth/userinfo.profile');

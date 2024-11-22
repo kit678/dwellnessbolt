@@ -2,20 +2,22 @@ import { useEffect, useState } from 'react';
 import { m } from 'framer-motion';
 import { Calendar, Clock, DollarSign, User } from 'lucide-react';
 import { format } from 'date-fns';
-import { Booking } from '../types';
+import { Booking } from '../types/index';
 import { useAuthStore } from '../store/authStore';
 import { useBookings } from '../hooks/useBookings';
+import OnboardingQuiz from '../components/OnboardingQuiz';
 
 export default function Dashboard() {
   const { user } = useAuthStore();
   const { getUserBookings, loading } = useBookings();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [quizOpen, setQuizOpen] = useState(false);
 
   useEffect(() => {
     console.log('Dashboard mounted. User:', user);
     const fetchBookings = async () => {
-      if (user) {
+      if (user && user.id) {
         console.log('Fetching bookings for user:', user);
         try {
           const userBookings = await getUserBookings();
@@ -26,7 +28,7 @@ export default function Dashboard() {
           setError('Failed to load bookings. Please try again later.');
         }
       } else {
-        console.log('No user is logged in.');
+        console.log('No user is logged in or user ID is undefined.');
       }
     };
     fetchBookings();
@@ -74,6 +76,16 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      {/* Quiz Prompt */}
+      {user && !user.quizCompleted && (
+        <div className="bg-yellow-100 rounded-lg shadow-md p-6 mb-8 text-center">
+          <p className="text-yellow-800">You haven't completed your onboarding quiz yet. Please complete it to get personalized recommendations.</p>
+          <button onClick={() => setQuizOpen(true)} className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md">
+            Complete Quiz
+          </button>
+        </div>
+      )}
 
       <h2 className="text-2xl font-bold text-gray-900 mb-6">My Bookings</h2>
       
@@ -129,6 +141,7 @@ export default function Dashboard() {
           ))
         )}
       </div>
+      <OnboardingQuiz isOpen={quizOpen} onClose={() => setQuizOpen(false)} onComplete={() => setQuizOpen(false)} />
     </div>
   );
 }
