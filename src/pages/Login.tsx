@@ -5,7 +5,7 @@ import { Lock, Mail, LogIn } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import toast from 'react-hot-toast';
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
-import { auth, googleProvider } from '../lib/firebase';
+import { auth } from '../lib/firebase'; // Ensure this is correctly imported
 
 export default function Login() {
   const { login, loading } = useAuth();
@@ -20,7 +20,7 @@ export default function Login() {
       signInFlow: 'popup', // Use popup to avoid redirect issues
       signInOptions: [
         {
-          provider: googleProvider.providerId,
+          provider: 'google.com', // Ensure this is the correct provider ID
           customParameters: {
             prompt: 'select_account',
           },
