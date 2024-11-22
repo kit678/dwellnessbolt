@@ -14,11 +14,11 @@ export default function Dashboard() {
   const [hasFetched, setHasFetched] = useState<boolean>(false);
 
   useEffect(() => {
-    console.log('Dashboard mounted. User:', user);
-    const fetchBookings = async () => {
-      if (user && !hasFetched) {
-        console.log('Fetching bookings for user:', user);
+    if (!hasFetched && user) {
+      console.log('Dashboard mounted. User:', user);
+      const fetchBookings = async () => {
         try {
+          console.log('Fetching bookings for user:', user);
           const userBookings = await getUserBookings();
           console.log('Fetched bookings:', userBookings);
           setBookings(userBookings);
@@ -27,9 +27,9 @@ export default function Dashboard() {
           console.error('Failed to fetch bookings:', err);
           setError('Failed to load bookings. Please try again later.');
         }
-      }
-    };
-    fetchBookings();
+      };
+      fetchBookings();
+    }
   }, [user, hasFetched, getUserBookings]);
 
   if (loading) {
