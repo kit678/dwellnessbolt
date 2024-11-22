@@ -169,7 +169,8 @@ export function useAuth() {
       clearCookies();
       localStorage.clear();
       sessionStorage.clear();
-      window.location.href = '/';
+      setUser(null); // Ensure user state is reset
+      window.location.href = '/'; // Redirect to home after logout
     } catch (error: any) {
       handleAuthError(error);
     } finally {
