@@ -16,14 +16,12 @@ export default function Login() {
 
   useEffect(() => {
     // Configure FirebaseUI.
-    setUiConfig({
+    const config = {
       signInFlow: 'redirect',
       signInOptions: [
         {
           provider: googleProvider.providerId,
           customParameters: {
-            // Forces account selection even when one account
-            // is available.
             prompt: 'select_account',
           },
         },
@@ -34,7 +32,13 @@ export default function Login() {
           return false; // Avoid redirects after sign-in.
         },
       },
-    });
+    };
+    setUiConfig(config);
+
+    // Cleanup function to ensure the component is not unmounted prematurely
+    return () => {
+      setUiConfig(null);
+    };
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
