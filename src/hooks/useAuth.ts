@@ -30,7 +30,7 @@ function clearCookies() {
 
 export function useAuth() {
   const [loading, setLoading] = useState(false);
-  const { setUser } = useAuthStore();
+  const { setUser, logout: storeLogout } = useAuthStore();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -169,7 +169,7 @@ export function useAuth() {
       clearCookies();
       localStorage.clear();
       sessionStorage.clear();
-      setUser(null); // Ensure user state is reset
+      storeLogout(); // Use the logout method from authStore
       window.location.href = '/'; // Redirect to home after logout
     } catch (error: any) {
       handleAuthError(error);
