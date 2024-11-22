@@ -34,34 +34,26 @@ export function useAuth() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log('Setting up onAuthStateChanged listener');
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
-        console.log('Auth state changed: User is signed in:', firebaseUser.uid);
         try {
           const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
           if (userDoc.exists()) {
             const userData = userDoc.data() as Omit<User, 'id'>;
             setUser({ id: firebaseUser.uid, ...userData });
-            console.log('User document found. User set in auth store:', userData);
           } else {
-            console.log('User document does not exist. Creating user document.');
             await createUserDocument(firebaseUser);
           }
         } catch (error: any) {
           console.error('Error fetching user data:', error);
-          if (error.code !== 'permission-denied') {
-            toast.error('Error loading user data. Please try again.');
-          }
+          toast.error('Error loading user data. Please try again.');
         }
       } else {
-        console.log('Auth state changed: No user is signed in.');
         setUser(null);
       }
     });
 
     return () => {
-      console.log('Cleaning up onAuthStateChanged listener');
       unsubscribe();
     };
   }, [setUser]);
@@ -111,7 +103,6 @@ export function useAuth() {
         };
         await setDoc(doc(db, 'users', user.uid), userData);
         setUser({ id: user.uid, ...userData });
-        console.log('User document created and user set in auth store:', userData);
       }
     } catch (error) {
       console.error('Error creating user document:', error);
@@ -122,23 +113,19 @@ export function useAuth() {
   const signInWithGoogle = async () => {
     setLoading(true);
     try {
-      console.log('Initiating Google sign-in...');
       await setPersistence(auth, browserSessionPersistence);
       if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-        console.log('Detected mobile device. Using Google sign-in with redirect.');
         await signInWithRedirect(auth, googleProvider);
         return;
       }
 
       const result = await signInWithPopup(auth, googleProvider, browserPopupRedirectResolver);
-      console.log('Google sign-in successful:', result.user.uid);
       await createUserDocument(result.user);
       toast.success('Signed in successfully!');
       navigate('/dashboard');
     } catch (error: any) {
       if (error.code === 'auth/popup-blocked') {
         toast.loading('Redirecting to Google Sign-in...');
-        console.log('Popup blocked. Redirecting to Google sign-in.');
         await signInWithRedirect(auth, googleProvider);
       } else {
         handleAuthError(error);
@@ -151,9 +138,7 @@ export function useAuth() {
   const login = async (email: string, password: string) => {
     setLoading(true);
     try {
-      console.log('Attempting to log in with email:', email);
       await signInWithEmailAndPassword(auth, email, password);
-      console.log('Logged in successfully with email:', email);
       toast.success('Logged in successfully!');
       navigate('/dashboard');
     } catch (error: any) {
@@ -166,10 +151,8 @@ export function useAuth() {
   const signup = async (email: string, password: string, name: string) => {
     setLoading(true);
     try {
-      console.log('Creating account for email:', email);
       const { user: firebaseUser } = await createUserWithEmailAndPassword(auth, email, password);
       await createUserDocument({ ...firebaseUser, displayName: name });
-      console.log('Account created successfully for:', email);
       toast.success('Account created successfully!');
       navigate('/dashboard');
     } catch (error: any) {
@@ -182,14 +165,11 @@ export function useAuth() {
   const logout = async () => {
     setLoading(true);
     try {
-      console.log('Initiating logout...');
       await signOut(auth);
       clearCookies();
       localStorage.clear();
       sessionStorage.clear();
-      // Redirect to homepage and reload to reset state
       window.location.href = '/';
-      console.log('User signed out successfully.');
     } catch (error: any) {
       handleAuthError(error);
     } finally {
