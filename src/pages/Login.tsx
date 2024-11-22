@@ -1,40 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { m } from 'framer-motion';
 import { Lock, Mail, LogIn } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import toast from 'react-hot-toast';
-import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
-import { auth, googleProvider } from '../lib/firebase'; // Ensure this is correctly imported
 
 export default function Login() {
-  const { login, loading } = useAuth();
+  const { login, signInWithGoogle, loading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [formError, setFormError] = useState('');
-  const [uiConfig, setUiConfig] = useState<any>(null);
-
-  useEffect(() => {
-    // Configure FirebaseUI.
-    const config = {
-      signInFlow: 'popup', // Use popup to avoid redirect issues
-      signInOptions: [
-        googleProvider.providerId, // Use the providerId from googleProvider
-      ],
-      callbacks: {
-        signInSuccessWithAuthResult: () => {
-          toast.success('Signed in successfully!');
-          return false; // Avoid redirects after sign-in.
-        },
-      },
-    };
-    setUiConfig(config);
-
-    // Cleanup function to ensure the component is not unmounted prematurely
-    return () => {
-      setUiConfig(null);
-    };
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,8 +72,6 @@ export default function Login() {
           </div>
         )}
 
-        {uiConfig && <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={auth} />}
-
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-gray-300" />
@@ -107,6 +80,13 @@ export default function Login() {
             <span className="px-2 bg-gray-50 text-gray-500">Or continue with</span>
           </div>
         </div>
+
+        <button
+          onClick={signInWithGoogle}
+          className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        >
+          Sign in with Google
+        </button>
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm -space-y-px">
