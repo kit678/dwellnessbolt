@@ -102,14 +102,17 @@ export function useAuth() {
 
   const createUserDocument = async (user: any) => {
     try {
-      const userData: Omit<User, 'id'> = {
-        email: user.email!,
-        name: user.displayName || user.email?.split('@')[0] || 'User',
-        role: 'user'
-      };
-      await setDoc(doc(db, 'users', user.uid), userData);
-      setUser({ id: user.uid, ...userData });
-      console.log('User document created and user set in auth store:', userData);
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      if (!userDoc.exists()) {
+        const userData: Omit<User, 'id'> = {
+          email: user.email!,
+          name: user.displayName || user.email?.split('@')[0] || 'User',
+          role: 'user'
+        };
+        await setDoc(doc(db, 'users', user.uid), userData);
+        setUser({ id: user.uid, ...userData });
+        console.log('User document created and user set in auth store:', userData);
+      }
     } catch (error) {
       console.error('Error creating user document:', error);
       toast.error('Failed to create user profile.');
