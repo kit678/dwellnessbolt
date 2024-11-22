@@ -11,18 +11,18 @@ export default function Dashboard() {
   const { getUserBookings, loading } = useBookings();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [hasFetched, setHasFetched] = useState<boolean>(false); // Added state to track fetching
+  const [hasFetched, setHasFetched] = useState<boolean>(false);
 
   useEffect(() => {
     console.log('Dashboard mounted. User:', user);
     const fetchBookings = async () => {
-      if (user && !hasFetched) { // Check if bookings have not been fetched yet
+      if (user && !hasFetched) {
         console.log('Fetching bookings for user:', user);
         try {
           const userBookings = await getUserBookings();
           console.log('Fetched bookings:', userBookings);
           setBookings(userBookings);
-          setHasFetched(true); // Mark as fetched
+          setHasFetched(true);
         } catch (err) {
           console.error('Failed to fetch bookings:', err);
           setError('Failed to load bookings. Please try again later.');
@@ -30,7 +30,7 @@ export default function Dashboard() {
       }
     };
     fetchBookings();
-  }, [user, hasFetched, getUserBookings]); // Added hasFetched to dependencies
+  }, [user, hasFetched, getUserBookings]);
 
   if (loading) {
     console.log('Loading bookings...');

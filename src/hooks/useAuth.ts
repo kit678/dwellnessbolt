@@ -50,7 +50,9 @@ export function useAuth() {
           }
         } catch (error: any) {
           console.error('Error fetching user data:', error);
-          toast.error('Error loading user data. Please try again.');
+          if (error.code !== 'permission-denied') {
+            toast.error('Error loading user data. Please try again.');
+          }
         }
       } else {
         console.log('Auth state changed: No user is signed in.');
