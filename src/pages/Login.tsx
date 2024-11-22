@@ -4,9 +4,11 @@ import { m } from 'framer-motion';
 import { Lock, Mail, LogIn } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import toast from 'react-hot-toast';
+import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
+import { auth, googleProvider } from '../lib/firebase';
 
 export default function Login() {
-  const { login, signInWithGoogle, loading } = useAuth();
+  const { login, loading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [formError, setFormError] = useState('');
@@ -20,6 +22,27 @@ export default function Login() {
       console.error('Login failed:', error);
       setFormError('Failed to log in. Please check your credentials and try again.');
     }
+  };
+
+  // Configure FirebaseUI.
+  const uiConfig = {
+    signInFlow: 'redirect',
+    signInOptions: [
+      {
+        provider: googleProvider.providerId,
+        customParameters: {
+          // Forces account selection even when one account
+          // is available.
+          prompt: 'select_account',
+        },
+      },
+    ],
+    callbacks: {
+      signInSuccessWithAuthResult: () => {
+        toast.success('Signed in successfully!');
+        return false; // Avoid redirects after sign-in.
+      },
+    },
   };
 
   return (
@@ -72,24 +95,7 @@ export default function Login() {
           </div>
         )}
 
-        <button
-          onClick={() => signInWithGoogle()}
-          disabled={loading}
-          className="w-full flex justify-center items-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-        >
-          {loading ? (
-            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-700" />
-          ) : (
-            <>
-              <img
-                src="https://www.google.com/favicon.ico"
-                alt="Google"
-                className="h-5 w-5 mr-2"
-              />
-              Sign in with Google
-            </>
-          )}
-        </button>
+        <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={auth} />
 
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
