@@ -17,7 +17,7 @@ export default function Login() {
   useEffect(() => {
     // Configure FirebaseUI.
     const config = {
-      signInFlow: 'redirect',
+      signInFlow: 'popup', // Use popup to avoid redirect issues
       signInOptions: [
         {
           provider: googleProvider.providerId,
