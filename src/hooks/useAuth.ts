@@ -6,7 +6,9 @@ import {
   onAuthStateChanged,
   createUserWithEmailAndPassword,
   signOut,
-  browserPopupRedirectResolver
+  browserPopupRedirectResolver,
+  setPersistence,
+  browserSessionPersistence
 } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { auth, db, googleProvider } from '../lib/firebase';
@@ -116,6 +118,7 @@ export function useAuth() {
     setLoading(true);
     try {
       console.log('Initiating Google sign-in...');
+      await setPersistence(auth, browserSessionPersistence);
       if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
         console.log('Detected mobile device. Using Google sign-in with redirect.');
         await signInWithRedirect(auth, googleProvider);
@@ -176,10 +179,9 @@ export function useAuth() {
     try {
       console.log('Initiating logout...');
       await signOut(auth);
-      setUser(null);
+      clearCookies();
       localStorage.clear();
       sessionStorage.clear();
-      clearCookies();
       toast.success('Logged out successfully.');
       // Redirect to homepage and reload to reset state
       window.location.href = '/';
