@@ -181,7 +181,8 @@ export function useAuth() {
       sessionStorage.clear();
       clearCookies();
       toast.success('Logged out successfully.');
-      navigate('/');
+      // Redirect to homepage and reload to reset state
+      window.location.href = '/';
       console.log('User signed out successfully.');
     } catch (error: any) {
       handleAuthError(error);
