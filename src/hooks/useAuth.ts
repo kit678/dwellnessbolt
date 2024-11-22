@@ -48,7 +48,7 @@ export function useAuth() {
           }
         } catch (error: any) {
           console.error('Error fetching user data:', error);
-          toast.error('Error loading user data');
+          toast.error('Error loading user data. Please try again.');
         }
       } else {
         console.log('Auth state changed: No user is signed in.');
@@ -108,7 +108,7 @@ export function useAuth() {
       console.log('User document created and user set in auth store:', userData);
     } catch (error) {
       console.error('Error creating user document:', error);
-      toast.error('Failed to create user profile');
+      toast.error('Failed to create user profile.');
     }
   };
 
@@ -172,6 +172,7 @@ export function useAuth() {
   };
 
   const logout = async () => {
+    setLoading(true);
     try {
       console.log('Initiating logout...');
       await signOut(auth);
@@ -179,11 +180,13 @@ export function useAuth() {
       localStorage.clear();
       sessionStorage.clear();
       clearCookies();
-      toast.success('Logged out successfully');
+      toast.success('Logged out successfully.');
       navigate('/');
-      console.log('User signed out successfully');
+      console.log('User signed out successfully.');
     } catch (error: any) {
       handleAuthError(error);
+    } finally {
+      setLoading(false);
     }
   };
 

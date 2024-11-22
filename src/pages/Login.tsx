@@ -3,18 +3,22 @@ import { Link } from 'react-router-dom';
 import { m } from 'framer-motion';
 import { Lock, Mail, LogIn } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import toast from 'react-hot-toast';
 
 export default function Login() {
   const { login, signInWithGoogle, loading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [formError, setFormError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setFormError('');
     try {
       await login(email, password);
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
+      console.error('Login failed:', error);
+      setFormError('Failed to log in. Please check your credentials and try again.');
     }
   };
 
@@ -39,6 +43,34 @@ export default function Login() {
             </Link>
           </p>
         </div>
+
+        {formError && (
+          <div className="rounded-md bg-red-50 p-4">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg
+                  className="h-5 w-5 text-red-400"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l6.518 11.618c.75 1.338-.213 2.988-1.742 2.988H3.481c-1.529 0-2.493-1.65-1.742-2.988L8.257 3.1zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-5a1 1 0 00-1 1v2a1 1 0 102 0V9a1 1 0 00-1-1z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-red-800">Login Failed</h3>
+                <div className="mt-2 text-sm text-red-700">
+                  <p>{formError}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         <button
           onClick={() => signInWithGoogle()}
