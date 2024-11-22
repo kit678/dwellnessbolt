@@ -1,17 +1,19 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
+import { useAuth } from '../hooks/useAuth';
 import { Menu, X, User as UserIcon, LogOut, Calendar } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function Navbar() {
-  const { user, logout } = useAuthStore();
+  const { user } = useAuthStore();
+  const { logout, loading } = useAuth();
   const [isOpen, setIsOpen] = React.useState(false);
   const navigate = useNavigate();
   const [isLoggingOut, setIsLoggingOut] = React.useState(false);
 
   const handleLogout = async () => {
-    if (isLoggingOut) return;
+    if (isLoggingOut || loading) return;
     setIsLoggingOut(true);
     try {
       await logout();
@@ -53,12 +55,12 @@ export default function Navbar() {
                 )}
                 <button
                   onClick={handleLogout}
-                  disabled={isLoggingOut}
+                  disabled={isLoggingOut || loading}
                   className="flex items-center text-gray-700 hover:text-indigo-600 disabled:opacity-50"
                   aria-label="Logout"
                 >
                   <LogOut className="h-5 w-5 mr-1" />
-                  {isLoggingOut ? 'Logging out...' : 'Logout'}
+                  {isLoggingOut || loading ? 'Logging out...' : 'Logout'}
                 </button>
               </>
             ) : (
@@ -122,12 +124,12 @@ export default function Navbar() {
                     handleLogout();
                     setIsOpen(false);
                   }}
-                  disabled={isLoggingOut}
+                  disabled={isLoggingOut || loading}
                   className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:text-indigo-600 disabled:opacity-50"
                   role="menuitem"
                   aria-label="Logout"
                 >
-                  {isLoggingOut ? 'Logging out...' : 'Logout'}
+                  {isLoggingOut || loading ? 'Logging out...' : 'Logout'}
                 </button>
               </>
             ) : (
