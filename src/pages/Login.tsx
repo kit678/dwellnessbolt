@@ -12,7 +12,7 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [formError, setFormError] = useState('');
-  const [uiConfig, setUiConfig] = useState(null);
+  const [uiConfig, setUiConfig] = useState<any>(null);
 
   useEffect(() => {
     // Configure FirebaseUI.
