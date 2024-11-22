@@ -1,8 +1,20 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { m } from 'framer-motion';
-import { User, Lock, Mail, UserPlus } from 'lucide-react';
+import { UserPlus, Lock, Mail, User } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import OnboardingQuiz from '../components/OnboardingQuiz';
+import { FirebaseError } from 'firebase/app'; // Import FirebaseError if available
+
+// Type Guard to check if error is FirebaseError
+function isFirebaseError(error: unknown): error is FirebaseError {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    typeof (error as any).code === 'string'
+  );
+}
 
 export default function Register() {
   const { signup, signInWithGoogle, loading } = useAuth();
@@ -12,6 +24,8 @@ export default function Register() {
     password: '',
     confirmPassword: ''
   });
+  const [quizOpen, setQuizOpen] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -26,9 +40,40 @@ export default function Register() {
     
     try {
       await signup(formData.email, formData.password, formData.name);
+      setQuizOpen(true);
+      navigate('/dashboard');
     } catch (error) {
-      console.error(error);
+      if (isFirebaseError(error)) {
+        if (error.code !== 'auth/popup-closed-by-user') {
+          console.error(error);
+        }
+      } else {
+        console.error('An unexpected error occurred:', error);
+      }
+      // Navigation is handled here after successful signup
     }
+  };
+
+  const handleGoogleSignUp = async () => {
+    try {
+      await signInWithGoogle();
+      navigate('/dashboard');
+    } catch (error) {
+      if (isFirebaseError(error)) {
+        if (error.code !== 'auth/popup-closed-by-user') {
+          console.error('Google sign-up failed:', error);
+        }
+      } else {
+        console.error('An unexpected error occurred:', error);
+      }
+      // Navigation is handled here after successful Google sign-up
+    }
+  };
+
+  const handleQuizComplete = (score: { Vata: number; Pitta: number; Kapha: number }) => {
+    setQuizOpen(false);
+    console.log('Quiz completed with score:', score);
+    // Handle score storage or further processing here
   };
 
   return (
@@ -54,7 +99,7 @@ export default function Register() {
         </div>
 
         <button
-          onClick={() => signInWithGoogle()}
+          onClick={handleGoogleSignUp}
           disabled={loading}
           className="w-full flex justify-center items-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
         >
@@ -81,7 +126,7 @@ export default function Register() {
           </div>
         </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
               <label htmlFor="name" className="sr-only">
@@ -95,14 +140,15 @@ export default function Register() {
                   id="name"
                   name="name"
                   type="text"
-                  required
                   value={formData.name}
                   onChange={handleChange}
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                  required
+                  className="appearance-none rounded-none relative block w-full px-3 py-2 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                   placeholder="Full Name"
                 />
               </div>
             </div>
+            
             <div>
               <label htmlFor="email" className="sr-only">
                 Email address
@@ -115,6 +161,7 @@ export default function Register() {
                   id="email"
                   name="email"
                   type="email"
+                  autoComplete="email"
                   required
                   value={formData.email}
                   onChange={handleChange}
@@ -135,6 +182,7 @@ export default function Register() {
                   id="password"
                   name="password"
                   type="password"
+                  autoComplete="current-password"
                   required
                   value={formData.password}
                   onChange={handleChange}
@@ -183,6 +231,7 @@ export default function Register() {
           </div>
         </form>
       </m.div>
+      <OnboardingQuiz isOpen={quizOpen} onClose={() => setQuizOpen(false)} onComplete={handleQuizComplete} />
     </div>
   );
 }

@@ -1,24 +1,57 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { m } from 'framer-motion';
 import { Lock, Mail, LogIn } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import toast from 'react-hot-toast';
+import { FirebaseError } from 'firebase/app';
+
+// Type Guard to check if error is FirebaseError
+function isFirebaseError(error: unknown): error is FirebaseError {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    typeof (error as any).code === 'string'
+  );
+}
 
 export default function Login() {
   const { login, signInWithGoogle, loading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [formError, setFormError] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError('');
     try {
       await login(email, password);
-    } catch (error: any) {
-      console.error('Login failed:', error);
-      setFormError('Failed to log in. Please check your credentials and try again.');
+      navigate('/dashboard');
+    } catch (error) {
+      if (isFirebaseError(error)) {
+        if (error.code !== 'auth/popup-closed-by-user') {
+          console.error('Login failed:', error);
+        }
+      } else {
+        console.error('An unexpected error occurred:', error);
+      }
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      await signInWithGoogle();
+      navigate('/dashboard');
+    } catch (error) {
+      if (isFirebaseError(error)) {
+        if (error.code !== 'auth/popup-closed-by-user') {
+          console.error('Google sign-in failed:', error);
+        }
+      } else {
+        console.error('An unexpected error occurred:', error);
+      }
     }
   };
 
@@ -73,8 +106,9 @@ export default function Login() {
         )}
 
         <button
-          onClick={signInWithGoogle}
-          className="group relative w-full flex justify-center py-2 px-4 border border-gray-300 text-sm font-medium rounded-md text-gray-900 bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          onClick={handleGoogleSignIn}
+          disabled={loading}
+          className="w-full flex justify-center items-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
         >
           <img
             src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png"
@@ -93,7 +127,7 @@ export default function Login() {
           </div>
         </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
               <label htmlFor="email" className="sr-only">

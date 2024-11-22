@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { collection, addDoc, query, where, getDocs, updateDoc, doc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useAuthStore } from '../store/authStore';
-import { RecurringSession, Booking } from '../types';
+import { RecurringSession, Booking } from '../types/index';
 import toast from 'react-hot-toast';
 
 export function useBookings() {
@@ -17,7 +17,6 @@ export function useBookings() {
 
     setLoading(true);
     try {
-      // Create a booking document
       const bookingRef = await addDoc(collection(db, 'bookings'), {
         userId: user.id,
         sessionId: session.id,
@@ -27,7 +26,6 @@ export function useBookings() {
         scheduledDate
       });
 
-      // For local development, use the mock endpoint
       const response = await fetch('/api/stripe/create-checkout-session', {
         method: 'POST',
         headers: {
@@ -37,7 +35,7 @@ export function useBookings() {
           sessionId: session.id,
           bookingId: bookingRef.id,
           userId: user.id,
-          amount: session.price * 100, // Convert to cents
+          amount: session.price * 100,
         }),
       });
 
@@ -56,7 +54,10 @@ export function useBookings() {
   };
 
   const getUserBookings = async (): Promise<Booking[]> => {
-    if (!user) return [];
+    if (!user || !user.id) {
+      console.error('User or user ID is undefined');
+      return [];
+    }
 
     try {
       const bookingsQuery = query(
