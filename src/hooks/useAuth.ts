@@ -121,35 +121,27 @@ export function useAuth() {
   };
 
   const signInWithGoogle = async () => {
-    console.log('Starting Google sign in process...');
     setLoading(true);
     try {
-      console.log('Setting persistence...');
       await setPersistence(auth, browserSessionPersistence);
-      
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      console.log('Device type:', isMobile ? 'mobile' : 'desktop');
+      if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        await signInWithRedirect(auth, googleProvider);
+        return false;
+      }
 
-      if (isMobile) {
-        console.log('Using redirect flow for mobile...');
-        await getRedirectResult(auth);
+      const result = await signInWithPopup(auth, googleProvider);
+      await createUserDocument(result.user);
+      toast.success('Signed in successfully!');
+      return true;
+    } catch (error: any) {
+      if (error.code === 'auth/popup-blocked') {
+        toast.loading('Redirecting to Google Sign-in...');
         await signInWithRedirect(auth, googleProvider);
         return false;
       } else {
-        console.log('Using popup flow for desktop...');
-        const result = await signInWithPopup(auth, googleProvider);
-        console.log('Popup sign in result:', result);
-        
-        if (result.user) {
-          console.log('User signed in successfully:', result.user.uid);
-          await createUserDocument(result.user);
-          toast.success('Successfully signed in with Google!');
-          return true;
-        }
+        handleAuthError(error);
+        return false;
       }
-    } catch (error: any) {
-      handleAuthError(error);
-      return false;
     } finally {
       setLoading(false);
     }

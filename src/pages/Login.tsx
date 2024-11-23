@@ -43,9 +43,12 @@ export default function Login() {
   const handleGoogleSignIn = async () => {
     try {
       setFormError('');
-      const success = await signInWithGoogle();
+      const success = await signInWithGoogle(); 
       if (success) {
         navigate('/dashboard');
+      } else {
+        // Don't show error for redirect flow
+        console.log('Redirect flow initiated');
       }
     } catch (error) {
       if (isFirebaseError(error)) {
