@@ -71,10 +71,10 @@ export function useAuth(): {
 
   useEffect(() => {
     let isMounted = true;
-    const { setError } = useAuthStore.getState();
+    const { setLoading, setError } = useAuthStore.getState();
 
     // Handle redirect result
-    const handleRedirectResult = async (): Promise<void> => {
+    const handleRedirectResult = async () => {
       const redirectPending = sessionStorage.getItem('googleSignInRedirect');
       console.log('Checking redirect result. Pending:', redirectPending);
       
@@ -100,7 +100,6 @@ export function useAuth(): {
             });
           } else {
             console.log('No redirect result found');
-            setUser(null);
           }
         } catch (error: any) {
           console.error('Redirect sign-in error:', error);
@@ -116,6 +115,7 @@ export function useAuth(): {
     // Handle auth state changes
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (!isMounted) return;
+      
       setLoading(true);
       if (firebaseUser) {
         try {
@@ -144,23 +144,17 @@ export function useAuth(): {
       if (isMounted) setLoading(false);
     });
 
-    // Handle initial redirect result
-    try {
-      await handleRedirectResult();
-    } catch (error: any) {
-      console.error('Error handling redirect result:', error);
-      handleAuthError(error);
-    }
+    handleRedirectResult();
 
     return () => {
       isMounted = false;
       unsubscribe();
     };
-  }, [setUser]);
+  }, []);
 
 
   const signInWithGoogle = async () => {
-    const { setError } = useAuthStore.getState();
+    const { setLoading, setError } = useAuthStore.getState();
     setLoading(true);
     setError(null);
     
