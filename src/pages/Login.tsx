@@ -23,6 +23,8 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [formError, setFormError] = useState('');
   const navigate = useNavigate();
+  const [formError, setFormError] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,7 +41,6 @@ export default function Login() {
         console.error('An unexpected error occurred:', error);
       }
     }
-  };
   };
 
   const handleGoogleSignIn = async () => {
