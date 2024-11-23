@@ -25,29 +25,27 @@ if (import.meta.env.DEV) {
 }
 
 // Initialize Firebase only if no apps are already initialized
-// Note: Removed CORP meta tag as it was interfering with Firebase Auth iframe
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
 console.log('Firebase initialized with config:', {
   ...firebaseConfig,
   apiKey: '[REDACTED]' // Don't log API key
 });
 
-// Configure additional security settings for auth
-const authSettings = getAuth(app).settings;
-authSettings.appVerificationDisabledForTesting = false; // Ensure verification is enabled
-
-// Initialize Firebase Authentication
+// Initialize Firebase Authentication with custom settings
 const auth = getAuth(app);
+auth.settings.appVerificationDisabledForTesting = false;
+
+// Configure auth to allow iframe operations
+auth.settings.forceRecaptchaFlowForTesting = false;
 
 // Initialize Firestore
 const db = getFirestore(app);
 
-// Configure Google Auth Provider
+// Configure Google Auth Provider with more permissive settings
 const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({
   prompt: 'select_account',
-  access_type: 'online',
-  display: 'popup'  // Force popup display
+  access_type: 'online'
 });
 
 // Set default persistence
