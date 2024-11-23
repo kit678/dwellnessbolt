@@ -102,9 +102,6 @@ export function useAuth(): {
             });
           } else {
             console.log('No redirect result found');
-            navigate('/dashboard');
-          } else {
-            console.log('No redirect result found');
             setUser(null);
           }
         } catch (error: any) {
