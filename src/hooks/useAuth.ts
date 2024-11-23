@@ -113,34 +113,72 @@ export function useAuth() {
   const signInWithGoogle = async () => {
     setLoading(true);
     try {
+      // Configure persistence
       await setPersistence(auth, browserSessionPersistence);
       console.log('Starting Google sign-in process...');
       
       let result;
+      // Detect mobile devices for redirect vs popup
       if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
         console.log('Mobile device detected, using redirect...');
+        // Add scopes for additional user info
+        googleProvider.addScope('profile');
+        googleProvider.addScope('email');
+        // Use redirect for mobile
         await signInWithRedirect(auth, googleProvider);
         result = await getRedirectResult(auth);
       } else {
         console.log('Desktop device detected, using popup...');
+        // Use popup for desktop
         result = await signInWithPopup(auth, googleProvider);
       }
 
       if (result && result.user) {
-        console.log('Google sign-in successful:', result.user.email);
+        // Get additional user info
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        const token = credential?.accessToken;
+        
+        console.log('Google sign-in successful:', {
+          email: result.user.email,
+          displayName: result.user.displayName,
+          photoURL: result.user.photoURL
+        });
+        
         await createUserDocument(result.user);
+        toast.success('Successfully signed in with Google!');
         return true;
       }
       return false;
     } catch (error: any) {
       console.error('Google sign-in error:', error);
-      if (error.code === 'auth/popup-blocked') {
-        console.log('Popup blocked, falling back to redirect...');
-        toast.loading('Redirecting to Google Sign-in...');
-        await signInWithRedirect(auth, googleProvider);
-        return false;
-      } else if (error.code !== 'auth/popup-closed-by-user') {
-        handleAuthError(error);
+      
+      // Handle specific error cases
+      switch (error.code) {
+        case 'auth/popup-blocked':
+          console.log('Popup blocked, falling back to redirect...');
+          toast.loading('Redirecting to Google Sign-in...');
+          await signInWithRedirect(auth, googleProvider);
+          return false;
+          
+        case 'auth/popup-closed-by-user':
+          console.log('Sign-in popup closed by user');
+          toast.error('Sign-in cancelled');
+          return false;
+          
+        case 'auth/account-exists-with-different-credential':
+          toast.error('An account already exists with the same email address but different sign-in credentials. Sign in using the original provider.');
+          break;
+          
+        case 'auth/network-request-failed':
+          toast.error('Network error - please check your connection and try again');
+          break;
+          
+        case 'auth/cancelled-popup-request':
+          // Ignore this error as it's handled by popup-closed-by-user
+          return false;
+          
+        default:
+          handleAuthError(error);
       }
       throw error;
     } finally {
