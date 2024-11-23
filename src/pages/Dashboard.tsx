@@ -19,6 +19,8 @@ export default function Dashboard() {
   useEffect(() => {
     if (!hasFetched && user) {
       console.log('Dashboard mounted. User:', user);
+      console.log('Quiz Results:', user.quizResults);
+      console.log('Latest Quiz Result:', user.quizResults?.[user.quizResults.length - 1]);
       const fetchBookings = async () => {
         try {
           console.log('Fetching bookings for user:', user);

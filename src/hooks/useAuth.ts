@@ -138,7 +138,11 @@ export function useAuth(): {
               quizCompleted: userData.quizCompleted || false,
               dosha: userData.dosha || null,
               secondaryDosha: userData.secondaryDosha || null,
-              quizResults: userData.quizResults || [],
+              quizResults: Array.isArray(userData.quizResults) ? userData.quizResults.map(result => ({
+                ...result,
+                percentages: result.percentages || { Vata: 0, Pitta: 0, Kapha: 0 },
+                scores: result.scores || { Vata: 0, Pitta: 0, Kapha: 0 }
+              })) : [],
               lastQuizDate: userData.lastQuizDate || null
             };
             if (isMounted) setUser(user);
