@@ -43,14 +43,25 @@ export default function Login() {
   const handleGoogleSignIn = async () => {
     try {
       setFormError('');
+      console.log('Starting Google sign-in from Login page');
       const success = await signInWithGoogle(); 
+      
       if (success) {
+        console.log('Sign-in successful, navigating to dashboard');
         navigate('/dashboard');
       } else {
-        // Don't show error for redirect flow
-        console.log('Redirect flow initiated');
+        // Check if we're in a redirect flow
+        const isPendingRedirect = sessionStorage.getItem('googleSignInRedirect');
+        if (isPendingRedirect) {
+          console.log('Redirect flow in progress');
+          // Don't show any error, just wait for redirect
+        } else {
+          console.log('Sign-in unsuccessful but not in redirect flow');
+          setFormError('Sign-in was not completed');
+        }
       }
     } catch (error) {
+      console.error('Google sign-in error in Login page:', error);
       if (isFirebaseError(error)) {
         setFormError(error.message);
       } else {

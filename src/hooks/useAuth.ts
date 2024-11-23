@@ -17,9 +17,23 @@ function handleAuthError(error: any) {
     case 'auth/popup-blocked':
       toast.error('Popup was blocked. Please allow popups or try using redirect.');
       break;
-    // ... other cases ...
+    case 'auth/cancelled-popup-request':
+      // Silent handling as this is a user action
+      console.log('User closed the popup');
+      break;
+    case 'auth/popup-closed-by-user':
+      // Silent handling as this is a user action  
+      console.log('User closed the popup');
+      break;
+    case 'auth/account-exists-with-different-credential':
+      toast.error('An account already exists with this email using a different sign-in method.');
+      break;
+    case 'auth/network-request-failed':
+      toast.error('Network error. Please check your connection and try again.');
+      break;
     default:
       toast.error('Authentication failed. Please try again.');
+      console.error('Unhandled auth error:', error);
   }
 }
 
@@ -62,20 +76,27 @@ export function useAuth() {
   const signInWithGoogle = async () => {
     setLoading(true);
     try {
+      console.log('Starting Google sign-in process...');
       const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      console.log('Device type:', isMobile ? 'mobile' : 'desktop');
 
       if (isMobile) {
+        console.log('Using redirect flow for mobile');
         await signInWithRedirect(auth, googleProvider);
         return false; // Redirect flow initiated
       } else {
+        console.log('Using popup flow for desktop');
         const result = await signInWithPopup(auth, googleProvider);
         if (result.user) {
+          console.log('Google sign-in successful:', result.user.email);
           toast.success('Successfully signed in with Google!');
           return true;
         }
+        console.log('No user returned from Google sign-in');
         return false;
       }
     } catch (error: any) {
+      console.log('Google sign-in error:', error.code);
       handleAuthError(error);
       return false;
     } finally {
