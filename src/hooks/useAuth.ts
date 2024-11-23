@@ -40,7 +40,18 @@ export function useAuth() {
           // Fetch user data and set it in the store
           const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
           if (userDoc.exists()) {
-            setUser(userDoc.data());
+            const userData = userDoc.data();
+            // Transform Firestore data to User type
+            const user = {
+              id: userDoc.id,
+              uid: firebaseUser.uid,
+              email: userData.email || firebaseUser.email || '',
+              displayName: userData.displayName || firebaseUser.displayName || '',
+              role: userData.role || 'user',
+              quizCompleted: userData.quizCompleted || false,
+              dosha: userData.dosha || null
+            };
+            setUser(user);
           }
         } catch (error) {
           console.error('Failed to fetch user data:', error);
