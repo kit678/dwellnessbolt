@@ -119,127 +119,24 @@ export function useAuth() {
   const signInWithGoogle = async () => {
     setLoading(true);
     try {
-      // Configure persistence to keep user signed in
       await setPersistence(auth, browserSessionPersistence);
-      console.log('Starting Google sign-in process...');
-
-      // Using minimal scopes configured in firebase.ts
-      // No additional scopes needed here
-
-      let result;
-      // Detect mobile devices for redirect vs popup
       const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      
+
       if (isMobile) {
-        console.log('Mobile device detected, using redirect flow...');
-        try {
-          // Clear any pending redirect operations
-          await getRedirectResult(auth);
-          // Start new redirect flow
-          await signInWithRedirect(auth, googleProvider);
-          // Note: result will be null here since redirect happens
-          return false; // Return false to indicate redirect started
-        } catch (redirectError: any) {
-          console.error('Redirect error:', redirectError);
-          if (redirectError.code === 'auth/redirect-cancelled-by-user') {
-            toast.error('Sign-in cancelled');
-            return false;
-          }
-          throw redirectError;
-        }
+        await getRedirectResult(auth);
+        await signInWithRedirect(auth, googleProvider);
+        return false;
       } else {
-        console.log('Desktop device detected, using popup flow...');
-        try {
-          result = await signInWithPopup(auth, googleProvider);
-        } catch (popupError: any) {
-          console.error('Popup error:', popupError);
-          if (popupError.code === 'auth/popup-blocked') {
-            console.log('Popup blocked, falling back to redirect...');
-            toast.loading('Redirecting to Google Sign-in...');
-            await signInWithRedirect(auth, googleProvider);
-            return false;
-          }
-          throw popupError;
+        const result = await signInWithPopup(auth, googleProvider);
+        if (result.user) {
+          await createUserDocument(result.user);
+          toast.success('Successfully signed in with Google!');
+          return true;
         }
       }
-
-      if (result?.user) {
-        // Get additional user info
-        GoogleAuthProvider.credentialFromResult(result);
-        
-        // Log successful sign-in details
-        console.log('Google sign-in successful:', {
-          email: result.user.email,
-          displayName: result.user.displayName,
-          photoURL: result.user.photoURL,
-          uid: result.user.uid,
-          emailVerified: result.user.emailVerified,
-          providerId: result.user.providerId,
-          metadata: {
-            creationTime: result.user.metadata.creationTime,
-            lastSignInTime: result.user.metadata.lastSignInTime
-          }
-        });
-
-        // Create/update user document
-        await createUserDocument(result.user);
-        
-        // Show success message
-        toast.success('Successfully signed in with Google!');
-        return true;
-      }
-      
-      console.log('No user data received from Google sign-in');
-      return false;
     } catch (error: any) {
-      console.error('Google sign-in error:', error);
-      
-      // Handle specific error cases
-      switch (error.code) {
-        case 'auth/popup-closed-by-user':
-        case 'auth/cancelled-popup-request':
-          console.log('Sign-in cancelled by user');
-          toast.error('Sign-in cancelled');
-          return false;
-
-        case 'auth/account-exists-with-different-credential':
-          console.error('Account linking required:', error);
-          // Get existing providers for the email
-          const email = error.customData?.email;
-          if (email) {
-            const providers = await fetchSignInMethodsForEmail(auth, email);
-            toast.error(`Please sign in with ${providers[0]}`);
-          } else {
-            toast.error('An account already exists with the same email. Please sign in with your original provider.');
-          }
-          break;
-
-        case 'auth/network-request-failed':
-          toast.error('Network error - please check your connection and try again');
-          break;
-
-        case 'auth/operation-not-allowed':
-          console.error('Google sign-in not enabled in Firebase Console');
-          toast.error('This sign-in method is not currently available');
-          break;
-
-        case 'auth/invalid-credential':
-          console.error('Invalid Google credential:', error);
-          toast.error('Unable to sign in - invalid credentials');
-          break;
-
-        case 'auth/user-disabled':
-          toast.error('This account has been disabled. Please contact support.');
-          break;
-
-        case 'auth/timeout':
-          toast.error('The sign in request timed out. Please try again.');
-          break;
-
-        default:
-          handleAuthError(error);
-      }
-      throw error;
+      handleAuthError(error);
+      return false;
     } finally {
       setLoading(false);
     }
