@@ -114,21 +114,35 @@ export function useAuth() {
     setLoading(true);
     try {
       await setPersistence(auth, browserSessionPersistence);
+      console.log('Starting Google sign-in process...');
+      
+      let result;
       if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        console.log('Mobile device detected, using redirect...');
         await signInWithRedirect(auth, googleProvider);
-        return;
+        result = await getRedirectResult(auth);
+      } else {
+        console.log('Desktop device detected, using popup...');
+        result = await signInWithPopup(auth, googleProvider);
       }
 
-      const result = await signInWithPopup(auth, googleProvider);
-      await createUserDocument(result.user);
-      toast.success('Signed in successfully!');
+      if (result && result.user) {
+        console.log('Google sign-in successful:', result.user.email);
+        await createUserDocument(result.user);
+        return true;
+      }
+      return false;
     } catch (error: any) {
+      console.error('Google sign-in error:', error);
       if (error.code === 'auth/popup-blocked') {
+        console.log('Popup blocked, falling back to redirect...');
         toast.loading('Redirecting to Google Sign-in...');
         await signInWithRedirect(auth, googleProvider);
+        return false;
       } else if (error.code !== 'auth/popup-closed-by-user') {
         handleAuthError(error);
       }
+      throw error;
     } finally {
       setLoading(false);
     }
