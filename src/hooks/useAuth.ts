@@ -2,20 +2,14 @@ import { useState, useEffect } from 'react';
 import { 
   signInWithPopup,
   signInWithRedirect,
-  setPersistence,
-  browserSessionPersistence,
-  GoogleAuthProvider,
   onAuthStateChanged,
   signOut,
   signInWithEmailAndPassword
 } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
-import { auth, db } from '../lib/firebase';
+import { auth, db, googleProvider } from '../lib/firebase';
 import { useAuthStore } from '../store/authStore';
 import toast from 'react-hot-toast';
-
-// Initialize GoogleAuthProvider
-const googleProvider = new GoogleAuthProvider();
 
 function handleAuthError(error: any) {
   console.error('Auth error:', error);
@@ -68,7 +62,6 @@ export function useAuth() {
   const signInWithGoogle = async () => {
     setLoading(true);
     try {
-      await setPersistence(auth, browserSessionPersistence);
       const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
       if (isMobile) {
@@ -84,6 +77,7 @@ export function useAuth() {
       }
     } catch (error: any) {
       handleAuthError(error);
+      return false;
     } finally {
       setLoading(false);
     }
@@ -106,12 +100,12 @@ export function useAuth() {
   const login = async (email: string, password: string) => {
     setLoading(true);
     try {
-      await setPersistence(auth, browserSessionPersistence);
       const result = await signInWithEmailAndPassword(auth, email, password);
       if (result.user) {
         toast.success('Successfully signed in!');
+        return true;
       }
-      return true;
+      return false;
     } catch (error: any) {
       handleAuthError(error);
       return false;

@@ -30,4 +30,8 @@ googleProvider.setCustomParameters({
   access_type: 'online'
 });
 
+// Set default persistence
+setPersistence(auth, browserSessionPersistence)
+  .catch(error => console.error('Failed to set auth persistence:', error));
+
 export { auth, db, googleProvider };
