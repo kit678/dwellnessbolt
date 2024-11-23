@@ -95,7 +95,7 @@ export default function Dashboard() {
                 Complete Quiz
               </button>
             </div>
-          ) : (
+          ) : user.quizResults?.length > 0 ? (
             <div>
               <h3 className="text-xl font-semibold mb-4 text-center">Your Dosha Profile</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -107,9 +107,9 @@ export default function Dashboard() {
                       <PieChart>
                         <Pie
                           data={[
-                            { name: 'Vata', value: user.quizResults[user.quizResults.length - 1].percentages.Vata },
-                            { name: 'Pitta', value: user.quizResults[user.quizResults.length - 1].percentages.Pitta },
-                            { name: 'Kapha', value: user.quizResults[user.quizResults.length - 1].percentages.Kapha }
+                            { name: 'Vata', value: user.quizResults?.[user.quizResults.length - 1]?.percentages?.Vata || 0 },
+                            { name: 'Pitta', value: user.quizResults?.[user.quizResults.length - 1]?.percentages?.Pitta || 0 },
+                            { name: 'Kapha', value: user.quizResults?.[user.quizResults.length - 1]?.percentages?.Kapha || 0 }
                           ]}
                           cx="50%"
                           cy="50%"
@@ -170,6 +170,16 @@ export default function Dashboard() {
                   </div>
                 </div>
               </div>
+            </div>
+          ) : (
+            <div className="text-center">
+              <p className="text-yellow-800">Your quiz results are not available. Please retake the quiz.</p>
+              <button 
+                onClick={() => setQuizOpen(true)} 
+                className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+              >
+                Retake Quiz
+              </button>
             </div>
           )}
         </div>
