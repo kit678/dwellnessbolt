@@ -17,7 +17,8 @@ function isFirebaseError(error: unknown): error is FirebaseError {
 }
 
 export default function Login() {
-  const { login, signInWithGoogle, loading } = useAuth();
+  const auth = useAuth();
+  const { login, signInWithGoogle, loading } = auth;
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [formError, setFormError] = useState('');

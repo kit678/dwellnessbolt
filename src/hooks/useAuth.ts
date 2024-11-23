@@ -37,7 +37,12 @@ function handleAuthError(error: any) {
   }
 }
 
-export function useAuth() {
+export function useAuth(): { 
+  login: (email: string, password: string) => Promise<boolean>;
+  signInWithGoogle: () => Promise<boolean>;
+  logout: () => Promise<void>;
+  loading: boolean;
+} {
   const [loading, setLoading] = useState(false);
   const { setUser, logout: storeLogout } = useAuthStore();
 
@@ -98,13 +103,12 @@ export function useAuth() {
         });
         console.log('Popup settings:', {
           provider: googleProvider.providerId,
-          customParameters: googleProvider.customParameters,
         });
         
-        try {
-          console.log('Attempting to open popup...');
-          const result = await signInWithPopup(auth, googleProvider);
-          console.log('Popup completed successfully');
+        console.log('Attempting to open popup...');
+        const result = await signInWithPopup(auth, googleProvider);
+        console.log('Popup completed successfully');
+        
         if (result.user) {
           console.log('Google sign-in successful:', result.user.email);
           toast.success('Successfully signed in with Google!');
