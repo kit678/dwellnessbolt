@@ -105,12 +105,16 @@ const options = [
 ]
 
 export default function OnboardingQuiz({ isOpen, onClose, onComplete }: OnboardingQuizProps) {
-  const { user, updateQuizCompletion } = useAuth();
+  const { user } = useAuth();
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
+  const [answers, setAnswers] = useState<number[]>([]);
 
   const handleOptionSelect = (index: number) => {
     setSelectedOption(index);
+    const newAnswers = [...answers];
+    newAnswers[currentQuestion] = index;
+    setAnswers(newAnswers);
   };
 
   const handleNext = () => {
@@ -129,19 +133,44 @@ export default function OnboardingQuiz({ isOpen, onClose, onComplete }: Onboardi
   };
 
   const handleSkip = () => {
+    setSelectedOption(null);
+    setCurrentQuestion(0);
+    setAnswers([]);
     onClose();
   };
 
   const handleFinish = async () => {
-    if (user && user.uid) {
-      try {
-        await updateQuizCompletion(user.uid);
-        onComplete({ Vata: 0, Pitta: 0, Kapha: 0 }); // Example score
-      } catch (error) {
-        console.error('Error updating quiz completion status:', error);
-      }
-    } else {
+    if (!user?.uid) {
       console.error('User ID is undefined');
+      return;
+    }
+
+    try {
+      // Calculate scores based on answers
+      const scores = {
+        Vata: answers.filter((a, i) => a === 0).length,
+        Pitta: answers.filter((a, i) => a === 1).length,
+        Kapha: answers.filter((a, i) => a === 2).length
+      };
+
+      // Update quiz completion in auth store
+      await updateUserProfile(user.uid, {
+        quizCompleted: true,
+        dosha: Object.entries(scores).reduce((a, b) => a[1] > b[1] ? a : b)[0]
+      });
+
+      // Pass results back to parent
+      onComplete(scores);
+      
+      // Reset local state
+      setSelectedOption(null);
+      setCurrentQuestion(0);
+      setAnswers([]);
+      
+      // Close modal
+      onClose();
+    } catch (error) {
+      console.error('Error updating quiz completion status:', error);
     }
   };
 

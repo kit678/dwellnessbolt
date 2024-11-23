@@ -65,6 +65,8 @@ export function useAuth(): {
   signInWithGoogle: () => Promise<boolean>;
   logout: () => Promise<void>;
   loading: boolean;
+  user: User | null;
+  updateUserProfile: (uid: string, data: Partial<User>) => Promise<void>;
 } {
   const [loading, setLoading] = useState(false);
   const { setUser, logout: storeLogout } = useAuthStore();
@@ -236,10 +238,24 @@ export function useAuth(): {
     }
   };
 
+  const updateUserProfile = async (uid: string, data: Partial<User>) => {
+    try {
+      const userRef = doc(db, 'users', uid);
+      await updateDoc(userRef, data);
+      const { setUser } = useAuthStore.getState();
+      setUser({ ...useAuthStore.getState().user, ...data } as User);
+    } catch (error) {
+      console.error('Error updating user profile:', error);
+      throw error;
+    }
+  };
+
   return {
     login,
     signInWithGoogle,
     logout,
-    loading
+    loading,
+    user: useAuthStore.getState().user,
+    updateUserProfile
   };
 }
