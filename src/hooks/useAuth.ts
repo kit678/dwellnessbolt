@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
 import { 
   signInWithPopup,
-  signInWithRedirect,
   onAuthStateChanged,
   signOut,
   signInWithEmailAndPassword,
-  getRedirectResult
+
 } from 'firebase/auth';
 import { auth, googleProvider } from '../lib/firebase';
 import { useAuthStore } from '../store/authStore';
