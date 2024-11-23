@@ -11,7 +11,7 @@ import OnboardingQuiz from '../components/OnboardingQuiz';
 
 export default function Dashboard() {
   const { user } = useAuthStore();
-  const { updateUserProfile } = useUser();
+  const { } = useUser(); // We'll add hooks back here when needed
   const { getUserBookings, loading } = useBookings();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [error, setError] = useState<string | null>(null);

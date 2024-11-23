@@ -7,10 +7,12 @@ import {
   signInWithEmailAndPassword,
   getRedirectResult
 } from 'firebase/auth';
-import { auth, googleProvider } from '../lib/firebase';
+import { doc, getDoc } from 'firebase/firestore';
+import { auth, db, googleProvider } from '../lib/firebase';
 import { useAuthStore } from '../store/authStore';
 import { AUTH_ERROR_CODES, BROWSER_DETECTION } from '../constants/auth';
 import { userService } from '../services/userService';
+import { User } from '../types';
 import toast from 'react-hot-toast';
 
 function handleAuthError(error: any) {
@@ -60,13 +62,7 @@ function handleAuthError(error: any) {
   }
 }
 
-export function useAuth(): { 
-  login: (email: string, password: string) => Promise<boolean>;
-  signInWithGoogle: (navigate: (path: string) => void) => Promise<{ success: boolean; isRedirect: boolean }>;
-  logout: () => Promise<void>;
-  loading: boolean;
-  user: User | null;
-  updateUserProfile: (uid: string, data: Partial<User>) => Promise<void>;
+export function useAuth() {
 } {
   const [loading, setLoading] = useState(false);
   const { setUser, logout: storeLogout } = useAuthStore();
