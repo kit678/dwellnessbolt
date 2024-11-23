@@ -24,12 +24,28 @@ if (import.meta.env.DEV) {
   self.FIREBASE_DEBUG_MODE = debugConfig;
 }
 
+// Set Cross-Origin-Resource-Policy header
+const meta = document.createElement('meta');
+meta.httpEquiv = 'Cross-Origin-Resource-Policy';
+meta.content = 'same-site';
+document.head.appendChild(meta);
+
+// Set Cross-Origin-Embedder-Policy header
+const coepMeta = document.createElement('meta');
+coepMeta.httpEquiv = 'Cross-Origin-Embedder-Policy';
+coepMeta.content = 'require-corp';
+document.head.appendChild(coepMeta);
+
 // Initialize Firebase only if no apps are already initialized
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
 console.log('Firebase initialized with config:', {
   ...firebaseConfig,
   apiKey: '[REDACTED]' // Don't log API key
 });
+
+// Configure additional security settings for auth
+const authSettings = getAuth(app).settings;
+authSettings.appVerificationDisabledForTesting = false; // Ensure verification is enabled
 
 // Initialize Firebase Authentication
 const auth = getAuth(app);
