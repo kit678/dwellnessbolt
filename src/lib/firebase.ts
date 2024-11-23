@@ -35,9 +35,6 @@ console.log('Firebase initialized with config:', {
 const auth = getAuth(app);
 auth.settings.appVerificationDisabledForTesting = false;
 
-// Configure auth to allow iframe operations
-auth.settings.forceRecaptchaFlowForTesting = false;
-
 // Initialize Firestore
 const db = getFirestore(app);
 
