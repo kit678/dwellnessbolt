@@ -17,18 +17,7 @@ interface OnboardingQuizProps {
 const questions = [
   "How would you describe your body frame?",
   "How does your body weight usually behave?",
-  "How's your hunger?",
-  "How would you describe your digestion?",
-  "What's your skin like?",
-  "How is your hair texture?",
-  "How often do you go to the bathroom?",
-  "How do you feel about your internal body temperature?",
-  "What's your ideal weather?",
-  "What best describes your physical activity level?",
-  "How does your mind typically work?",
-  "How do you sleep?",
-  "How do you usually speak?",
-  "How would you describe your memory?"
+  "How's your hunger?"
 ]
 
 const options = [
@@ -46,62 +35,7 @@ const options = [
     { image: "https://images.unsplash.com/photo-1495214783159-3503fd1b572d?w=250&h=250&fit=crop", label: "Unpredictable" },
     { image: "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=250&h=250&fit=crop", label: "Strong" },
     { image: "https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=250&h=250&fit=crop", label: "Mild" },
-  ],
-  [
-    { image: "https://images.unsplash.com/photo-1604480132736-44c188fe4d20?w=250&h=250&fit=crop", label: "Irregular" },
-    { image: "https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=250&h=250&fit=crop", label: "Quick" },
-    { image: "https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=250&h=250&fit=crop", label: "Slow & Steady" },
-  ],
-  [
-    { image: "https://images.unsplash.com/photo-1508264165352-258db2ebd59b?w=250&h=250&fit=crop", label: "Dry" },
-    { image: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=250&h=250&fit=crop", label: "Warm" },
-    { image: "https://images.unsplash.com/photo-1601412436009-d964bd02edbc?w=250&h=250&fit=crop", label: "Smooth" },
-  ],
-  [
-    { image: "https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=250&h=250&fit=crop", label: "Dry & Frizzy" },
-    { image: "https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?w=250&h=250&fit=crop", label: "Fine & Thin" },
-    { image: "https://images.unsplash.com/photo-1580618864180-f6d7d39b8ff6?w=250&h=250&fit=crop", label: "Thick & Oily" },
-  ],
-  [
-    { image: "https://images.unsplash.com/photo-1541199249251-f713e6145474?w=250&h=250&fit=crop", label: "Inconsistent" },
-    { image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=250&h=250&fit=crop", label: "Regular" },
-    { image: "https://images.unsplash.com/photo-1596689200475-21e5bfb8266f?w=250&h=250&fit=crop", label: "Slow & Regular" },
-  ],
-  [
-    { image: "https://images.unsplash.com/photo-1515876305430-f06edab8282a?w=250&h=250&fit=crop", label: "Always Cold" },
-    { image: "https://images.unsplash.com/photo-1517241034903-9a4c3ab12f00?w=250&h=250&fit=crop", label: "Always Warm" },
-    { image: "https://images.unsplash.com/photo-1476611338391-6f395a0ebc7b?w=250&h=250&fit=crop", label: "Comfortable" },
-  ],
-  [
-    { image: "https://images.unsplash.com/photo-1473496169904-658ba7c44d8a?w=250&h=250&fit=crop", label: "Warm & Dry" },
-    { image: "https://images.unsplash.com/photo-1418985991508-e47386d96a71?w=250&h=250&fit=crop", label: "Cool & Refreshing" },
-    { image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=250&h=250&fit=crop", label: "Warm & Humid" },
-  ],
-  [
-    { image: "https://images.unsplash.com/photo-1434596922112-19c563067271?w=250&h=250&fit=crop", label: "Quick but Tiring" },
-    { image: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=250&h=250&fit=crop", label: "Intense & Energetic" },
-    { image: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=250&h=250&fit=crop", label: "Slow & Steady" },
-  ],
-  [
-    { image: "https://images.unsplash.com/photo-1507413245164-6160d8298b31?w=250&h=250&fit=crop", label: "Fast & Creative" },
-    { image: "https://images.unsplash.com/photo-1457369804613-b5bdb714032a?w=250&h=250&fit=crop", label: "Sharp & Focused" },
-    { image: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=250&h=250&fit=crop", label: "Calm & Steady" },
-  ],
-  [
-    { image: "https://images.unsplash.com/photo-1489533119213-66a5cd877091?w=250&h=250&fit=crop", label: "Light & Restless" },
-    { image: "https://images.unsplash.com/photo-1531353826977-0941b4779a1c?w=250&h=250&fit=crop", label: "Deep but Light" },
-    { image: "https://images.unsplash.com/photo-1465101162946-4377e57745c3?w=250&h=250&fit=crop", label: "Heavy & Long" },
-  ],
-  [
-    { image: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=250&h=250&fit=crop", label: "Fast & Talkative" },
-    { image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=250&h=250&fit=crop", label: "Clear & Direct" },
-    { image: "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=250&h=250&fit=crop", label: "Slow & Thoughtful" },
-  ],
-  [
-    { image: "https://images.unsplash.com/photo-1456406644174-8ddd4cd52a06?w=250&h=250&fit=crop", label: "Quick but Forgetful" },
-    { image: "https://images.unsplash.com/photo-1565538810643-b5bdb714032a?w=250&h=250&fit=crop", label: "Sharp & Detailed" },
-    { image: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=250&h=250&fit=crop", label: "Slow but Lasting" },
-  ],
+  ]
 ]
 
 export default function OnboardingQuiz({ isOpen, onClose, onComplete }: OnboardingQuizProps) {
