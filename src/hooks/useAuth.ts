@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { 
   signInWithPopup,
   signInWithRedirect,
@@ -67,7 +67,7 @@ export function useAuth(): {
   loading: boolean;
 } {
   const loading = useAuthStore((state) => state.loading);
-  const { setLoading, setError, setUser, logout: storeLogout } = useAuthStore();
+  const { setLoading, setUser, logout: storeLogout } = useAuthStore();
 
   useEffect(() => {
     let isMounted = true;

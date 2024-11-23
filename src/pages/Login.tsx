@@ -44,7 +44,6 @@ export default function Login() {
   const handleGoogleSignIn = async () => {
     try {
       setFormError('');
-      setLoading(true);
       console.log('Starting Google sign-in from Login page');
       const success = await signInWithGoogle(); 
     
