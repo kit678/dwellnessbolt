@@ -31,6 +31,8 @@ function clearCookies() {
 
 function handleAuthError(error: any) {
   console.error('Auth error:', error);
+  console.log('Error code:', error.code);
+  console.log('Error message:', error.message);
   switch (error.code) {
     case 'auth/popup-blocked':
       toast.error('Popup was blocked. Please allow popups or try using redirect.');
@@ -96,8 +98,10 @@ export function useAuth() {
   }, [setUser]);
 
   const createUserDocument = async (user: any) => {
+    console.log('Creating/updating user document for:', user.uid);
     try {
       const userDoc = await getDoc(doc(db, 'users', user.uid));
+      console.log('Existing user document:', userDoc.exists() ? 'found' : 'not found');
       if (!userDoc.exists()) {
         const userData: Omit<User, 'id'> = {
           email: user.email!,
@@ -117,18 +121,27 @@ export function useAuth() {
   };
 
   const signInWithGoogle = async () => {
+    console.log('Starting Google sign in process...');
     setLoading(true);
     try {
+      console.log('Setting persistence...');
       await setPersistence(auth, browserSessionPersistence);
+      
       const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      console.log('Device type:', isMobile ? 'mobile' : 'desktop');
 
       if (isMobile) {
+        console.log('Using redirect flow for mobile...');
         await getRedirectResult(auth);
         await signInWithRedirect(auth, googleProvider);
         return false;
       } else {
+        console.log('Using popup flow for desktop...');
         const result = await signInWithPopup(auth, googleProvider);
+        console.log('Popup sign in result:', result);
+        
         if (result.user) {
+          console.log('User signed in successfully:', result.user.uid);
           await createUserDocument(result.user);
           toast.success('Successfully signed in with Google!');
           return true;
