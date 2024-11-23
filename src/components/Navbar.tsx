@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 export default function Navbar() {
   const { user } = useAuthStore();
   const auth = useAuth();
-  const { logout } = auth;
+  const { logout, loading } = auth;
   const [isOpen, setIsOpen] = React.useState(false);
   const navigate = useNavigate();
   const [isLoggingOut, setIsLoggingOut] = React.useState(false);
