@@ -153,7 +153,7 @@ export function useAuth(): {
       isMounted = false;
       unsubscribe();
     };
-  }, []);
+  }, [navigate]);
 
 
   const signInWithGoogle = async () => {
