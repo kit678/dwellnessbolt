@@ -9,12 +9,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Set security headers
-app.use((req, res, next) => {
-  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
-  res.setHeader('Cross-Origin-Embedder-Policy', 'credentialless');
-  next();
-});
 
 // Routes
 app.use('/api/stripe', stripeRoutes);
