@@ -104,7 +104,9 @@ export function useAuth(): {
             console.log('No redirect result found');
             navigate('/dashboard');
           } else {
+            console.log('No redirect result found');
             setUser(null);
+          }
         } catch (error: any) {
           console.error('Redirect sign-in error:', error);
           handleAuthError(error);
@@ -119,7 +121,6 @@ export function useAuth(): {
     // Handle auth state changes
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (!isMounted) return;
-      
       setLoading(true);
       if (firebaseUser) {
         try {
@@ -146,6 +147,7 @@ export function useAuth(): {
         if (isMounted) setUser(null);
       }
       if (isMounted) setLoading(false);
+    });
     });
 
     handleRedirectResult();
