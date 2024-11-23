@@ -69,7 +69,6 @@ export function useAuth(): {
 } {
   const loading = useAuthStore((state) => state.loading);
   const { setLoading, setUser, logout: storeLogout } = useAuthStore();
-  const navigate = useNavigate();
 
   useEffect(() => {
     let isMounted = true;
