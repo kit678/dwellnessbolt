@@ -68,7 +68,6 @@ export function useAuth(): {
   loading: boolean;
 } {
   const loading = useAuthStore((state) => state.loading);
-  const navigate = useNavigate();
   const { setLoading, setUser, logout: storeLogout } = useAuthStore();
 
   useEffect(() => {
@@ -146,15 +145,9 @@ export function useAuth(): {
       if (isMounted) setLoading(false);
     });
 
-    handleRedirectResult();
     });
 
-    handleRedirectResult();
 
-    return () => {
-      isMounted = false;
-      unsubscribe();
-    };
   }, [navigate]);
 
 
