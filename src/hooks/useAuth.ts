@@ -71,7 +71,7 @@ export function useAuth(): {
   const { setLoading, setUser, logout: storeLogout } = useAuthStore();
 
   useEffect(() => {
-    const isMounted = true;
+    let isMounted = true;
     const { setLoading, setError, setUser, logout: storeLogout } = useAuthStore.getState();
 
     // Handle redirect result
@@ -157,7 +157,7 @@ export function useAuth(): {
 
 
   const signInWithGoogle = async () => {
-    const { setLoading, setError } = useAuthStore.getState();
+    const { setError } = useAuthStore.getState();
     setLoading(true);
     setError(null);
     
