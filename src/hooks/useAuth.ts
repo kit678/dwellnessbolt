@@ -63,7 +63,7 @@ function handleAuthError(error: any) {
 
 export function useAuth(): { 
   login: (email: string, password: string) => Promise<boolean>;
-  signInWithGoogle: () => Promise<boolean>;
+  signInWithGoogle: (navigate: (path: string) => void) => Promise<{ success: boolean; isRedirect: boolean }>;
   logout: () => Promise<void>;
   loading: boolean;
   user: User | null;
@@ -173,7 +173,7 @@ export function useAuth(): {
   }, []);
 
 
-  const signInWithGoogle = async (navigate: (path: string) => void) => {
+  const signInWithGoogle = async (navigate: (path: string) => void): Promise<{ success: boolean; isRedirect: boolean }> => {
     const { setLoading, setError, setUser } = useAuthStore.getState();
     setLoading(true);
     setError(null);

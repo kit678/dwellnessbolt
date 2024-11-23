@@ -44,11 +44,13 @@ export default function Login() {
     try {
       setFormError('');
       console.log('Starting Google sign-in from Login page');
-      const { success, isRedirect } = await signInWithGoogle(navigate); 
+      const result = await signInWithGoogle(navigate); 
     
-      if (success) {
+      if (result.success) {
+    
+      if (result.success) {
         console.log('Sign-in successful, navigation handled by useAuth');
-      } else if (!isRedirect) {
+      } else if (!result.isRedirect) {
         console.log('Sign-in unsuccessful and not in redirect flow');
         setFormError('Sign-in was not completed');
       }
