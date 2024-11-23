@@ -143,6 +143,11 @@ export function useAuth(): {
         if (isMounted) setUser(null);
       }
       if (isMounted) setLoading(false);
+    handleRedirectResult();
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
     });
 
     });
