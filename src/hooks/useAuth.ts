@@ -7,7 +7,8 @@ import {
   signInWithEmailAndPassword,
   getRedirectResult
 } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { User } from '../types/index';
 import { auth, db, googleProvider } from '../lib/firebase';
 import { useAuthStore } from '../store/authStore';
 import { AUTH_ERROR_CODES, BROWSER_DETECTION } from '../constants/auth';
