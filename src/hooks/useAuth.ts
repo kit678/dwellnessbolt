@@ -122,16 +122,8 @@ export function useAuth() {
       await setPersistence(auth, browserSessionPersistence);
       console.log('Starting Google sign-in process...');
 
-      // Configure Google provider with additional scopes
-      googleProvider.addScope('profile');
-      googleProvider.addScope('email');
-      // Add calendar scope if your app needs calendar access
-      googleProvider.addScope('https://www.googleapis.com/auth/calendar.readonly');
-      
-      // Set custom OAuth parameters
-      googleProvider.setCustomParameters({
-        'prompt': 'select_account' // Force account selection
-      });
+      // Using minimal scopes configured in firebase.ts
+      // No additional scopes needed here
 
       let result;
       // Detect mobile devices for redirect vs popup

@@ -22,9 +22,12 @@ const auth = getAuth(app);
 // Initialize Firestore
 const db = getFirestore(app);
 
-// Configure Google Auth Provider
+// Configure Google Auth Provider with minimal scopes
 const googleProvider = new GoogleAuthProvider();
-googleProvider.addScope('https://www.googleapis.com/auth/userinfo.email');
-googleProvider.addScope('https://www.googleapis.com/auth/userinfo.profile');
+// Only request basic profile info
+googleProvider.setCustomParameters({
+  prompt: 'select_account',
+  access_type: 'online'
+});
 
 export { auth, db, googleProvider };
