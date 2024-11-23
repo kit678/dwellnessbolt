@@ -1,5 +1,4 @@
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { 
   signInWithPopup,
   signInWithRedirect,
@@ -67,12 +66,12 @@ export function useAuth(): {
   logout: () => Promise<void>;
   loading: boolean;
 } {
-  const loading = useAuthStore((state) => state.loading);
-  const { setLoading, setUser, logout: storeLogout } = useAuthStore();
+  const [loading, setLoading] = useState(false);
+  const { setUser, logout: storeLogout } = useAuthStore();
 
   useEffect(() => {
     let isMounted = true;
-    const { setLoading, setError, setUser, logout: storeLogout } = useAuthStore.getState();
+    const { setLoading, setError } = useAuthStore.getState();
 
     // Handle redirect result
     const handleRedirectResult = async () => {
@@ -144,16 +143,12 @@ export function useAuth(): {
       }
       if (isMounted) setLoading(false);
     handleRedirectResult();
+
     return () => {
       isMounted = false;
       unsubscribe();
     };
-    });
-
-    });
-
-
-  }, [navigate]);
+  }, []);
 
 
   const signInWithGoogle = async () => {
