@@ -152,14 +152,6 @@ export function useAuth(): {
     };
   }, []);
 
-  const isPopupBlocked = () => {
-    const testPopup = window.open('', '', 'width=1,height=1');
-    if (!testPopup || testPopup.closed || typeof testPopup.closed === 'undefined') {
-      return true;
-    }
-    testPopup.close();
-    return false;
-  };
 
   const signInWithGoogle = async () => {
     const { setLoading, setError } = useAuthStore.getState();

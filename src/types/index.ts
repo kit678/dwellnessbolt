@@ -6,6 +6,7 @@ export interface User {
   name: string;
   role: string;
   quizCompleted: boolean;
+  dosha: string | null;
   // Add other properties as needed
 }
 
