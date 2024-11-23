@@ -66,8 +66,8 @@ export function useAuth(): {
   logout: () => Promise<void>;
   loading: boolean;
 } {
-  const [loading, setLoading] = useState(false);
-  const { setUser, logout: storeLogout } = useAuthStore();
+  const loading = useAuthStore((state) => state.loading);
+  const { setLoading, setError, setUser, logout: storeLogout } = useAuthStore();
 
   useEffect(() => {
     let isMounted = true;

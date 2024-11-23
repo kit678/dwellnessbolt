@@ -1,6 +1,13 @@
 import { create } from 'zustand';
 import { User } from '../types/index';
 
+const initialState = {
+  user: null,
+  isAuthenticated: false,
+  loading: true, // Start with loading true
+  error: null,
+};
+
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
@@ -14,16 +21,13 @@ interface AuthState {
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
-  user: null,
-  isAuthenticated: false,
-  loading: true,
-  error: null,
+  ...initialState,
   setUser: (user) => set({ user, isAuthenticated: !!user, loading: false }),
   setLoading: (loading) => set({ loading }),
   setError: (error) => set({ error }),
   logout: () => {
     console.log('Logging out user from auth store');
-    set({ user: null, isAuthenticated: false, loading: false, error: null });
+    set({ ...initialState });
   },
-  reset: () => set({ user: null, isAuthenticated: false, loading: false, error: null }),
+  reset: () => set({ ...initialState }),
 }));
