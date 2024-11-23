@@ -80,6 +80,7 @@ export default function OnboardingQuiz({ isOpen, onClose, onComplete }: Onboardi
     }
 
     try {
+      console.log('Quiz finished - calculating scores...');
       // Calculate scores based on answers
       const scores = {
         Vata: answers.filter(a => a === 0).length,
@@ -87,14 +88,17 @@ export default function OnboardingQuiz({ isOpen, onClose, onComplete }: Onboardi
         Kapha: answers.filter(a => a === 2).length
       };
 
+      console.log('Updating user profile with quiz results...');
       // Update quiz completion in auth store
       await updateUserProfile(user.uid, {
         quizCompleted: true,
         dosha: Object.entries(scores).reduce((a, b) => a[1] > b[1] ? a : b)[0]
       });
+      console.log('Quiz results stored in database successfully');
 
       // Pass results back to parent
       onComplete(scores);
+      console.log('Quiz state updated successfully');
       
       // Reset local state
       setSelectedOption(null);

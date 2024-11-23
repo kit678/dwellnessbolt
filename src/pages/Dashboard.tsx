@@ -25,6 +25,10 @@ export default function Dashboard() {
           console.log('Fetched bookings:', userBookings);
           setBookings(userBookings);
           setHasFetched(true);
+          
+          if (user.quizCompleted) {
+            console.log('Quiz results fetched:', user.dosha);
+          }
         } catch (err) {
           console.error('Failed to fetch bookings:', err);
           setError('Failed to load bookings. Please try again later.');
@@ -77,13 +81,29 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Quiz Prompt */}
-      {user && !user.quizCompleted && (
-        <div className="bg-yellow-100 rounded-lg shadow-md p-6 mb-8 text-center">
-          <p className="text-yellow-800">You haven't completed your onboarding quiz yet. Please complete it to get personalized recommendations.</p>
-          <button onClick={() => setQuizOpen(true)} className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md">
-            Complete Quiz
-          </button>
+      {/* Quiz Section */}
+      {user && (
+        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+          {!user.quizCompleted ? (
+            <div className="text-center">
+              <p className="text-yellow-800">You haven't completed your onboarding quiz yet. Please complete it to get personalized recommendations.</p>
+              <button 
+                onClick={() => setQuizOpen(true)} 
+                className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+              >
+                Complete Quiz
+              </button>
+            </div>
+          ) : (
+            <div className="text-center">
+              <h3 className="text-xl font-semibold mb-2">Your Dosha Type</h3>
+              <p className="text-lg text-indigo-600 font-medium">{user.dosha}</p>
+              <p className="mt-2 text-gray-600">
+                Based on your quiz results, your dominant dosha is {user.dosha}. 
+                This helps us provide personalized recommendations for your wellness journey.
+              </p>
+            </div>
+          )}
         </div>
       )}
 
