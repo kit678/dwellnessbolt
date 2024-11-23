@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   signInWithPopup,
   signInWithRedirect,
@@ -67,6 +68,7 @@ export function useAuth(): {
   loading: boolean;
 } {
   const loading = useAuthStore((state) => state.loading);
+  const navigate = useNavigate();
   const { setLoading, setUser, logout: storeLogout } = useAuthStore();
 
   useEffect(() => {
@@ -100,7 +102,9 @@ export function useAuth(): {
             });
           } else {
             console.log('No redirect result found');
-          }
+            navigate('/dashboard');
+          } else {
+            setUser(null);
         } catch (error: any) {
           console.error('Redirect sign-in error:', error);
           handleAuthError(error);

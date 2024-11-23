@@ -29,7 +29,6 @@ export default function Login() {
     setFormError('');
     try {
       await login(email, password);
-      navigate('/dashboard');
     } catch (error) {
       if (isFirebaseError(error)) {
         if (error.code !== 'auth/popup-closed-by-user') {
