@@ -142,9 +142,11 @@ export function useAuth(): {
         if (isMounted) setUser(null);
       }
       if (isMounted) setLoading(false);
-    handleRedirectResult().catch((error) => {
+    try {
+      await handleRedirectResult();
+    } catch (error) {
       console.error('Error handling redirect result:', error);
-    });
+    }
 
     return () => {
       isMounted = false;
