@@ -160,31 +160,17 @@ export function useAuth(): {
     
     try {
       console.log('Starting Google sign-in process...');
-      // First try popup unless we're certain we need redirect
-      const forceRedirect = BROWSER_DETECTION.shouldUseRedirect();
-      console.log('Force redirect?', forceRedirect);
+      const useRedirect = BROWSER_DETECTION.shouldUseRedirect();
+      console.log('Using redirect method?', useRedirect);
 
-      if (forceRedirect) {
-        console.log('Using redirect flow');
+      if (useRedirect) {
+        console.log('Initiating redirect flow');
         sessionStorage.setItem('googleSignInRedirect', 'true');
         await signInWithRedirect(auth, googleProvider);
-        return false;
+        return false; // Redirect in progress
       }
 
-      console.log('Using popup flow');
-
-      console.log('Using popup flow');
-      console.log('Browser details:', {
-        userAgent: navigator.userAgent,
-        vendor: navigator.vendor,
-        platform: navigator.platform,
-        language: navigator.language,
-        dimensions: {
-          inner: { width: window.innerWidth, height: window.innerHeight },
-          outer: { width: window.outerWidth, height: window.outerHeight },
-        }
-      });
-
+      console.log('Initiating popup flow');
       const result = await signInWithPopup(auth, googleProvider);
       
       if (result.user) {
@@ -197,13 +183,21 @@ export function useAuth(): {
       return false;
     } catch (error: any) {
       console.log('Google sign-in error:', error.code);
-      if (error.code === AUTH_ERROR_CODES.POPUP_BLOCKED || 
-          error.code === AUTH_ERROR_CODES.POPUP_CLOSED_BY_USER) {
-        console.log('Popup failed, falling back to redirect');
+      
+      // Only fall back to redirect if popup was blocked
+      if (error.code === AUTH_ERROR_CODES.POPUP_BLOCKED) {
+        console.log('Popup blocked, falling back to redirect');
         sessionStorage.setItem('googleSignInRedirect', 'true');
         await signInWithRedirect(auth, googleProvider);
         return false;
       }
+      
+      // Don't treat popup closure as an error
+      if (error.code === AUTH_ERROR_CODES.POPUP_CLOSED_BY_USER) {
+        console.log('User closed the popup');
+        return false;
+      }
+      
       handleAuthError(error);
       return false;
     } finally {

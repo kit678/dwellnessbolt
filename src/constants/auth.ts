@@ -11,12 +11,11 @@ export const AUTH_ERROR_CODES = {
 } as const;
 
 export const BROWSER_DETECTION = {
-  isMobile: () => /Mobi|Android/i.test(navigator.userAgent),
-  isSafari: () => /^((?!chrome|android).)*safari/i.test(navigator.userAgent),
   shouldUseRedirect: () => {
     const isMobile = /Mobi|Android/i.test(navigator.userAgent);
     const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const isSmallScreen = window.innerWidth < 768;
     
     // For debugging
     console.log('Browser Detection:', {
@@ -24,11 +23,17 @@ export const BROWSER_DETECTION = {
       isMobile,
       isSafari,
       isIOS,
+      isSmallScreen,
       platform: navigator.platform,
-      vendor: navigator.vendor
+      vendor: navigator.vendor,
+      screenWidth: window.innerWidth
     });
     
-    // Only use redirect for mobile devices and Safari
-    return isMobile || isIOS || (isSafari && !navigator.userAgent.includes('Chrome'));
+    // Use redirect for:
+    // 1. Mobile devices
+    // 2. iOS devices
+    // 3. Safari (not Chrome)
+    // 4. Small screens
+    return isMobile || isIOS || isSmallScreen || (isSafari && !navigator.userAgent.includes('Chrome'));
   }
 } as const;
