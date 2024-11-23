@@ -8,13 +8,13 @@ import toast from 'react-hot-toast';
 export default function Navbar() {
   const { user } = useAuthStore();
   const auth = useAuth();
-  const { logout, loading } = auth;
+  const { logout } = auth;
   const [isOpen, setIsOpen] = React.useState(false);
   const navigate = useNavigate();
   const [isLoggingOut, setIsLoggingOut] = React.useState(false);
 
   const handleLogout = useCallback(async () => {
-    if (isLoggingOut || loading) return;
+    if (isLoggingOut) return;
     setIsLoggingOut(true);
     try {
       await logout();
@@ -26,7 +26,7 @@ export default function Navbar() {
     } finally {
       setIsLoggingOut(false);
     }
-  }, [isLoggingOut, loading, logout, navigate]);
+  }, [isLoggingOut, logout, navigate]);
 
   return (
     <nav className="bg-white shadow-lg fixed w-full z-50" aria-label="Main Navigation">
@@ -56,12 +56,12 @@ export default function Navbar() {
                 )}
                 <button
                   onClick={handleLogout}
-                  disabled={isLoggingOut || loading}
+                  disabled={isLoggingOut}
                   className="flex items-center text-gray-700 hover:text-indigo-600 disabled:opacity-50"
                   aria-label="Logout"
                 >
                   <LogOut className="h-5 w-5 mr-1" />
-                  {isLoggingOut || loading ? 'Logging out...' : 'Logout'}
+                  {isLoggingOut ? 'Logging out...' : 'Logout'}
                 </button>
               </>
             ) : (
