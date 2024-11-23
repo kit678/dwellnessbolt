@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { useAuth } from '../hooks/useAuth';
@@ -12,7 +12,7 @@ export default function Navbar() {
   const navigate = useNavigate();
   const [isLoggingOut, setIsLoggingOut] = React.useState(false);
 
-  const handleLogout = async () => {
+  const handleLogout = useCallback(async () => {
     if (isLoggingOut || loading) return;
     setIsLoggingOut(true);
     try {
@@ -25,7 +25,7 @@ export default function Navbar() {
     } finally {
       setIsLoggingOut(false);
     }
-  };
+  }, [isLoggingOut, loading, logout, navigate]);
 
   return (
     <nav className="bg-white shadow-lg fixed w-full z-50" aria-label="Main Navigation">
