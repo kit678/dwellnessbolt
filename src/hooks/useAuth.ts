@@ -4,12 +4,13 @@ import {
   signInWithRedirect,
   setPersistence,
   browserSessionPersistence,
-  getRedirectResult,
   GoogleAuthProvider,
   onAuthStateChanged,
-  signOut
+  signOut,
+  signInWithEmailAndPassword
 } from 'firebase/auth';
-import { auth } from '../lib/firebase';
+import { doc, getDoc } from 'firebase/firestore';
+import { auth, db } from '../lib/firebase';
 import { useAuthStore } from '../store/authStore';
 import toast from 'react-hot-toast';
 
@@ -60,12 +61,14 @@ export function useAuth() {
 
       if (isMobile) {
         await signInWithRedirect(auth, googleProvider);
+        return false; // Redirect flow initiated
       } else {
         const result = await signInWithPopup(auth, googleProvider);
         if (result.user) {
-          // Handle successful sign-in
           toast.success('Successfully signed in with Google!');
+          return true;
         }
+        return false;
       }
     } catch (error: any) {
       handleAuthError(error);
@@ -88,7 +91,25 @@ export function useAuth() {
     }
   };
 
+  const login = async (email: string, password: string) => {
+    setLoading(true);
+    try {
+      await setPersistence(auth, browserSessionPersistence);
+      const result = await signInWithEmailAndPassword(auth, email, password);
+      if (result.user) {
+        toast.success('Successfully signed in!');
+      }
+      return true;
+    } catch (error: any) {
+      handleAuthError(error);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
+    login,
     signInWithGoogle,
     logout,
     loading
