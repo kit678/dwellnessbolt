@@ -46,6 +46,7 @@ export function useAuth() {
               id: userDoc.id,
               uid: firebaseUser.uid,
               email: userData.email || firebaseUser.email || '',
+              name: userData.displayName || firebaseUser.displayName || '',
               displayName: userData.displayName || firebaseUser.displayName || '',
               role: userData.role || 'user',
               quizCompleted: userData.quizCompleted || false,
