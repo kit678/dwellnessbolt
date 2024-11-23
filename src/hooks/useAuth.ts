@@ -4,10 +4,11 @@ import {
   onAuthStateChanged,
   signOut,
   signInWithEmailAndPassword,
-
 } from 'firebase/auth';
 import { auth, googleProvider } from '../lib/firebase';
 import { useAuthStore } from '../store/authStore';
+import { userService } from '../services/userService';
+import { User } from '../types';
 import toast from 'react-hot-toast';
 
 export function useAuth() {
@@ -20,11 +21,24 @@ export function useAuth() {
       if (firebaseUser) {
         try {
           // Fetch user data and set user state
-          setUser({
-            id: firebaseUser.uid,
-            email: firebaseUser.email || '',
-            displayName: firebaseUser.displayName || '',
-          });
+          const userData = await userService.getUserProfile(firebaseUser.uid);
+          if (userData) {
+            setUser(userData);
+          } else {
+            // Create default user profile if it doesn't exist
+            const defaultUser: User = {
+              id: firebaseUser.uid,
+              uid: firebaseUser.uid,
+              email: firebaseUser.email || '',
+              displayName: firebaseUser.displayName || '',
+              name: firebaseUser.displayName || '',
+              role: 'user',
+              quizCompleted: false,
+              dosha: null,
+              secondaryDosha: null,
+            };
+            setUser(defaultUser);
+          }
         } catch (error) {
           console.error('Failed to fetch user data:', error);
         }
@@ -77,11 +91,25 @@ export function useAuth() {
     }
   };
 
+  const updateUserProfile = async (uid: string, data: Partial<User>) => {
+    try {
+      await userService.updateUserProfile(uid, data);
+      const updatedUser = await userService.getUserProfile(uid);
+      if (updatedUser) {
+        setUser(updatedUser);
+      }
+    } catch (error) {
+      console.error('Error updating user profile:', error);
+      throw error;
+    }
+  };
+
   return {
     login,
     signInWithGoogle,
     logout,
     loading,
-    user: useAuthStore.getState().user
+    user: useAuthStore.getState().user,
+    updateUserProfile
   };
 }

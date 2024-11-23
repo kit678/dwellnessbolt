@@ -43,14 +43,8 @@ export default function Login() {
     try {
       setFormError('');
       console.log('Starting Google sign-in from Login page');
-      const result = await signInWithGoogle(navigate); 
-    
-      if (result.success) {
-        console.log('Sign-in successful, navigation handled by useAuth');
-      } else if (!result.isRedirect) {
-        console.log('Sign-in unsuccessful and not in redirect flow');
-        setFormError('Sign-in was not completed');
-      }
+      await signInWithGoogle();
+      console.log('Sign-in successful, navigation handled by useAuth');
     } catch (error) {
       console.error('Google sign-in error in Login page:', error);
       if (isFirebaseError(error)) {
