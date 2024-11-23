@@ -71,7 +71,7 @@ export function useAuth(): {
 
   useEffect(() => {
     let isMounted = true;
-    const { setLoading, setError } = useAuthStore.getState();
+    const { setError } = useAuthStore.getState();
 
     // Handle redirect result
     const handleRedirectResult = async () => {
@@ -142,7 +142,9 @@ export function useAuth(): {
         if (isMounted) setUser(null);
       }
       if (isMounted) setLoading(false);
-    handleRedirectResult();
+    handleRedirectResult().catch((error) => {
+      console.error('Error handling redirect result:', error);
+    });
 
     return () => {
       isMounted = false;
