@@ -105,7 +105,7 @@ const options = [
 ]
 
 export default function OnboardingQuiz({ isOpen, onClose, onComplete }: OnboardingQuizProps) {
-  const { user } = useAuth();
+  const { user, updateUserProfile } = useAuth();
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [answers, setAnswers] = useState<number[]>([]);
@@ -148,9 +148,9 @@ export default function OnboardingQuiz({ isOpen, onClose, onComplete }: Onboardi
     try {
       // Calculate scores based on answers
       const scores = {
-        Vata: answers.filter((a, i) => a === 0).length,
-        Pitta: answers.filter((a, i) => a === 1).length,
-        Kapha: answers.filter((a, i) => a === 2).length
+        Vata: answers.filter(a => a === 0).length,
+        Pitta: answers.filter(a => a === 1).length,
+        Kapha: answers.filter(a => a === 2).length
       };
 
       // Update quiz completion in auth store
