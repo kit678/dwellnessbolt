@@ -36,6 +36,8 @@ export function useAuth() {
               quizCompleted: false,
               dosha: null,
               secondaryDosha: null,
+              quizResults: [],
+              lastQuizDate: null
             };
             setUser(defaultUser);
           }
