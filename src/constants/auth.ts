@@ -14,12 +14,21 @@ export const BROWSER_DETECTION = {
   isMobile: () => /Mobi|Android/i.test(navigator.userAgent),
   isSafari: () => /^((?!chrome|android).)*safari/i.test(navigator.userAgent),
   shouldUseRedirect: () => {
+    const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    
     // For debugging
-    console.log('UserAgent:', navigator.userAgent);
-    console.log('Is Mobile:', /Mobi|Android/i.test(navigator.userAgent));
-    console.log('Is Safari:', /^((?!chrome|android).)*safari/i.test(navigator.userAgent));
-    // Default to popup for desktop browsers except Safari
-    return /Mobi|Android/i.test(navigator.userAgent) || 
-           /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    console.log('Browser Detection:', {
+      userAgent: navigator.userAgent,
+      isMobile,
+      isSafari,
+      isIOS,
+      platform: navigator.platform,
+      vendor: navigator.vendor
+    });
+    
+    // Only use redirect for mobile devices and Safari
+    return isMobile || isIOS || (isSafari && !navigator.userAgent.includes('Chrome'));
   }
 } as const;

@@ -37,12 +37,12 @@ const auth = getAuth(app);
 // Initialize Firestore
 const db = getFirestore(app);
 
-// Configure Google Auth Provider with minimal scopes
+// Configure Google Auth Provider
 const googleProvider = new GoogleAuthProvider();
-// Only request basic profile info
 googleProvider.setCustomParameters({
   prompt: 'select_account',
-  access_type: 'online'
+  access_type: 'online',
+  display: 'popup'  // Force popup display
 });
 
 // Set default persistence

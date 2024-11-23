@@ -168,10 +168,11 @@ export function useAuth(): {
     
     try {
       console.log('Starting Google sign-in process...');
-      const shouldUseRedirect = BROWSER_DETECTION.shouldUseRedirect() || isPopupBlocked();
-      console.log('Should use redirect?', shouldUseRedirect);
+      // First try popup unless we're certain we need redirect
+      const forceRedirect = BROWSER_DETECTION.shouldUseRedirect();
+      console.log('Force redirect?', forceRedirect);
 
-      if (shouldUseRedirect) {
+      if (forceRedirect) {
         console.log('Using redirect flow');
         sessionStorage.setItem('googleSignInRedirect', 'true');
         await signInWithRedirect(auth, googleProvider);
