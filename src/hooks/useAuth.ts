@@ -9,7 +9,8 @@ import {
   setPersistence,
   browserSessionPersistence,
   getRedirectResult,
-  GoogleAuthProvider
+  GoogleAuthProvider,
+  fetchSignInMethodsForEmail
 } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { auth, db, googleProvider } from '../lib/firebase';
@@ -163,9 +164,8 @@ export function useAuth() {
       }
 
       if (result?.user) {
-        // Get additional user info and OAuth credentials
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        const token = credential?.accessToken;
+        // Get additional user info
+        GoogleAuthProvider.credentialFromResult(result);
         
         // Log successful sign-in details
         console.log('Google sign-in successful:', {
