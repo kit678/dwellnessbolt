@@ -24,13 +24,8 @@ if (import.meta.env.DEV) {
   self.FIREBASE_DEBUG_MODE = debugConfig;
 }
 
-// Set Cross-Origin-Resource-Policy header
-const meta = document.createElement('meta');
-meta.httpEquiv = 'Cross-Origin-Resource-Policy';
-meta.content = 'same-site';
-document.head.appendChild(meta);
-
 // Initialize Firebase only if no apps are already initialized
+// Note: Removed CORP meta tag as it was interfering with Firebase Auth iframe
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
 console.log('Firebase initialized with config:', {
   ...firebaseConfig,
