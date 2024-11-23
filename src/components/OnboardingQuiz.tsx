@@ -41,7 +41,8 @@ const options = [
 ]
 
 export default function OnboardingQuiz({ isOpen, onClose, onComplete }: OnboardingQuizProps) {
-  const { user, updateUserProfile } = useAuth();
+  const auth = useAuth();
+  const { user, updateUserProfile } = auth;
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [answers, setAnswers] = useState<number[]>([]);
