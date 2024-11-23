@@ -13,12 +13,9 @@ const firebaseConfig = {
 
 // Initialize Firebase only if no apps are already initialized
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
-console.log('Firebase initialized with config:', {
-  ...firebaseConfig,
-  apiKey: '[REDACTED]' // Don't log API key
-});
+console.log('Firebase initialized with config:', firebaseConfig);
 
-// Initialize Firestore with optimized settings
+// Initialize Firestore with REST configuration
 const db = initializeFirestore(app, {
   experimentalForceLongPolling: true,
   localCache: persistentLocalCache({
@@ -39,12 +36,9 @@ setPersistence(auth, browserSessionPersistence)
     console.error('Error setting auth persistence:', error);
   });
 
-// Configure Google Provider with explicit scopes
+// Configure Google Provider
 const googleProvider = new GoogleAuthProvider();
 googleProvider.addScope('https://www.googleapis.com/auth/userinfo.email');
 googleProvider.addScope('https://www.googleapis.com/auth/userinfo.profile');
-googleProvider.setCustomParameters({
-  prompt: 'select_account'
-});
 
 export { auth, db, googleProvider };
