@@ -45,21 +45,15 @@ export default function Login() {
       setFormError('');
       const success = await signInWithGoogle();
       if (success) {
-        toast.success('Successfully signed in with Google!');
         navigate('/dashboard');
       }
     } catch (error) {
       if (isFirebaseError(error)) {
-        if (error.code !== 'auth/popup-closed-by-user') {
-          console.error('Google sign-in failed:', error);
-          setFormError(error.message);
-          toast.error('Failed to sign in with Google');
-        }
+        setFormError(error.message);
       } else {
-        console.error('An unexpected error occurred:', error);
         setFormError('An unexpected error occurred');
-        toast.error('Failed to sign in with Google');
       }
+      toast.error('Failed to sign in with Google');
     }
   };
 
