@@ -145,6 +145,8 @@ export function useAuth(): {
       }
       if (isMounted) setLoading(false);
     });
+
+    handleRedirectResult();
     });
 
     handleRedirectResult();
