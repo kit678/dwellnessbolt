@@ -3,6 +3,6 @@
 @tailwind utilities;
 
 /* Add any global styles here */ 
-html {
-  overflow-y: scroll; /* Always show vertical scrollbar */
+body {
+  overflow-y: scroll; /* Always reserve space for vertical scrollbar */
 }
