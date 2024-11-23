@@ -12,5 +12,14 @@ export const AUTH_ERROR_CODES = {
 
 export const BROWSER_DETECTION = {
   isMobile: () => /Mobi|Android/i.test(navigator.userAgent),
-  isSafari: () => /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
+  isSafari: () => /^((?!chrome|android).)*safari/i.test(navigator.userAgent),
+  shouldUseRedirect: () => {
+    // For debugging
+    console.log('UserAgent:', navigator.userAgent);
+    console.log('Is Mobile:', /Mobi|Android/i.test(navigator.userAgent));
+    console.log('Is Safari:', /^((?!chrome|android).)*safari/i.test(navigator.userAgent));
+    // Default to popup for desktop browsers except Safari
+    return /Mobi|Android/i.test(navigator.userAgent) || 
+           /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+  }
 } as const;

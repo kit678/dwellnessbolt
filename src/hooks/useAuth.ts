@@ -75,18 +75,37 @@ export function useAuth(): {
 
     // Handle redirect result
     const handleRedirectResult = async () => {
-      if (sessionStorage.getItem('googleSignInRedirect')) {
+      const redirectPending = sessionStorage.getItem('googleSignInRedirect');
+      console.log('Checking redirect result. Pending:', redirectPending);
+      
+      if (redirectPending) {
         try {
+          console.log('Processing redirect result...');
           setLoading(true);
           const result = await getRedirectResult(auth);
+          
           if (result?.user) {
             console.log('Redirect sign-in successful:', result.user.email);
             toast.success('Successfully signed in with Google!');
+            // Force a state update
+            setUser({
+              id: result.user.uid,
+              uid: result.user.uid,
+              email: result.user.email || '',
+              name: result.user.displayName || '',
+              displayName: result.user.displayName || '',
+              role: 'user',
+              quizCompleted: false,
+              dosha: null
+            });
+          } else {
+            console.log('No redirect result found');
           }
         } catch (error: any) {
           console.error('Redirect sign-in error:', error);
           handleAuthError(error);
         } finally {
+          console.log('Cleaning up redirect state');
           sessionStorage.removeItem('googleSignInRedirect');
           if (isMounted) setLoading(false);
         }
@@ -149,9 +168,8 @@ export function useAuth(): {
     
     try {
       console.log('Starting Google sign-in process...');
-      const shouldUseRedirect = BROWSER_DETECTION.isMobile() || 
-                              BROWSER_DETECTION.isSafari() || 
-                              isPopupBlocked();
+      const shouldUseRedirect = BROWSER_DETECTION.shouldUseRedirect() || isPopupBlocked();
+      console.log('Should use redirect?', shouldUseRedirect);
 
       if (shouldUseRedirect) {
         console.log('Using redirect flow');
@@ -159,6 +177,8 @@ export function useAuth(): {
         await signInWithRedirect(auth, googleProvider);
         return false;
       }
+
+      console.log('Using popup flow');
 
       console.log('Using popup flow');
       console.log('Browser details:', {
