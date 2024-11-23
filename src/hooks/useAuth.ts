@@ -7,11 +7,10 @@ import {
   signInWithEmailAndPassword,
   getRedirectResult
 } from 'firebase/auth';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { User } from '../types/index';
-import { auth, db, googleProvider } from '../lib/firebase';
+import { auth, googleProvider } from '../lib/firebase';
 import { useAuthStore } from '../store/authStore';
 import { AUTH_ERROR_CODES, BROWSER_DETECTION } from '../constants/auth';
+import { userService } from '../services/userService';
 import toast from 'react-hot-toast';
 
 function handleAuthError(error: any) {
@@ -125,28 +124,10 @@ export function useAuth(): {
       setLoading(true);
       if (firebaseUser) {
         try {
-          const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
-          if (userDoc.exists()) {
-            const userData = userDoc.data();
-            const user = {
-              id: userDoc.id,
-              uid: firebaseUser.uid,
-              email: userData.email || firebaseUser.email || '',
-              name: userData.displayName || firebaseUser.displayName || '',
-              displayName: userData.displayName || firebaseUser.displayName || '',
-              role: userData.role || 'user',
-              quizCompleted: userData.quizCompleted || false,
-              dosha: userData.dosha || null,
-              secondaryDosha: userData.secondaryDosha || null,
-              quizResults: Array.isArray(userData.quizResults) ? userData.quizResults.map(result => ({
-                ...result,
-                percentages: result.percentages || { Vata: 0, Pitta: 0, Kapha: 0 },
-                scores: result.scores || { Vata: 0, Pitta: 0, Kapha: 0 }
-              })) : [],
-              lastQuizDate: userData.lastQuizDate || null
-            };
+          const userData = await userService.getUserProfile(firebaseUser.uid);
+          if (userData) {
             if (isMounted) {
-              setUser(user);
+              setUser(userData);
               // Check if we're on the login page and redirect if needed
               const currentPath = window.location.pathname;
               if (currentPath === '/login') {
@@ -276,24 +257,11 @@ export function useAuth(): {
     }
   };
 
-  const updateUserProfile = async (uid: string, data: Partial<User>) => {
-    try {
-      const userRef = doc(db, 'users', uid);
-      await updateDoc(userRef, data);
-      const { setUser } = useAuthStore.getState();
-      setUser({ ...useAuthStore.getState().user, ...data } as User);
-    } catch (error) {
-      console.error('Error updating user profile:', error);
-      throw error;
-    }
-  };
-
   return {
     login,
     signInWithGoogle,
     logout,
     loading,
-    user: useAuthStore.getState().user,
-    updateUserProfile
+    user: useAuthStore.getState().user
   };
 }

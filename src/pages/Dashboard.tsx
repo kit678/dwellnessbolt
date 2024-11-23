@@ -5,11 +5,13 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { format } from 'date-fns';
 import { Booking } from '../types/index';
 import { useAuthStore } from '../store/authStore';
+import { useUser } from '../hooks/useUser';
 import { useBookings } from '../hooks/useBookings';
 import OnboardingQuiz from '../components/OnboardingQuiz';
 
 export default function Dashboard() {
   const { user } = useAuthStore();
+  const { updateUserProfile } = useUser();
   const { getUserBookings, loading } = useBookings();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [error, setError] = useState<string | null>(null);
