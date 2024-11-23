@@ -1,6 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+import { calculateQuizResults } from '@/utils/quizUtils'
+import { useQuizStore } from '@/store/quizStore'
 import { m, AnimatePresence } from 'framer-motion'
 import { X, ArrowLeft, ArrowRight } from 'lucide-react'
 import { Button } from "@/components/ui/button"

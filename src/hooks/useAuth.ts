@@ -99,7 +99,10 @@ export function useAuth(): {
               displayName: result.user.displayName || '',
               role: 'user',
               quizCompleted: false,
-              dosha: null
+              dosha: null,
+              secondaryDosha: null,
+              quizResults: [],
+              lastQuizDate: null
             });
           } else {
             console.log('No redirect result found');
@@ -133,7 +136,10 @@ export function useAuth(): {
               displayName: userData.displayName || firebaseUser.displayName || '',
               role: userData.role || 'user',
               quizCompleted: userData.quizCompleted || false,
-              dosha: userData.dosha || null
+              dosha: userData.dosha || null,
+              secondaryDosha: userData.secondaryDosha || null,
+              quizResults: userData.quizResults || [],
+              lastQuizDate: userData.lastQuizDate || null
             };
             if (isMounted) setUser(user);
           }
