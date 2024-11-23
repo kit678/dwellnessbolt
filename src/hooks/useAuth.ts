@@ -7,7 +7,9 @@ import {
   signInWithPopup,
   signInWithRedirect,
   setPersistence,
-  browserSessionPersistence
+  browserSessionPersistence,
+  getRedirectResult,
+  GoogleAuthProvider
 } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { auth, db, googleProvider } from '../lib/firebase';
@@ -99,7 +101,10 @@ export function useAuth() {
         const userData: Omit<User, 'id'> = {
           email: user.email!,
           name: user.displayName || user.email?.split('@')[0] || 'User',
-          role: 'user'
+          role: 'user',
+          uid: user.uid,
+          displayName: user.displayName || user.email?.split('@')[0] || 'User',
+          quizCompleted: false
         };
         await setDoc(doc(db, 'users', user.uid), userData);
         setUser({ id: user.uid, ...userData });
@@ -136,7 +141,6 @@ export function useAuth() {
       if (result && result.user) {
         // Get additional user info
         const credential = GoogleAuthProvider.credentialFromResult(result);
-        const token = credential?.accessToken;
         
         console.log('Google sign-in successful:', {
           email: result.user.email,
