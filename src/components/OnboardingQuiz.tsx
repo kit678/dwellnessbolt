@@ -80,25 +80,26 @@ export default function OnboardingQuiz({ isOpen, onClose, onComplete }: Onboardi
     }
 
     try {
-      console.log('Quiz finished - calculating scores...');
-      // Calculate scores based on answers
-      const scores = {
-        Vata: answers.filter(a => a === 0).length,
-        Pitta: answers.filter(a => a === 1).length,
-        Kapha: answers.filter(a => a === 2).length
-      };
-
+      console.log('Quiz finished - calculating results...');
+      const quizResults = calculateQuizResults(answers, user.uid);
+      
       console.log('Updating user profile with quiz results...');
-      // Update quiz completion in auth store
+      // Update quiz completion and results in auth store
       await updateUserProfile(user.uid, {
         quizCompleted: true,
-        dosha: Object.entries(scores).reduce((a, b) => a[1] > b[1] ? a : b)[0]
+        dosha: quizResults.dominantDosha,
+        secondaryDosha: quizResults.secondaryDosha,
+        lastQuizDate: quizResults.completedAt,
+        quizResults: [...(user.quizResults || []), quizResults]
       });
       console.log('Quiz results stored in database successfully');
 
-      // Pass results back to parent
-      onComplete(scores);
+      // Update quiz store
+      useQuizStore.getState().setQuizResults(quizResults);
       console.log('Quiz state updated successfully');
+
+      // Pass results back to parent
+      onComplete(quizResults.scores);
       
       // Reset local state
       setSelectedOption(null);

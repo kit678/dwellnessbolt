@@ -1,3 +1,23 @@
+export interface QuizResult {
+  id: string;
+  userId: string;
+  completedAt: string;
+  answers: number[];
+  scores: {
+    Vata: number;
+    Pitta: number;
+    Kapha: number;
+  };
+  dominantDosha: string;
+  secondaryDosha: string | null;
+  percentages: {
+    Vata: number;
+    Pitta: number;
+    Kapha: number;
+  };
+  version: string;
+}
+
 export interface User {
   id: string;
   uid: string;
@@ -7,6 +27,9 @@ export interface User {
   role: string;
   quizCompleted: boolean;
   dosha: string | null;
+  secondaryDosha: string | null;
+  quizResults: QuizResult[];
+  lastQuizDate: string | null;
   // Add other properties as needed
 }
 
