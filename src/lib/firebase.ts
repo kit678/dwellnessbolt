@@ -12,9 +12,24 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
+// Enable Firebase internal debugging
+if (import.meta.env.DEV) {
+  const debugConfig = {
+    trace: true,
+    debug: true,
+  };
+  // @ts-ignore - Firebase internal debug config
+  self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+  // @ts-ignore - Firebase internal debug config
+  self.FIREBASE_DEBUG_MODE = debugConfig;
+}
+
 // Initialize Firebase only if no apps are already initialized
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
-console.log('Firebase initialized with config:', firebaseConfig);
+console.log('Firebase initialized with config:', {
+  ...firebaseConfig,
+  apiKey: '[REDACTED]' // Don't log API key
+});
 
 // Initialize Firebase Authentication
 const auth = getAuth(app);

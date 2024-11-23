@@ -86,7 +86,25 @@ export function useAuth() {
         return false; // Redirect flow initiated
       } else {
         console.log('Using popup flow for desktop');
-        const result = await signInWithPopup(auth, googleProvider);
+        console.log('Browser details:', {
+          userAgent: navigator.userAgent,
+          vendor: navigator.vendor,
+          platform: navigator.platform,
+          language: navigator.language,
+        });
+        console.log('Window dimensions:', {
+          inner: { width: window.innerWidth, height: window.innerHeight },
+          outer: { width: window.outerWidth, height: window.outerHeight },
+        });
+        console.log('Popup settings:', {
+          provider: googleProvider.providerId,
+          customParameters: googleProvider.customParameters,
+        });
+        
+        try {
+          console.log('Attempting to open popup...');
+          const result = await signInWithPopup(auth, googleProvider);
+          console.log('Popup completed successfully');
         if (result.user) {
           console.log('Google sign-in successful:', result.user.email);
           toast.success('Successfully signed in with Google!');
