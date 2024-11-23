@@ -44,21 +44,13 @@ export default function Login() {
     try {
       setFormError('');
       console.log('Starting Google sign-in from Login page');
-      const success = await signInWithGoogle(); 
+      const { success, isRedirect } = await signInWithGoogle(navigate); 
     
       if (success) {
-        console.log('Sign-in successful, navigating to dashboard');
-        navigate('/dashboard');
-      } else {
-        // Check if we're in a redirect flow
-        const isPendingRedirect = sessionStorage.getItem('googleSignInRedirect');
-        if (isPendingRedirect) {
-          console.log('Redirect flow in progress');
-          // Don't show any error, just wait for redirect
-        } else {
-          console.log('Sign-in unsuccessful but not in redirect flow');
-          setFormError('Sign-in was not completed');
-        }
+        console.log('Sign-in successful, navigation handled by useAuth');
+      } else if (!isRedirect) {
+        console.log('Sign-in unsuccessful and not in redirect flow');
+        setFormError('Sign-in was not completed');
       }
     } catch (error) {
       console.error('Google sign-in error in Login page:', error);

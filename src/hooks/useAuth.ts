@@ -145,7 +145,14 @@ export function useAuth(): {
               })) : [],
               lastQuizDate: userData.lastQuizDate || null
             };
-            if (isMounted) setUser(user);
+            if (isMounted) {
+              setUser(user);
+              // Check if we're on the login page and redirect if needed
+              const currentPath = window.location.pathname;
+              if (currentPath === '/login') {
+                window.location.href = '/dashboard';
+              }
+            }
           }
         } catch (error) {
           console.error('Failed to fetch user data:', error);
@@ -166,8 +173,8 @@ export function useAuth(): {
   }, []);
 
 
-  const signInWithGoogle = async () => {
-    const { setLoading, setError } = useAuthStore.getState();
+  const signInWithGoogle = async (navigate: (path: string) => void) => {
+    const { setLoading, setError, setUser } = useAuthStore.getState();
     setLoading(true);
     setError(null);
     
@@ -180,7 +187,7 @@ export function useAuth(): {
         console.log('Initiating redirect flow');
         sessionStorage.setItem('googleSignInRedirect', 'true');
         await signInWithRedirect(auth, googleProvider);
-        return false; // Redirect in progress
+        return { success: false, isRedirect: true }; // Redirect in progress
       }
 
       console.log('Initiating popup flow');
@@ -188,12 +195,32 @@ export function useAuth(): {
       
       if (result.user) {
         console.log('Google sign-in successful:', result.user.email);
-        toast.success('Successfully signed in with Google!');
-        return true;
+        const userDoc = await getDoc(doc(db, 'users', result.user.uid));
+        
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          const user = {
+            id: userDoc.id,
+            uid: result.user.uid,
+            email: userData.email || result.user.email || '',
+            name: userData.displayName || result.user.displayName || '',
+            displayName: userData.displayName || result.user.displayName || '',
+            role: userData.role || 'user',
+            quizCompleted: userData.quizCompleted || false,
+            dosha: userData.dosha || null,
+            secondaryDosha: userData.secondaryDosha || null,
+            quizResults: userData.quizResults || [],
+            lastQuizDate: userData.lastQuizDate || null
+          };
+          setUser(user);
+          toast.success('Successfully signed in with Google!');
+          navigate('/dashboard');
+          return { success: true, isRedirect: false };
+        }
       }
       
       setError('Sign-in failed: No user returned');
-      return false;
+      return { success: false, isRedirect: false };
     } catch (error: any) {
       console.log('Google sign-in error:', error.code);
       
