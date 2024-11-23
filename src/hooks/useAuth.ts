@@ -72,8 +72,8 @@ export function useAuth(): {
   const { setLoading, setUser, logout: storeLogout } = useAuthStore();
 
   useEffect(() => {
-    let isMounted = true;
-    const { setLoading, setError } = useAuthStore.getState();
+    const isMounted = true;
+    const { setLoading, setError, setUser, logout: storeLogout } = useAuthStore.getState();
 
     // Handle redirect result
     const handleRedirectResult = async () => {
