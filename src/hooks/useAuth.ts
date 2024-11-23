@@ -4,11 +4,13 @@ import {
   signInWithRedirect,
   onAuthStateChanged,
   signOut,
-  signInWithEmailAndPassword
+  signInWithEmailAndPassword,
+  getRedirectResult
 } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { auth, db, googleProvider } from '../lib/firebase';
 import { useAuthStore } from '../store/authStore';
+import { AUTH_ERROR_CODES, BROWSER_DETECTION } from '../constants/auth';
 import toast from 'react-hot-toast';
 
 function handleAuthError(error: any) {
@@ -47,14 +49,39 @@ export function useAuth(): {
   const { setUser, logout: storeLogout } = useAuthStore();
 
   useEffect(() => {
+    let isMounted = true;
+    const { setLoading, setError } = useAuthStore.getState();
+
+    // Handle redirect result
+    const handleRedirectResult = async () => {
+      if (sessionStorage.getItem('googleSignInRedirect')) {
+        try {
+          setLoading(true);
+          const result = await getRedirectResult(auth);
+          if (result?.user) {
+            console.log('Redirect sign-in successful:', result.user.email);
+            toast.success('Successfully signed in with Google!');
+          }
+        } catch (error: any) {
+          console.error('Redirect sign-in error:', error);
+          handleAuthError(error);
+        } finally {
+          sessionStorage.removeItem('googleSignInRedirect');
+          if (isMounted) setLoading(false);
+        }
+      }
+    };
+
+    // Handle auth state changes
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (!isMounted) return;
+      
+      setLoading(true);
       if (firebaseUser) {
         try {
-          // Fetch user data and set it in the store
           const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
           if (userDoc.exists()) {
             const userData = userDoc.data();
-            // Transform Firestore data to User type
             const user = {
               id: userDoc.id,
               uid: firebaseUser.uid,
@@ -65,60 +92,84 @@ export function useAuth(): {
               quizCompleted: userData.quizCompleted || false,
               dosha: userData.dosha || null
             };
-            setUser(user);
+            if (isMounted) setUser(user);
           }
         } catch (error) {
           console.error('Failed to fetch user data:', error);
+          if (isMounted) setError('Failed to fetch user data');
         }
       } else {
-        setUser(null);
+        if (isMounted) setUser(null);
       }
+      if (isMounted) setLoading(false);
     });
 
-    return () => unsubscribe();
-  }, [setUser]);
+    handleRedirectResult();
+
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
+  }, []);
+
+  const isPopupBlocked = () => {
+    const testPopup = window.open('', '', 'width=1,height=1');
+    if (!testPopup || testPopup.closed || typeof testPopup.closed === 'undefined') {
+      return true;
+    }
+    testPopup.close();
+    return false;
+  };
 
   const signInWithGoogle = async () => {
+    const { setLoading, setError } = useAuthStore.getState();
     setLoading(true);
+    setError(null);
+    
     try {
       console.log('Starting Google sign-in process...');
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      console.log('Device type:', isMobile ? 'mobile' : 'desktop');
+      const shouldUseRedirect = BROWSER_DETECTION.isMobile() || 
+                              BROWSER_DETECTION.isSafari() || 
+                              isPopupBlocked();
 
-      if (isMobile) {
-        console.log('Using redirect flow for mobile');
+      if (shouldUseRedirect) {
+        console.log('Using redirect flow');
+        sessionStorage.setItem('googleSignInRedirect', 'true');
         await signInWithRedirect(auth, googleProvider);
-        return false; // Redirect flow initiated
-      } else {
-        console.log('Using popup flow for desktop');
-        console.log('Browser details:', {
-          userAgent: navigator.userAgent,
-          vendor: navigator.vendor,
-          platform: navigator.platform,
-          language: navigator.language,
-        });
-        console.log('Window dimensions:', {
-          inner: { width: window.innerWidth, height: window.innerHeight },
-          outer: { width: window.outerWidth, height: window.outerHeight },
-        });
-        console.log('Popup settings:', {
-          provider: googleProvider.providerId,
-        });
-        
-        console.log('Attempting to open popup...');
-        const result = await signInWithPopup(auth, googleProvider);
-        console.log('Popup completed successfully');
-        
-        if (result.user) {
-          console.log('Google sign-in successful:', result.user.email);
-          toast.success('Successfully signed in with Google!');
-          return true;
-        }
-        console.log('No user returned from Google sign-in');
         return false;
       }
+
+      console.log('Using popup flow');
+      console.log('Browser details:', {
+        userAgent: navigator.userAgent,
+        vendor: navigator.vendor,
+        platform: navigator.platform,
+        language: navigator.language,
+        dimensions: {
+          inner: { width: window.innerWidth, height: window.innerHeight },
+          outer: { width: window.outerWidth, height: window.outerHeight },
+        }
+      });
+
+      const result = await signInWithPopup(auth, googleProvider);
+      
+      if (result.user) {
+        console.log('Google sign-in successful:', result.user.email);
+        toast.success('Successfully signed in with Google!');
+        return true;
+      }
+      
+      setError('Sign-in failed: No user returned');
+      return false;
     } catch (error: any) {
       console.log('Google sign-in error:', error.code);
+      if (error.code === AUTH_ERROR_CODES.POPUP_BLOCKED || 
+          error.code === AUTH_ERROR_CODES.POPUP_CLOSED_BY_USER) {
+        console.log('Popup failed, falling back to redirect');
+        sessionStorage.setItem('googleSignInRedirect', 'true');
+        await signInWithRedirect(auth, googleProvider);
+        return false;
+      }
       handleAuthError(error);
       return false;
     } finally {
