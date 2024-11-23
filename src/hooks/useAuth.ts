@@ -74,7 +74,7 @@ export function useAuth(): {
     const { setError } = useAuthStore.getState();
 
     // Handle redirect result
-    const handleRedirectResult = async () => {
+    const handleRedirectResult = async (): Promise<void> => {
       const redirectPending = sessionStorage.getItem('googleSignInRedirect');
       console.log('Checking redirect result. Pending:', redirectPending);
       
@@ -142,17 +142,21 @@ export function useAuth(): {
         if (isMounted) setUser(null);
       }
       if (isMounted) setLoading(false);
+    });
+
+    // Handle initial redirect result
     try {
       await handleRedirectResult();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error handling redirect result:', error);
+      handleAuthError(error);
     }
 
     return () => {
       isMounted = false;
       unsubscribe();
     };
-  }, []);
+  }, [setUser]);
 
 
   const signInWithGoogle = async () => {
