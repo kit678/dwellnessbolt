@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { m } from 'framer-motion';
 import { Calendar, Clock, DollarSign, User } from 'lucide-react';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { format } from 'date-fns';
 import { Booking } from '../types/index';
 import { useAuthStore } from '../store/authStore';
@@ -95,13 +96,80 @@ export default function Dashboard() {
               </button>
             </div>
           ) : (
-            <div className="text-center">
-              <h3 className="text-xl font-semibold mb-2">Your Dosha Type</h3>
-              <p className="text-lg text-indigo-600 font-medium">{user.dosha}</p>
-              <p className="mt-2 text-gray-600">
-                Based on your quiz results, your dominant dosha is {user.dosha}. 
-                This helps us provide personalized recommendations for your wellness journey.
-              </p>
+            <div>
+              <h3 className="text-xl font-semibold mb-4 text-center">Your Dosha Profile</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Dosha Distribution Chart */}
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h4 className="text-lg font-medium mb-4 text-center">Dosha Distribution</h4>
+                  <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={[
+                            { name: 'Vata', value: user.quizResults[user.quizResults.length - 1].percentages.Vata },
+                            { name: 'Pitta', value: user.quizResults[user.quizResults.length - 1].percentages.Pitta },
+                            { name: 'Kapha', value: user.quizResults[user.quizResults.length - 1].percentages.Kapha }
+                          ]}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={60}
+                          outerRadius={80}
+                          fill="#8884d8"
+                          paddingAngle={5}
+                          dataKey="value"
+                        >
+                          <Cell fill="#FF9F40" /> {/* Vata */}
+                          <Cell fill="#FF6B6B" /> {/* Pitta */}
+                          <Cell fill="#4ECDC4" /> {/* Kapha */}
+                        </Pie>
+                        <Tooltip formatter={(value) => `${Math.round(value)}%`} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="flex justify-center space-x-4 mt-4">
+                    <div className="flex items-center">
+                      <div className="w-3 h-3 bg-[#FF9F40] rounded-full mr-2"></div>
+                      <span>Vata</span>
+                    </div>
+                    <div className="flex items-center">
+                      <div className="w-3 h-3 bg-[#FF6B6B] rounded-full mr-2"></div>
+                      <span>Pitta</span>
+                    </div>
+                    <div className="flex items-center">
+                      <div className="w-3 h-3 bg-[#4ECDC4] rounded-full mr-2"></div>
+                      <span>Kapha</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Dosha Details */}
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h4 className="text-lg font-medium mb-4">Your Dosha Details</h4>
+                  <div className="space-y-4">
+                    <div>
+                      <p className="text-gray-600">Dominant Dosha</p>
+                      <p className="text-xl font-semibold text-indigo-600">{user.dosha}</p>
+                    </div>
+                    {user.secondaryDosha && (
+                      <div>
+                        <p className="text-gray-600">Secondary Dosha</p>
+                        <p className="text-xl font-semibold text-indigo-500">{user.secondaryDosha}</p>
+                      </div>
+                    )}
+                    <div>
+                      <p className="text-gray-600">Last Quiz Taken</p>
+                      <p className="text-lg">{new Date(user.lastQuizDate || '').toLocaleDateString('en-GB', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
         </div>
