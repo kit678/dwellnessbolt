@@ -87,12 +87,23 @@ export default function OnboardingQuiz({ isOpen, onClose, onComplete }: Onboardi
       
       console.log('Updating user profile with quiz results...');
       // Update quiz completion and results in auth store
+      // Store complete quiz results in user profile
       await updateUserProfile(user.uid, {
         quizCompleted: true,
         dosha: quizResults.dominantDosha,
         secondaryDosha: quizResults.secondaryDosha,
         lastQuizDate: quizResults.completedAt,
-        quizResults: [...(user.quizResults || []), quizResults]
+        quizResults: [...(user.quizResults || []), {
+          id: quizResults.id,
+          userId: user.uid,
+          completedAt: quizResults.completedAt,
+          answers: quizResults.answers,
+          scores: quizResults.scores,
+          percentages: quizResults.percentages,
+          dominantDosha: quizResults.dominantDosha,
+          secondaryDosha: quizResults.secondaryDosha,
+          version: quizResults.version
+        }]
       });
       console.log('Quiz results stored in database successfully');
 

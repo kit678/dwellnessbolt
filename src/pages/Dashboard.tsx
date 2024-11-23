@@ -99,7 +99,15 @@ export default function Dashboard() {
             </div>
           ) : user.quizResults?.length > 0 ? (
             <div>
-              <h3 className="text-xl font-semibold mb-4 text-center">Your Dosha Profile</h3>
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xl font-semibold text-center">Your Dosha Profile</h3>
+                <button 
+                  onClick={() => setQuizOpen(true)} 
+                  className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+                >
+                  Retake Quiz
+                </button>
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Dosha Distribution Chart */}
                 <div className="bg-gray-50 p-4 rounded-lg">
