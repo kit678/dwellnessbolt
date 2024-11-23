@@ -47,8 +47,6 @@ export default function Login() {
       const result = await signInWithGoogle(navigate); 
     
       if (result.success) {
-    
-      if (result.success) {
         console.log('Sign-in successful, navigation handled by useAuth');
       } else if (!result.isRedirect) {
         console.log('Sign-in unsuccessful and not in redirect flow');

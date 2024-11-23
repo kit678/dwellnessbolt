@@ -229,17 +229,17 @@ export function useAuth(): {
         console.log('Popup blocked, falling back to redirect');
         sessionStorage.setItem('googleSignInRedirect', 'true');
         await signInWithRedirect(auth, googleProvider);
-        return false;
+        return { success: false, isRedirect: true };
       }
       
       // Don't treat popup closure as an error
       if (error.code === AUTH_ERROR_CODES.POPUP_CLOSED_BY_USER) {
         console.log('User closed the popup');
-        return false;
+        return { success: false, isRedirect: false };
       }
       
       handleAuthError(error);
-      return false;
+      return { success: false, isRedirect: false };
     } finally {
       setLoading(false);
     }
