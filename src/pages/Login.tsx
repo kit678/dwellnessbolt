@@ -40,6 +40,7 @@ export default function Login() {
       }
     }
   };
+  };
 
   const handleGoogleSignIn = async () => {
     try {
