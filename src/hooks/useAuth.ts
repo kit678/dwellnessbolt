@@ -8,7 +8,7 @@ import {
 import { auth, googleProvider } from '../lib/firebase';
 import { useAuthStore } from '../store/authStore';
 import { userService } from '../services/userService';
-import { User } from '../types';
+import { User } from '../types/index';
 import toast from 'react-hot-toast';
 
 export function useAuth() {
