@@ -13,8 +13,16 @@ export default function Dashboard() {
   const { getUserBookings, loading } = useBookings();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [quizOpen, setQuizOpen] = useState(false);
+  const [quizOpen, setQuizOpen] = useState<boolean>(false);
   const [hasFetched, setHasFetched] = useState<boolean>(false);
+
+  // Effect to handle automatic quiz modal display
+  useEffect(() => {
+    if (user && !user.quizCompleted) {
+      console.log('User has not completed quiz - showing modal');
+      setQuizOpen(true);
+    }
+  }, [user]);
 
   useEffect(() => {
     if (!hasFetched && user) {
