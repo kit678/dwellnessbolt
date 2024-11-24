@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { collection, addDoc, query, where, getDocs, updateDoc, doc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useAuthStore } from '../store/authStore';
@@ -7,7 +7,7 @@ import toast from 'react-hot-toast';
 
 export function useBookings() {
   const [loading, setLoading] = useState(false);
-  const { user, setLoading } = useAuthStore();
+  const { user } = useAuthStore();
 
   const bookSession = async (session: RecurringSession, scheduledDate: string) => {
     if (!user) {
@@ -16,9 +16,6 @@ export function useBookings() {
     } finally {
       setLoading(false);
     }
-
-    setLoading(true);
-    setLoading(true);
     try {
       const bookingRef = await addDoc(collection(db, 'bookings'), {
         userId: user.id,
