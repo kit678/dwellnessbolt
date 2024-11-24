@@ -112,7 +112,7 @@ export function useAuth() {
               displayName: firebaseUser.displayName || '',
               name: firebaseUser.displayName || '',
               role: 'user',
-              authProvider: firebaseUser.providerData[0]?.providerId || 'email',
+              authProvider: firebaseUser.providerData[0]?.providerId === 'google.com' ? 'google' : 'email',
               createdAt: new Date().toISOString(),
               lastLoginAt: new Date().toISOString(),
               quizCompleted: false,
@@ -127,7 +127,11 @@ export function useAuth() {
             logger.info('User profile created successfully', 'useAuth');
           }
         } catch (error) {
-          logger.error('Failed to fetch user data', error, 'useAuth');
+          if (error instanceof Error) {
+            logger.error('Failed to fetch user data', error, 'useAuth');
+          } else {
+            logger.error('Failed to fetch user data', new Error('Unknown error'), 'useAuth');
+          }
         }
       } else {
         setUser(null);
