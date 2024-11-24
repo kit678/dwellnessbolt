@@ -18,14 +18,31 @@ export default function EmailVerification() {
   }, [countdown]);
 
   const handleResendEmail = async () => {
-    if (countdown > 0) return;
+    if (countdown > 0) {
+      toast.error(`Please wait ${countdown} seconds before requesting another email`);
+      return;
+    }
     
     try {
+      const lastSent = localStorage.getItem('lastVerificationEmailSent');
+      if (lastSent) {
+        const timeSinceLastSent = Date.now() - parseInt(lastSent);
+        if (timeSinceLastSent < 5 * 60 * 1000) { // 5 minutes
+          const minutesRemaining = Math.ceil((5 * 60 * 1000 - timeSinceLastSent) / 60000);
+          throw new Error(`Please wait ${minutesRemaining} minutes before requesting another email`);
+        }
+      }
+
       await resendVerificationEmail();
       setCountdown(60); // Start 60 second countdown
-      toast.success('Verification email sent!');
+      toast.success('Verification email sent! Please check your inbox.');
     } catch (error) {
-      console.error('Failed to resend verification email:', error);
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        console.error('Failed to resend verification email:', error);
+        toast.error('Failed to send verification email. Please try again later.');
+      }
     }
   };
 

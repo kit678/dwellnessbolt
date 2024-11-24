@@ -173,10 +173,18 @@ export function useAuth() {
     setError(null);
     
     try {
-      await sendPasswordResetEmail(auth, email);
-      toast.success('Password reset email sent!');
+      // Configure password reset email settings
+      const actionCodeSettings = {
+        url: `${window.location.origin}/login`,
+        handleCodeInApp: true
+      };
+      
+      await sendPasswordResetEmail(auth, email, actionCodeSettings);
+      toast.success('Password reset email sent! Please check your inbox.');
+      return true;
     } catch (error) {
-      handleAuthError(error);
+      const errorMessage = handleAuthError(error);
+      throw new Error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -190,15 +198,34 @@ export function useAuth() {
       const user = auth.currentUser;
       if (!user || !user.email) throw new Error('No user logged in');
 
+      if (!user.emailVerified) {
+        throw new Error('Please verify your email before changing password');
+      }
+
+      // Validate new password
+      if (newPassword.length < 8) {
+        throw new Error('New password must be at least 8 characters long');
+      }
+
       // Re-authenticate user before password change
       const credential = EmailAuthProvider.credential(user.email, currentPassword);
-      await reauthenticateWithCredential(user, credential);
+      try {
+        await reauthenticateWithCredential(user, credential);
+      } catch (error) {
+        throw new Error('Current password is incorrect');
+      }
       
       // Update password
       await updatePassword(user, newPassword);
+      
+      // Log the security event
+      console.log('Password updated successfully for user:', user.email);
+      
       toast.success('Password updated successfully');
+      return true;
     } catch (error) {
-      handleAuthError(error);
+      const errorMessage = handleAuthError(error);
+      throw new Error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -212,10 +239,26 @@ export function useAuth() {
       const user = auth.currentUser;
       if (!user) throw new Error('No user logged in');
       
-      await sendEmailVerification(user);
-      toast.success('Verification email sent!');
+      if (user.emailVerified) {
+        throw new Error('Email is already verified');
+      }
+
+      // Configure verification email settings
+      const actionCodeSettings = {
+        url: `${window.location.origin}/dashboard`,
+        handleCodeInApp: true
+      };
+      
+      await sendEmailVerification(user, actionCodeSettings);
+      
+      // Store last sent timestamp to prevent spam
+      localStorage.setItem('lastVerificationEmailSent', Date.now().toString());
+      
+      toast.success('Verification email sent! Please check your inbox.');
+      return true;
     } catch (error) {
-      handleAuthError(error);
+      const errorMessage = handleAuthError(error);
+      throw new Error(errorMessage);
     } finally {
       setLoading(false);
     }
