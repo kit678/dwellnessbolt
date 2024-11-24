@@ -14,13 +14,15 @@ export const getNextDayOccurrence = (dayIndex: number, hour: number, minute: num
 export const getSpecializedTopicForDate = (date: Date): SpecializedTopic => {
   const startDate = new Date('2024-01-07'); // First Sunday of 2024 as reference
   const weeksDiff = Math.floor((date.getTime() - startDate.getTime()) / (7 * 24 * 60 * 60 * 1000));
-  const topicIndex = weeksDiff % 4;
+  const topicIndex = weeksDiff % 6;
   
   const topics: SpecializedTopic[] = [
     'Stress Management',
     'Diabetes & Hypertension',
     'Weight Loss',
-    'PCOS/Women\'s Health'
+    'PCOS/Women\'s Health',
+    'Meditation & Breathwork',
+    'General Wellness Class'
   ];
   
   return topics[topicIndex];
