@@ -13,6 +13,8 @@ export function useBookings() {
     if (!user) {
       toast.error('Please log in to book a session');
       return;
+      return;
+    }
     try {
       const bookingRef = await addDoc(collection(db, 'bookings'), {
         userId: user.id,
@@ -48,10 +50,10 @@ export function useBookings() {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   const getUserBookings = async (): Promise<Booking[]> => {
-    if (!user || !user.id) {
+    if (!user) {
       console.error('User or user ID is undefined');
       return [];
     }
