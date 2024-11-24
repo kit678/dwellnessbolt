@@ -161,6 +161,32 @@ export function useAuth() {
 
       setLoginAttempts(0);
       setLastLoginAttempt(null);
+      const userData = await userService.getUserProfile(userCredential.user.uid);
+      if (userData) {
+        setUser(userData);
+      } else {
+        // Create default user profile if it doesn't exist
+        const defaultUser: User = {
+          id: userCredential.user.uid,
+          uid: userCredential.user.uid,
+          email: userCredential.user.email || '',
+          displayName: userCredential.user.displayName || '',
+          name: userCredential.user.displayName || '',
+          role: 'user',
+          authProvider: userCredential.user.providerData[0]?.providerId === 'google.com' ? 'google' : 'email',
+          createdAt: new Date().toISOString(),
+          lastLoginAt: new Date().toISOString(),
+          quizCompleted: false,
+          dosha: null,
+          secondaryDosha: null,
+          quizResults: [],
+          lastQuizDate: null,
+          bookings: []
+        };
+        await userService.updateUserProfile(userCredential.user.uid, defaultUser);
+        setUser(defaultUser);
+        logger.info('User profile created successfully', 'useAuth');
+      }
       toast.success('Successfully signed in!');
     } catch (error) {
       setLoginAttempts(prev => prev + 1);
