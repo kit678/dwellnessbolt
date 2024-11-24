@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { logger } from '../utils/logger';
 import { 
   signInWithPopup,
   onAuthStateChanged,
@@ -17,6 +18,17 @@ import { auth, googleProvider } from '../lib/firebase';
 import { useAuthStore } from '../store/authStore';
 import { userService } from '../services/userService';
 import { User } from '../types/index';
+import { FirebaseError } from 'firebase/app';
+
+// Type Guard to check if error is FirebaseError
+function isFirebaseError(error: unknown): error is FirebaseError {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    typeof (error as any).code === 'string'
+  );
+}
 import toast from 'react-hot-toast';
 
 export function useAuth() {
@@ -91,7 +103,7 @@ export function useAuth() {
           const userData = await userService.getUserProfile(firebaseUser.uid);
           if (userData) {
             setUser(userData);
-            logger.info('Creating default user profile', 'useAuth');
+          } else {
             // Create default user profile if it doesn't exist
             const defaultUser: User = {
               id: firebaseUser.uid,
@@ -100,7 +112,7 @@ export function useAuth() {
               displayName: firebaseUser.displayName || '',
               name: firebaseUser.displayName || '',
               role: 'user',
-              authProvider: 'email', // Assuming email as default
+              authProvider: firebaseUser.providerData[0]?.providerId || 'email',
               createdAt: new Date().toISOString(),
               lastLoginAt: new Date().toISOString(),
               quizCompleted: false,
@@ -110,6 +122,7 @@ export function useAuth() {
               lastQuizDate: null,
               bookings: []
             };
+            await userService.updateUserProfile(firebaseUser.uid, defaultUser);
             setUser(defaultUser);
             logger.info('User profile created successfully', 'useAuth');
           }
