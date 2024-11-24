@@ -7,14 +7,17 @@ import toast from 'react-hot-toast';
 
 export function useBookings() {
   const [loading, setLoading] = useState(false);
-  const { user } = useAuthStore();
+  const { user, setLoading } = useAuthStore();
 
   const bookSession = async (session: RecurringSession, scheduledDate: string) => {
     if (!user) {
       toast.error('Please log in to book a session');
       return;
+    } finally {
+      setLoading(false);
     }
 
+    setLoading(true);
     setLoading(true);
     try {
       const bookingRef = await addDoc(collection(db, 'bookings'), {
