@@ -184,7 +184,10 @@ export function useAuth() {
           bookings: []
         };
         await userService.updateUserProfile(userCredential.user.uid, defaultUser);
-        setUser(defaultUser);
+        const updatedUser = await userService.getUserProfile(userCredential.user.uid);
+        if (updatedUser) {
+          setUser(updatedUser);
+        }
         logger.info('User profile created successfully', 'useAuth');
       }
       toast.success('Successfully signed in!');

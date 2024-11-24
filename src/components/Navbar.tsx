@@ -6,7 +6,7 @@ import { Menu, X, User as UserIcon, LogOut, Calendar } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function Navbar() {
-  const { user } = useAuthStore();
+  const { user, isAuthenticated } = useAuthStore();
   const { logout, loading } = useAuth();
   const [isOpen, setIsOpen] = React.useState(false);
   const navigate = useNavigate();
@@ -43,7 +43,7 @@ export default function Navbar() {
             <Link to="/sessions" className="text-gray-700 hover:text-indigo-600">
               Sessions
             </Link>
-            {user ? (
+            {isAuthenticated ? (
               <>
                 <Link to="/dashboard" className="text-gray-700 hover:text-indigo-600">
                   Dashboard
