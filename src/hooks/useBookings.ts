@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 
 export function useBookings() {
   const [loading, setLoading] = useState(false);
-  const { user } = useAuthStore();
+
 
   const bookSession = async (session: RecurringSession, scheduledDate: string) => {
     console.log('getUserBookings called');
