@@ -17,6 +17,8 @@ interface QuizState {
   dominantDosha: string | null;
   secondaryDosha: string | null;
   completedAt: string | null;
+  isLoadingResults: boolean;
+  setIsLoadingResults: (loading: boolean) => void;
   setQuizCompleted: (completed: boolean) => void;
   setQuizResults: (results: QuizResult) => void;
   reset: () => void;
