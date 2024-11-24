@@ -45,8 +45,9 @@ export function useBookings() {
         throw new Error('Failed to process booking');
       }
 
-      toast.success('Booking confirmed successfully!');
-      
+      const data = await response.json();
+      return data.sessionId;
+
     } catch (error) {
       console.error('Error fetching bookings:', error);
       console.error('Booking error:', error);
