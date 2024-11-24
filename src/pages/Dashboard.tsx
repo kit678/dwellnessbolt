@@ -5,14 +5,14 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { format } from 'date-fns';
 import { Booking } from '../types/index';
 import { useAuthStore } from '../store/authStore';
-import { useUser } from '../hooks/useUser';
+import { logger } from '../utils/logger';
 import { useBookings } from '../hooks/useBookings';
 import OnboardingQuiz from '../components/OnboardingQuiz';
 
-console.log('Dashboard component rendered');
+logger.info('Dashboard component rendered', 'Dashboard');
 
 export default function Dashboard() {
-  console.log('Dashboard component mounted');
+  logger.info('Dashboard component mounted', 'Dashboard');
   const { user, loading: authLoading } = useAuthStore();
   const { } = useUser(); // We'll add hooks back here when needed
   const { getUserBookings, loading: bookingsLoading } = useBookings();

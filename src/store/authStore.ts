@@ -26,31 +26,78 @@ interface AuthState {
   updateUserPassword: (currentPassword: string, newPassword: string) => Promise<void>;
   resendVerificationEmail: () => Promise<void>;
   updateUserProfile: (uid: string, data: Partial<User>) => Promise<void>;
+  setUser: (user: User | null) => void;
+  setLoading: (loading: boolean) => void;
+  setError: (error: string | null) => void;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
-  ...initialState,
-  login: async (email, password) => {
-    console.log('Login initiated');
-    set({ loading: true, error: null });
-    try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      console.log('User signed in:', userCredential.user.uid);
-      if (!userCredential.user.emailVerified) {
-        throw new Error('Please verify your email before logging in');
+export const useAuthStore = create<AuthState>((set) => {
+  // Initialize loading state
+  set({ loading: true });
+
+  // Listen to authentication state changes
+  onAuthStateChanged(auth, async (firebaseUser) => {
+    if (firebaseUser) {
+      // User is signed in
+      try {
+        const userData = await userService.getUserProfile(firebaseUser.uid);
+        if (userData) {
+          set({ user: userData, isAuthenticated: true, loading: false });
+        } else {
+          // Create default user profile
+          const defaultUser: User = {
+            id: firebaseUser.uid,
+            uid: firebaseUser.uid,
+            email: firebaseUser.email || '',
+            displayName: firebaseUser.displayName || '',
+            name: firebaseUser.displayName || '',
+            role: 'user',
+            authProvider: firebaseUser.providerData[0]?.providerId === 'google.com' ? 'google' : 'email',
+            createdAt: new Date().toISOString(),
+            lastLoginAt: new Date().toISOString(),
+            quizCompleted: false,
+            dosha: null,
+            secondaryDosha: null,
+            quizResults: [],
+            lastQuizDate: null,
+            bookings: []
+          };
+          await userService.updateUserProfile(firebaseUser.uid, defaultUser);
+          set({ user: defaultUser, isAuthenticated: true, loading: false });
+        }
+      } catch (error) {
+        set({ error: error.message, loading: false });
+        toast.error('Error fetching user profile');
       }
-      const userData = await userService.getUserProfile(userCredential.user.uid);
-      if (userData) {
-        set({ user: userData, isAuthenticated: true });
-      }
-    } catch (error) {
-      set({ error: error.message });
-      toast.error(error.message);
-    } finally {
-      console.log('Login process completed');
-      set({ loading: false });
+    } else {
+      // User is signed out
+      set({ user: null, isAuthenticated: false, loading: false });
     }
-  },
+  });
+
+  return {
+    ...initialState,
+    login: async (email, password) => {
+      console.log('Login initiated');
+      set({ loading: true, error: null });
+      try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        console.log('User signed in:', userCredential.user.uid);
+        if (!userCredential.user.emailVerified) {
+          throw new Error('Please verify your email before logging in');
+        }
+        const userData = await userService.getUserProfile(userCredential.user.uid);
+        if (userData) {
+          set({ user: userData, isAuthenticated: true });
+        }
+      } catch (error) {
+        set({ error: error.message });
+        toast.error(error.message);
+      } finally {
+        console.log('Login process completed');
+        set({ loading: false });
+      }
+    },
   signup: async (email, password, displayName) => {
     set({ loading: true, error: null });
     try {
@@ -62,6 +109,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({ error: error.message });
       toast.error(error.message);
     } finally {
+      console.log('Signup process completed');
       set({ loading: false });
     }
   },
