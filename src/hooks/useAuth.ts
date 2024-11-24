@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import type { User } from '../types/index';
 import { logger } from '../utils/logger';
 import {
@@ -31,6 +32,7 @@ import { userService } from '../services/userService';
 
 
 export function useAuth() {
+  const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -86,6 +88,7 @@ export function useAuth() {
       if (timeSinceLastAttempt < LOCKOUT_DURATION) {
         const remainingTime = Math.ceil((LOCKOUT_DURATION - timeSinceLastAttempt) / 60000);
         throw new Error(`Too many login attempts. Please try again in ${remainingTime} minutes`);
+        navigate('/dashboard');
       } else {
         // Reset attempts after lockout period
         setLoginAttempts(0);
