@@ -5,11 +5,12 @@ import SessionCard from '../components/SessionCard';
 import BookingModal from '../components/BookingModal';
 import { RecurringSession } from '../types/index';
 import { useSessions } from '../hooks/useSessions';
-import { useAuthStore } from '../store/authStore';
+import { useAuth } from '@/hooks/useAuth';
+
 
 export default function Sessions() {
   const navigate = useNavigate();
-  const { user } = useAuthStore();
+  const { user } = useAuth();
   const { sessions, loading, error } = useSessions();
   const [selectedSession, setSelectedSession] = React.useState<RecurringSession | null>(null);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
