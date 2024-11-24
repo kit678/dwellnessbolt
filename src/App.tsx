@@ -1,5 +1,6 @@
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { useAuth } from './hooks/useAuth';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
 import Navbar from './components/Navbar';
@@ -27,7 +28,7 @@ const LoadingSpinner = () => (
 
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated, loading } = useAuthStore();
+  const { isAuthenticated, loading } = useAuth();
   if (loading) {
     return <LoadingSpinner />; // Use the existing LoadingSpinner component
   }
@@ -36,7 +37,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
 // Admin Route Component
 const AdminRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user } = useAuthStore();
+  const { user } = useAuth();
   return user?.role === 'admin' ? <>{children}</> : <Navigate to="/" />;
 };
 
