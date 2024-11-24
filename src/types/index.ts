@@ -24,13 +24,21 @@ export interface User {
   email: string;
   displayName: string;
   name: string;
-  role: string;
+  role: 'user' | 'admin';
+  authProvider: 'google' | 'email';
+  createdAt: string;
+  lastLoginAt: string;
   quizCompleted: boolean;
   dosha: string | null;
   secondaryDosha: string | null;
   quizResults: QuizResult[];
   lastQuizDate: string | null;
-  // Add other properties as needed
+  bookings: string[];
+  quizProgress?: {
+    currentQuestion: number;
+    answers: number[];
+    lastUpdated: string;
+  };
 }
 
 export interface Booking {
