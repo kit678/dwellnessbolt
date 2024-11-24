@@ -93,9 +93,14 @@ export const useAuthStore = create<AuthState>((set) => {
         if (userData) {
           set({ user: userData, isAuthenticated: true });
         }
-      } catch (error) {
-        set({ error: error.message });
-        toast.error(error.message);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          set({ error: error.message });
+          toast.error(error.message);
+        } else {
+          set({ error: String(error) });
+          toast.error(String(error));
+        }
       } finally {
         console.log('Login process completed');
         set({ loading: false });
