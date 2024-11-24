@@ -9,6 +9,7 @@ import { logger } from '../utils/logger';
 import { useBookings } from '../hooks/useBookings';
 import OnboardingQuiz from '../components/OnboardingQuiz';
 import { useAuth } from '@/hooks/useAuth';
+import { useQuizStore } from '@/store/quizStore';
 
 logger.info('Dashboard component rendered', 'Dashboard');
 
