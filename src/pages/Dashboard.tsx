@@ -12,7 +12,7 @@ import OnboardingQuiz from '../components/OnboardingQuiz';
 export default function Dashboard() {
   const { user } = useAuthStore();
   const { } = useUser(); // We'll add hooks back here when needed
-  const { getUserBookings, loading } = useBookings();
+  const { getUserBookings, loading: bookingsLoading } = useBookings();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [quizOpen, setQuizOpen] = useState<boolean>(false);
@@ -51,7 +51,7 @@ export default function Dashboard() {
     }
   }, [user, hasFetched, getUserBookings]);
 
-  if (loading) {
+  if (bookingsLoading) {
     console.log('Loading bookings...');
     return (
       <div className="flex items-center justify-center min-h-screen">
