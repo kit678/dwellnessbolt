@@ -100,11 +100,15 @@ export function useAuth() {
               displayName: firebaseUser.displayName || '',
               name: firebaseUser.displayName || '',
               role: 'user',
+              authProvider: 'email', // Assuming email as default
+              createdAt: new Date().toISOString(),
+              lastLoginAt: new Date().toISOString(),
               quizCompleted: false,
               dosha: null,
               secondaryDosha: null,
               quizResults: [],
-              lastQuizDate: null
+              lastQuizDate: null,
+              bookings: []
             };
             setUser(defaultUser);
           }
