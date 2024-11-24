@@ -113,9 +113,14 @@ export const useAuthStore = create<AuthState>((set) => {
       await updateProfile(userCredential.user, { displayName });
       await sendEmailVerification(userCredential.user);
       toast.success('Account created! Please check your email for verification.');
-    } catch (error) {
-      set({ error: error.message });
-      toast.error(error.message);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        set({ error: error.message });
+        toast.error(error.message);
+      } else {
+        set({ error: String(error) });
+        toast.error(String(error));
+      }
     } finally {
       console.log('Signup process completed');
       set({ loading: false });
@@ -233,5 +238,5 @@ export const useAuthStore = create<AuthState>((set) => {
   setUser: (user) => set({ user, isAuthenticated: !!user, loading: false }),
   setLoading: (loading) => set({ loading }),
   setError: (error) => set({ error }),
-}))  };
+}));
 
