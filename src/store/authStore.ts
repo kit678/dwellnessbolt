@@ -3,7 +3,6 @@ import { User } from '../types/index';
 import { auth, googleProvider } from '../lib/firebase';
 import { userService } from '../services/userService';
 import { signInWithPopup, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, sendEmailVerification, sendPasswordResetEmail, EmailAuthProvider, reauthenticateWithCredential, updatePassword } from 'firebase/auth';
-import { FirebaseError } from 'firebase/app';
 import toast from 'react-hot-toast';
 
 const initialState = {
@@ -65,8 +64,12 @@ export const useAuthStore = create<AuthState>((set) => {
           await userService.updateUserProfile(firebaseUser.uid, defaultUser);
           set({ user: defaultUser, isAuthenticated: true, loading: false });
         }
-      } catch (error) {
-        set({ error: error.message, loading: false });
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          set({ error: error.message, loading: false });
+        } else {
+          set({ error: String(error), loading: false });
+        }
         toast.error('Error fetching user profile');
       }
     } else {
@@ -118,9 +121,14 @@ export const useAuthStore = create<AuthState>((set) => {
     try {
       await signInWithPopup(auth, googleProvider);
       toast.success('Successfully signed in with Google!');
-    } catch (error) {
-      set({ error: error.message });
-      toast.error('Failed to sign in with Google. Please try again.');
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        set({ error: error.message });
+        toast.error('Failed to sign in with Google. Please try again.');
+      } else {
+        set({ error: String(error) });
+        toast.error('Failed to sign in with Google. Please try again.');
+      }
     } finally {
       set({ loading: false });
     }
@@ -131,9 +139,14 @@ export const useAuthStore = create<AuthState>((set) => {
       await signOut(auth);
       set({ user: null, isAuthenticated: false });
       toast.success('Logged out successfully.');
-    } catch (error) {
-      set({ error: error.message });
-      toast.error('Failed to log out. Please try again.');
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        set({ error: error.message });
+        toast.error('Failed to log out. Please try again.');
+      } else {
+        set({ error: String(error) });
+        toast.error('Failed to log out. Please try again.');
+      }
     } finally {
       set({ loading: false });
     }
@@ -143,9 +156,14 @@ export const useAuthStore = create<AuthState>((set) => {
     try {
       await sendPasswordResetEmail(auth, email);
       toast.success('Password reset email sent! Please check your inbox.');
-    } catch (error) {
-      set({ error: error.message });
-      toast.error(error.message);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        set({ error: error.message });
+        toast.error(error.message);
+      } else {
+        set({ error: String(error) });
+        toast.error(String(error));
+      }
     } finally {
       set({ loading: false });
     }
@@ -159,9 +177,14 @@ export const useAuthStore = create<AuthState>((set) => {
       await reauthenticateWithCredential(user, credential);
       await updatePassword(user, newPassword);
       toast.success('Password updated successfully');
-    } catch (error) {
-      set({ error: error.message });
-      toast.error(error.message);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        set({ error: error.message });
+        toast.error(error.message);
+      } else {
+        set({ error: String(error) });
+        toast.error(String(error));
+      }
     } finally {
       set({ loading: false });
     }
@@ -173,9 +196,14 @@ export const useAuthStore = create<AuthState>((set) => {
       if (!user) throw new Error('No user logged in');
       await sendEmailVerification(user);
       toast.success('Verification email sent! Please check your inbox.');
-    } catch (error) {
-      set({ error: error.message });
-      toast.error(error.message);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        set({ error: error.message });
+        toast.error(error.message);
+      } else {
+        set({ error: String(error) });
+        toast.error(String(error));
+      }
     } finally {
       set({ loading: false });
     }
@@ -187,12 +215,18 @@ export const useAuthStore = create<AuthState>((set) => {
       if (updatedUser) {
         set({ user: updatedUser });
       }
-    } catch (error) {
-      set({ error: error.message });
-      toast.error('Error updating user profile');
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        set({ error: error.message });
+        toast.error('Error updating user profile');
+      } else {
+        set({ error: String(error) });
+        toast.error('Error updating user profile');
+      }
     }
   },
   setUser: (user) => set({ user, isAuthenticated: !!user, loading: false }),
   setLoading: (loading) => set({ loading }),
   setError: (error) => set({ error }),
-}));
+}))  };
+}))});
