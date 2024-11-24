@@ -60,14 +60,26 @@ export default function BookingModal({ session, isOpen, onClose }: BookingModalP
 
   const handlePayment = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+    setLoading(true);
+                    
     try {
-      await bookSession(session, selectedDate);
-      toast.success('Booking confirmed! Check your email for confirmation.');
-      onClose();
+      const sessionId = await bookSession(session, selectedDate);
+      if (sessionId) {
+        const stripe = await stripePromise;
+        const { error } = await stripe!.redirectToCheckout({ sessionId });
+        if (error) {
+          console.error('Stripe redirect error:', error);
+          toast.error('Failed to redirect to payment');
+        }
+      } else {
+        toast.success('Booking confirmed! Check your email for confirmation.');
+        onClose();
+      }
     } catch (error) {
       console.error('Booking failed:', error);
       toast.error('Failed to process booking');
+    } finally {
+      setLoading(false);
     }
   };
 
