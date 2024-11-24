@@ -16,7 +16,7 @@ export default function Dashboard() {
   logger.info('Dashboard component mounted', 'Dashboard');
   const { user, loading: authLoading } = useAuth();
   const { getUserBookings, loading: bookingsLoading } = useBookings();
-  const { results, isLoadingResults } = useQuizStore();
+  const { results } = useQuizStore();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [quizOpen, setQuizOpen] = useState<boolean>(false);
@@ -266,7 +266,7 @@ export default function Dashboard() {
           ))
         )}
       </div>
-      <OnboardingQuiz isOpen={quizOpen} onClose={() => setQuizOpen(false)} onComplete={(score) => setQuizOpen(false)} />
+      <OnboardingQuiz isOpen={quizOpen} onClose={() => setQuizOpen(false)} onComplete={() => setQuizOpen(false)} />
     </div>
   );
 }
