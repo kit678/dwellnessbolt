@@ -267,7 +267,7 @@ export default function Dashboard() {
           ))
         )}
       </div>
-      <OnboardingQuiz isOpen={quizOpen} onClose={() => setQuizOpen(false)} onComplete={(scores) => setQuizOpen(false)} />
+      <OnboardingQuiz isOpen={quizOpen} onClose={() => setQuizOpen(false)} onComplete={(_scores) => setQuizOpen(false)} />
     </div>
   );
 }
