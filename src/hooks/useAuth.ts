@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { User } from '../types/index';
 import { logger } from '../utils/logger';
-import { FirebaseError, 
+import {
   signInWithPopup,
   onAuthStateChanged,
   signOut,
@@ -19,15 +19,6 @@ import { auth, googleProvider } from '../lib/firebase';
 import toast from 'react-hot-toast';
 import { userService } from '../services/userService';
 
-// Type Guard to check if error is FirebaseError
-function isFirebaseError(error: unknown): error is FirebaseError {
-  return (
-    typeof error === 'object' &&
-    error !== null &&
-    'code' in error &&
-    typeof (error as any).code === 'string'
-  );
-}
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
