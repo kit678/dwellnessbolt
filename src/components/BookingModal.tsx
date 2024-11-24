@@ -32,7 +32,9 @@ export default function BookingModal({ session, isOpen, onClose }: BookingModalP
       'PCOS/Women\'s Health',
       'Diabetes & Hypertension',
       'Weight Loss',
-      'Stress Management'
+      'Stress Management',
+      'Meditation & Breathwork',
+      'General Wellness Class'
     ];
 
     const topicIndex = topicsOrder.indexOf(session.specializedTopic || '');
