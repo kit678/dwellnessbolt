@@ -9,6 +9,7 @@ import { logger } from '../utils/logger';
 import { useBookings } from '../hooks/useBookings';
 import OnboardingQuiz from '../components/OnboardingQuiz';
 import { useAuth } from '@/hooks/useAuth';
+import { useQuizStore } from '@/store/quizStore';
 
 logger.info('Dashboard component rendered', 'Dashboard');
 
@@ -16,7 +17,6 @@ export default function Dashboard() {
   logger.info('Dashboard component mounted', 'Dashboard');
   const { user, loading: authLoading } = useAuth();
   const { getUserBookings, loading: bookingsLoading } = useBookings();
-  const { quizResults, isLoadingResults } = useQuizStore();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [quizOpen, setQuizOpen] = useState<boolean>(false);
