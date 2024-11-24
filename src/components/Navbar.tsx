@@ -1,13 +1,13 @@
 import React, { useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
-import { useAuth } from '../hooks/useAuth';
+import { useAuthStore } from '../store/authStore';
 import { Menu, X, User as UserIcon, LogOut, Calendar } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function Navbar() {
   const { user, isAuthenticated } = useAuthStore();
-  const { logout, loading } = useAuth();
+  const { logout, loading, user, isAuthenticated } = useAuthStore();
   const [isOpen, setIsOpen] = React.useState(false);
   const navigate = useNavigate();
   const [isLoggingOut, setIsLoggingOut] = React.useState(false);
