@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
+import { logger } from '../utils/logger';
 import { db } from '../lib/firebase';
 import { RecurringSession } from '../types';
 import toast from 'react-hot-toast';
@@ -31,6 +32,7 @@ export function useSessions() {
               ...doc.data()
             })) as RecurringSession[];
             setSessions(sessionData);
+            logger.info('Fetched sessions from Firestore:', JSON.stringify(sessionData, null, 2));
           }
         }
       } catch (error: any) {
