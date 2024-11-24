@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { collection, addDoc, query, where, getDocs, updateDoc, doc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useAuthStore } from '../store/authStore';
@@ -13,9 +13,6 @@ export function useBookings() {
     if (!user) {
       toast.error('Please log in to book a session');
       return;
-    } finally {
-      setLoading(false);
-    }
     try {
       const bookingRef = await addDoc(collection(db, 'bookings'), {
         userId: user.id,
