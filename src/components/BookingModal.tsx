@@ -28,25 +28,20 @@ export default function BookingModal({ session, isOpen, onClose }: BookingModalP
   // Generate next 4 available dates based on rotation
   const getAvailableDates = () => {
     const dates: Date[] = [];
-    const topicsOrder = [
-      'PCOS/Women\'s Health',
-      'Diabetes & Hypertension',
-      'Weight Loss',
-      'Stress Management',
-      'Meditation & Breathwork',
-      'General Wellness Class'
-    ];
+    const recurringDays = session.recurringDays || [];
+    
+    if (recurringDays.length === 0) return dates;
 
-    const topicIndex = topicsOrder.indexOf(session.specializedTopic || '');
-    if (topicIndex === -1) return dates;
+    const today = new Date();
+    let currentDate = new Date(today);
 
-    const firstSunday = getNextDayOccurrence(0, 9, 30); // Next Sunday at 9:30 AM
+    while (dates.length < 4) {
+      currentDate.setDate(currentDate.getDate() + 1);
+      const dayOfWeek = currentDate.getDay();
 
-    for (let i = 0; i < 4; i++) {
-      const weeksToAdd = topicIndex + (i * 4);
-      const date = new Date(firstSunday);
-      date.setDate(firstSunday.getDate() + (weeksToAdd * 7));
-      dates.push(date);
+      if (recurringDays.includes(dayOfWeek)) {
+        dates.push(new Date(currentDate));
+      }
     }
 
     return dates;
