@@ -10,7 +10,7 @@ import { useBookings } from '../hooks/useBookings';
 import OnboardingQuiz from '../components/OnboardingQuiz';
 
 export default function Dashboard() {
-  const { user } = useAuthStore();
+  const { user, loading: authLoading } = useAuthStore();
   const { } = useUser(); // We'll add hooks back here when needed
   const { getUserBookings, loading: bookingsLoading } = useBookings();
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -51,7 +51,7 @@ export default function Dashboard() {
     }
   }, [user, hasFetched, getUserBookings]);
 
-  if (bookingsLoading) {
+  if (bookingsLoading || authLoading) {
     console.log('Loading bookings...');
     return (
       <div className="flex items-center justify-center min-h-screen">

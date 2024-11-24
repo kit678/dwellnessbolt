@@ -53,8 +53,10 @@ export function useBookings() {
   }
 
   const getUserBookings = async (): Promise<Booking[]> => {
+    setLoading(true);
     if (!user) {
       console.error('User or user ID is undefined');
+      setLoading(false);
       return [];
     }
 
@@ -72,6 +74,8 @@ export function useBookings() {
       toast.error('Failed to fetch bookings');
       console.error(error);
       return [];
+    } finally {
+      setLoading(false);
     }
   };
 
