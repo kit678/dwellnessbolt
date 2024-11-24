@@ -29,7 +29,7 @@ const LoadingSpinner = () => (
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, loading } = useAuthStore();
   if (loading) {
-    return <div>Loading...</div>; // or a spinner component
+    return <LoadingSpinner />; // Use the existing LoadingSpinner component
   }
   return isAuthenticated ? <>{children}</> : <Navigate to="/login" />;
 };
