@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { collection, addDoc, query, where, getDocs, updateDoc, doc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
+import { useAuth } from './useAuth';
 import { RecurringSession, Booking } from '../types/index';
 import toast from 'react-hot-toast';
 
 export function useBookings() {
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
 
 
