@@ -16,6 +16,16 @@ import {
   AuthErrorCodes
 } from 'firebase/auth';
 import { auth, googleProvider } from '../lib/firebase';
+
+// Type Guard to check if error is FirebaseError
+function isFirebaseError(error: unknown): error is { code: string; message: string } {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    typeof (error as any).code === 'string'
+  );
+}
 import toast from 'react-hot-toast';
 import { userService } from '../services/userService';
 
@@ -192,7 +202,7 @@ export function useAuth() {
         logger.info('User profile created successfully', 'useAuth');
       }
       toast.success('Successfully signed in!');
-    } catch (error) {
+    } catch (error: unknown) {
       setLoginAttempts(prev => prev + 1);
       setLastLoginAttempt(new Date());
       if (isFirebaseError(error) && error.code === 'auth/email-already-in-use') {
