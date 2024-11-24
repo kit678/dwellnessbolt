@@ -16,6 +16,7 @@ export default function Dashboard() {
   logger.info('Dashboard component mounted', 'Dashboard');
   const { user, loading: authLoading } = useAuth();
   const { getUserBookings, loading: bookingsLoading } = useBookings();
+  const { quizResults, isLoadingResults } = useQuizStore();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [quizOpen, setQuizOpen] = useState<boolean>(false);
