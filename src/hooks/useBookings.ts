@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { collection, addDoc, query, where, getDocs, updateDoc, doc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
-import { useAuthStore } from '../store/authStore';
 import { RecurringSession, Booking } from '../types/index';
 import toast from 'react-hot-toast';
 
