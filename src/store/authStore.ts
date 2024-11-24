@@ -125,7 +125,7 @@ export const useAuthStore = create<AuthState>((set) => {
       console.log('Signup process completed');
       set({ loading: false });
     }
-  },
+  }
   signInWithGoogle: async () => {
     set({ loading: true });
     try {
@@ -237,6 +237,6 @@ export const useAuthStore = create<AuthState>((set) => {
   },
   setUser: (user) => set({ user, isAuthenticated: !!user, loading: false }),
   setLoading: (loading) => set({ loading }),
-  setError: (error) => set({ error })
+  setError: (error) => set({ error });
 });
 
