@@ -46,8 +46,6 @@ export function useBookings() {
 
       toast.success('Booking confirmed successfully!');
       
-      console.log('Bookings fetched:', bookings);
-      return bookings;
     } catch (error) {
       console.error('Error fetching bookings:', error);
       console.error('Booking error:', error);
