@@ -16,7 +16,7 @@ export default function Dashboard() {
   logger.info('Dashboard component mounted', 'Dashboard');
   const { user, loading: authLoading } = useAuth();
   const { getUserBookings, loading: bookingsLoading } = useBookings();
-  const { quizResults, isLoadingResults } = useQuizStore();
+  const { results, isLoadingResults } = useQuizStore();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [quizOpen, setQuizOpen] = useState<boolean>(false);
@@ -34,7 +34,7 @@ export default function Dashboard() {
     if (!hasFetched && user) {
       console.log('Fetching bookings for user:', user);
       console.log('Dashboard mounted. User:', user);
-      console.log('Quiz Results:', user.quizResults);
+      console.log('Quiz Results:', results);
       console.log('Latest Quiz Result:', user.quizResults?.[user.quizResults.length - 1]);
       const fetchBookings = async () => {
         try {
@@ -57,32 +57,6 @@ export default function Dashboard() {
     }
   }, [user, hasFetched, getUserBookings]);
 
-  useEffect(() => {
-    if (!hasFetched && user) {
-      console.log('Fetching bookings for user:', user);
-      console.log('Dashboard mounted. User:', user);
-      console.log('Quiz Results:', user.quizResults);
-      console.log('Latest Quiz Result:', user.quizResults?.[user.quizResults.length - 1]);
-      const fetchBookings = async () => {
-        try {
-          console.log('Attempting to fetch bookings for user:', user);
-          const userBookings = await getUserBookings();
-          console.log('Fetched bookings:', userBookings);
-          console.log('Setting bookings state');
-          setBookings(userBookings);
-          setHasFetched(true);
-          
-          if (user.quizCompleted) {
-            console.log('Quiz results fetched:', user.dosha);
-          }
-        } catch (err) {
-          console.error('Failed to fetch bookings:', err);
-          setError('Failed to load bookings. Please try again later.');
-        }
-      };
-      fetchBookings();
-    }
-  }, [user, hasFetched, getUserBookings]);
 
   if (bookingsLoading || authLoading) {
     console.log('Loading bookings...');
