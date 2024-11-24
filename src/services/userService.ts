@@ -1,4 +1,4 @@
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import type { User } from '../types/index';
 
@@ -22,7 +22,7 @@ export const userService = {
   async updateUserProfile(uid: string, data: Partial<User>): Promise<void> {
     try {
       const userRef = doc(db, 'users', uid);
-      await updateDoc(userRef, data);
+      await setDoc(userRef, data, { merge: true });
     } catch (error) {
       console.error('Error updating user profile:', error);
       throw error;
