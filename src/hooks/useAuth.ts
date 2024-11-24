@@ -15,9 +15,6 @@ import {
   AuthErrorCodes
 } from 'firebase/auth';
 import { auth, googleProvider } from '../lib/firebase';
-import { userService } from '../services/userService';
-import { User } from '../types/index';
-import { FirebaseError } from 'firebase/app';
 import toast from 'react-hot-toast';
 
 // Type Guard to check if error is FirebaseError
@@ -390,7 +387,4 @@ export function useAuth() {
     updateUserProfile
   };
 }
-import { userService } from '../services/userService';
-import { User } from '../types/index';
-import { FirebaseError } from 'firebase/app';
 

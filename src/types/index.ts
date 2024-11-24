@@ -18,7 +18,7 @@ export interface QuizResult {
   version: string;
 }
 
-export interface User {
+export type User = {
   id: string;
   uid: string;
   email: string;
