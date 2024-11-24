@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { logger } from '@/utils/logger'
 import { calculateQuizResults } from '@/utils/quizUtils'
 import { useQuizStore } from '@/store/quizStore'
 import { m, AnimatePresence } from 'framer-motion'
