@@ -84,9 +84,10 @@ export default function OnboardingQuiz({ isOpen, onClose, onComplete }: Onboardi
     }
 
     try {
+      useQuizStore.getState().setIsLoadingResults(true);
       console.log('Quiz finished - calculating results...');
       const quizResults = calculateQuizResults(answers, user.uid);
-      
+    
       logger.info('Updating user profile with quiz results', 'OnboardingQuiz');
       await updateUserProfile(user.uid, {
         quizCompleted: true,
@@ -113,16 +114,18 @@ export default function OnboardingQuiz({ isOpen, onClose, onComplete }: Onboardi
 
       // Pass results back to parent
       onComplete(quizResults.scores);
-      
+    
       // Reset local state
       setSelectedOption(null);
       setCurrentQuestion(0);
       setAnswers([]);
-      
+    
       // Close modal
       onClose();
     } catch (error) {
       console.error('Error updating quiz completion status:', error);
+    } finally {
+      useQuizStore.getState().setIsLoadingResults(false);
     }
   };
 

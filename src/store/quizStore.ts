@@ -26,6 +26,7 @@ const QUIZ_VERSION = '1.0.0';
 
 export const useQuizStore = create<QuizState>((set) => ({
   isCompleted: false,
+  isLoadingResults: false,
   version: QUIZ_VERSION,
   answers: [],
   results: null,
@@ -43,8 +44,10 @@ export const useQuizStore = create<QuizState>((set) => ({
     answers: results.answers,
     isCompleted: true
   }),
+  setIsLoadingResults: (loading) => set({ isLoadingResults: loading }),
   reset: () => set({
     isCompleted: false,
+    isLoadingResults: false,
     answers: [],
     results: null,
     percentages: null,
