@@ -131,6 +131,12 @@ export function useAuth() {
             setUser(userData);
             setIsAuthenticated(true);
           }
+        } catch (error) {
+          if (error instanceof Error) {
+            logger.error('Failed to fetch user data', error, 'useAuth');
+          } else {
+            logger.error('Failed to fetch user data', new Error('Unknown error'), 'useAuth');
+          }
         }
       } else {
         setUser(null);
