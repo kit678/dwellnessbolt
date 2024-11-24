@@ -37,15 +37,18 @@ export const useQuizStore = create<QuizState>((set) => ({
   secondaryDosha: null,
   completedAt: null,
   setQuizCompleted: (completed) => set({ isCompleted: completed }),
-  setQuizResults: (results) => set({
-    results: results.scores,
-    percentages: results.percentages,
-    dominantDosha: results.dominantDosha,
-    secondaryDosha: results.secondaryDosha,
-    completedAt: results.completedAt,
-    answers: results.answers,
-    isCompleted: true
-  }),
+  setQuizResults: (results) => {
+    logger.info('Quiz results updated in quizStore', 'quizStore');
+    set({
+      results: results.scores,
+      percentages: results.percentages,
+      dominantDosha: results.dominantDosha,
+      secondaryDosha: results.secondaryDosha,
+      completedAt: results.completedAt,
+      answers: results.answers,
+      isCompleted: true
+    });
+  },
   setIsLoadingResults: (loading) => set({ isLoadingResults: loading }),
   reset: () => set({
     isCompleted: false,

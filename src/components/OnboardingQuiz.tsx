@@ -110,7 +110,7 @@ export default function OnboardingQuiz({ isOpen, onClose, onComplete }: Onboardi
 
       // Update quiz store
       useQuizStore.getState().setQuizResults(quizResults);
-      console.log('Quiz state updated successfully');
+      logger.info('Quiz state updated successfully', 'OnboardingQuiz');
 
       // Pass results back to parent
       onComplete(quizResults.scores);

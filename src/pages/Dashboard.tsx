@@ -26,20 +26,20 @@ export default function Dashboard() {
   // Effect to handle automatic quiz modal display
   useEffect(() => {
     if (user && !user.quizCompleted) {
-      console.log('User has not completed quiz - showing modal');
+      logger.info('User has not completed quiz - showing modal', 'Dashboard');
       setQuizOpen(true);
     }
   }, [user]);
 
   useEffect(() => {
     if (!hasFetched && user) {
-      console.log('Fetching bookings for user:', user);
-      console.log('Dashboard mounted. User:', user);
-      console.log('Quiz Results:', results);
-      console.log('Latest Quiz Result:', user.quizResults?.[user.quizResults.length - 1]);
+      logger.info(`Fetching bookings for user: ${user}`, 'Dashboard');
+      logger.info(`Dashboard mounted. User: ${user}`, 'Dashboard');
+      logger.info(`Quiz Results: ${JSON.stringify(results)}`, 'Dashboard');
+      logger.info(`Latest Quiz Result: ${JSON.stringify(user.quizResults?.[user.quizResults.length - 1])}`, 'Dashboard');
       const fetchBookings = async () => {
         try {
-          console.log('Attempting to fetch bookings for user:', user);
+          logger.info(`Attempting to fetch bookings for user: ${user}`, 'Dashboard');
           const userBookings = await getUserBookings();
           console.log('Fetched bookings:', userBookings);
           console.log('Setting bookings state');
