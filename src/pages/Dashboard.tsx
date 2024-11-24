@@ -4,16 +4,17 @@ import { Calendar, Clock, DollarSign, User } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { format } from 'date-fns';
 import { Booking } from '../types/index';
-import { useAuthStore } from '../store/authStore';
+
 import { logger } from '../utils/logger';
 import { useBookings } from '../hooks/useBookings';
 import OnboardingQuiz from '../components/OnboardingQuiz';
+import { useAuth } from '@/hooks/useAuth';
 
 logger.info('Dashboard component rendered', 'Dashboard');
 
 export default function Dashboard() {
   logger.info('Dashboard component mounted', 'Dashboard');
-  const { user, loading: authLoading } = useAuthStore();
+  const { user, loading: authLoading } = useAuth();
   const { getUserBookings, loading: bookingsLoading } = useBookings();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [error, setError] = useState<string | null>(null);

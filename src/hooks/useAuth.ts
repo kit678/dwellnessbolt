@@ -14,9 +14,11 @@ import {
   EmailAuthProvider,
   reauthenticateWithCredential,
   updatePassword,
-  AuthErrorCodes
+  AuthErrorCodes,
 } from 'firebase/auth';
 import { auth, googleProvider } from '../lib/firebase';
+import toast from 'react-hot-toast';
+import { userService } from '../services/userService';
 
 // Type Guard to check if error is FirebaseError
 function isFirebaseError(error: unknown): error is { code: string; message: string } {
@@ -27,9 +29,6 @@ function isFirebaseError(error: unknown): error is { code: string; message: stri
     typeof (error as any).code === 'string'
   );
 }
-import toast from 'react-hot-toast';
-import { userService } from '../services/userService';
-
 
 export function useAuth() {
   const navigate = useNavigate();
@@ -42,7 +41,7 @@ export function useAuth() {
 
   const handleAuthError = useCallback((error: any) => {
     let errorMessage = 'An unexpected error occurred';
-    
+
     if (typeof error === 'object' && error !== null && 'code' in error) {
       switch (error.code) {
         case AuthErrorCodes.USER_DISABLED:
@@ -88,7 +87,6 @@ export function useAuth() {
       if (timeSinceLastAttempt < LOCKOUT_DURATION) {
         const remainingTime = Math.ceil((LOCKOUT_DURATION - timeSinceLastAttempt) / 60000);
         throw new Error(`Too many login attempts. Please try again in ${remainingTime} minutes`);
-        navigate('/dashboard');
       } else {
         // Reset attempts after lockout period
         setLoginAttempts(0);
@@ -115,7 +113,8 @@ export function useAuth() {
               displayName: firebaseUser.displayName || '',
               name: firebaseUser.displayName || '',
               role: 'user',
-              authProvider: firebaseUser.providerData[0]?.providerId === 'google.com' ? 'google' : 'email',
+              authProvider:
+                firebaseUser.providerData[0]?.providerId === 'google.com' ? 'google' : 'email',
               createdAt: new Date().toISOString(),
               lastLoginAt: new Date().toISOString(),
               quizCompleted: false,
@@ -123,7 +122,7 @@ export function useAuth() {
               secondaryDosha: null,
               quizResults: [],
               lastQuizDate: null,
-              bookings: []
+              bookings: [],
             };
             await userService.updateUserProfile(firebaseUser.uid, defaultUser);
             const updatedUser = await userService.getUserProfile(firebaseUser.uid);
@@ -136,6 +135,7 @@ export function useAuth() {
             setUser(userData);
             setIsAuthenticated(true);
           }
+          navigate('/dashboard'); // Navigate to dashboard after authentication
         } catch (error) {
           if (error instanceof Error) {
             logger.error('Failed to fetch user data', error, 'useAuth');
@@ -153,26 +153,29 @@ export function useAuth() {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [navigate]);
 
   const login = async (email: string, password: string) => {
     setLoading(true);
     setError(null);
-    
+
     try {
       checkRateLimit();
-      
+
       logger.info(`Attempting to sign in with email: ${email}`, 'useAuth');
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       logger.info(`Sign-in successful. User ID: ${userCredential.user.uid}`, 'useAuth');
-      
+
       if (!userCredential.user.emailVerified) {
         throw new Error('Please verify your email before logging in');
       }
 
       setLoginAttempts(0);
       setLastLoginAttempt(null);
-      logger.info(`Fetching user profile from Firestore for User ID: ${userCredential.user.uid}`, 'useAuth');
+      logger.info(
+        `Fetching user profile from Firestore for User ID: ${userCredential.user.uid}`,
+        'useAuth'
+      );
       const userData = await userService.getUserProfile(userCredential.user.uid);
       logger.info(`User profile fetched: ${JSON.stringify(userData)}`, 'useAuth');
       if (userData) {
@@ -187,7 +190,8 @@ export function useAuth() {
           displayName: userCredential.user.displayName || '',
           name: userCredential.user.displayName || '',
           role: 'user',
-          authProvider: userCredential.user.providerData[0]?.providerId === 'google.com' ? 'google' : 'email',
+          authProvider:
+            userCredential.user.providerData[0]?.providerId === 'google.com' ? 'google' : 'email',
           createdAt: new Date().toISOString(),
           lastLoginAt: new Date().toISOString(),
           quizCompleted: false,
@@ -195,9 +199,12 @@ export function useAuth() {
           secondaryDosha: null,
           quizResults: [],
           lastQuizDate: null,
-          bookings: []
+          bookings: [],
         };
-        logger.info(`Creating default user profile in Firestore for User ID: ${userCredential.user.uid}`, 'useAuth');
+        logger.info(
+          `Creating default user profile in Firestore for User ID: ${userCredential.user.uid}`,
+          'useAuth'
+        );
         await userService.updateUserProfile(userCredential.user.uid, defaultUser);
         logger.info('Default user profile created successfully.', 'useAuth');
         const updatedUser = await userService.getUserProfile(userCredential.user.uid);
@@ -208,11 +215,16 @@ export function useAuth() {
         logger.info('User profile created successfully', 'useAuth');
       }
       toast.success('Successfully signed in!');
+      navigate('/dashboard'); // Navigate to dashboard after successful login
     } catch (error: unknown) {
-      setLoginAttempts(prev => prev + 1);
+      setLoginAttempts((prev) => prev + 1);
       setLastLoginAttempt(new Date());
       if (isFirebaseError(error) && error.code === 'auth/email-already-in-use') {
-        handleAuthError(new Error('This email is already associated with an account. Please sign in with Google if you previously used Google Sign-in.'));
+        handleAuthError(
+          new Error(
+            'This email is already associated with an account. Please sign in with Google if you previously used Google Sign-in.'
+          )
+        );
       } else {
         handleAuthError(error);
       }
@@ -224,16 +236,16 @@ export function useAuth() {
   const signup = async (email: string, password: string, displayName: string) => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      
+
       // Update profile with display name
       await updateProfile(userCredential.user, { displayName });
-      
+
       // Send verification email
       await sendEmailVerification(userCredential.user);
-      
+
       toast.success('Account created! Please check your email for verification.');
       return userCredential.user;
     } catch (error) {
@@ -247,14 +259,14 @@ export function useAuth() {
   const resetPassword = async (email: string) => {
     setLoading(true);
     setError(null);
-    
+
     try {
       // Configure password reset email settings
       const actionCodeSettings = {
         url: `${window.location.origin}/login`,
-        handleCodeInApp: true
+        handleCodeInApp: true,
       };
-      
+
       await sendPasswordResetEmail(auth, email, actionCodeSettings);
       toast.success('Password reset email sent! Please check your inbox.');
       return true;
@@ -269,7 +281,7 @@ export function useAuth() {
   const updateUserPassword = async (currentPassword: string, newPassword: string) => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const user = auth.currentUser;
       if (!user || !user.email) throw new Error('No user logged in');
@@ -290,13 +302,13 @@ export function useAuth() {
       } catch (error) {
         throw new Error('Current password is incorrect');
       }
-      
+
       // Update password
       await updatePassword(user, newPassword);
-      
+
       // Log the security event
       logger.info(`Password updated successfully for user: ${user.email}`, 'useAuth');
-      
+
       toast.success('Password updated successfully');
       return true;
     } catch (error) {
@@ -310,11 +322,11 @@ export function useAuth() {
   const resendVerificationEmail = async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const user = auth.currentUser;
       if (!user) throw new Error('No user logged in');
-      
+
       if (user.emailVerified) {
         throw new Error('Email is already verified');
       }
@@ -322,14 +334,14 @@ export function useAuth() {
       // Configure verification email settings
       const actionCodeSettings = {
         url: `${window.location.origin}/dashboard`,
-        handleCodeInApp: true
+        handleCodeInApp: true,
       };
-      
+
       await sendEmailVerification(user, actionCodeSettings);
-      
+
       // Store last sent timestamp to prevent spam
       localStorage.setItem('lastVerificationEmailSent', Date.now().toString());
-      
+
       toast.success('Verification email sent! Please check your inbox.');
       return true;
     } catch (error) {
@@ -342,12 +354,50 @@ export function useAuth() {
 
   const signInWithGoogle = async () => {
     setLoading(true);
+    setError(null);
+
     try {
-      await signInWithPopup(auth, googleProvider);
+      const result = await signInWithPopup(auth, googleProvider);
+      const userCredential = result.user;
+
+      logger.info(`Google sign-in successful. User ID: ${userCredential.uid}`, 'useAuth');
+
+      // Fetch or create user profile
+      const userData = await userService.getUserProfile(userCredential.uid);
+      if (userData) {
+        setUser(userData);
+        setIsAuthenticated(true);
+      } else {
+        // Create default user profile if it doesn't exist
+        const defaultUser: User = {
+          id: userCredential.uid,
+          uid: userCredential.uid,
+          email: userCredential.email || '',
+          displayName: userCredential.displayName || '',
+          name: userCredential.displayName || '',
+          role: 'user',
+          authProvider: 'google',
+          createdAt: new Date().toISOString(),
+          lastLoginAt: new Date().toISOString(),
+          quizCompleted: false,
+          dosha: null,
+          secondaryDosha: null,
+          quizResults: [],
+          lastQuizDate: null,
+          bookings: [],
+        };
+        await userService.updateUserProfile(userCredential.uid, defaultUser);
+        const updatedUser = await userService.getUserProfile(userCredential.uid);
+        if (updatedUser) {
+          setUser(updatedUser);
+          setIsAuthenticated(true);
+        }
+      }
       toast.success('Successfully signed in with Google!');
+      navigate('/dashboard'); // Navigate to dashboard after successful Google sign-in
     } catch (error) {
       console.error('Google sign-in error:', error);
-      toast.error('Failed to sign in with Google. Please try again.');
+      handleAuthError(error);
     } finally {
       setLoading(false);
     }
@@ -393,7 +443,6 @@ export function useAuth() {
     error,
     user,
     isAuthenticated,
-    updateUserProfile
+    updateUserProfile,
   };
 }
-
