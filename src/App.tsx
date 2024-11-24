@@ -11,6 +11,8 @@ import Playground from './pages/Playground';
 const Sessions = lazy(() => import('./pages/Sessions.tsx'));
 const Login = lazy(() => import('./pages/Login.tsx'));
 const Register = lazy(() => import('./pages/Register.tsx'));
+const ForgotPassword = lazy(() => import('./components/ForgotPassword.tsx'));
+const EmailVerification = lazy(() => import('./components/EmailVerification.tsx'));
 const Dashboard = lazy(() => import('./pages/Dashboard.tsx'));
 const Admin = lazy(() => import('./pages/Admin.tsx'));
 
@@ -48,6 +50,8 @@ function App() {
                 <Route path="/sessions" element={<Sessions />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/verify-email" element={<EmailVerification />} />
                 <Route
                   path="/dashboard"
                   element={
