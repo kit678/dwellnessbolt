@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import type { User } from '../types';
 import { logger } from '../utils/logger';
 import { 
   signInWithPopup,
@@ -153,9 +154,9 @@ export function useAuth() {
     try {
       checkRateLimit();
       
-      console.log('Attempting to sign in with email and password:', email);
+      logger.info(`Attempting to sign in with email: ${email}`, 'useAuth');
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      console.log('Sign-in successful. User ID:', userCredential.user.uid);
+      logger.info(`Sign-in successful. User ID: ${userCredential.user.uid}`, 'useAuth');
       
       if (!userCredential.user.emailVerified) {
         throw new Error('Please verify your email before logging in');
@@ -163,9 +164,9 @@ export function useAuth() {
 
       setLoginAttempts(0);
       setLastLoginAttempt(null);
-      console.log('Fetching user profile from Firestore for User ID:', userCredential.user.uid);
+      logger.info(`Fetching user profile from Firestore for User ID: ${userCredential.user.uid}`, 'useAuth');
       const userData = await userService.getUserProfile(userCredential.user.uid);
-      console.log('User profile fetched:', userData);
+      logger.info(`User profile fetched: ${JSON.stringify(userData)}`, 'useAuth');
       if (userData) {
         setUser(userData);
         setIsAuthenticated(true);
@@ -188,9 +189,9 @@ export function useAuth() {
           lastQuizDate: null,
           bookings: []
         };
-        console.log('Creating default user profile in Firestore for User ID:', userCredential.user.uid);
+        logger.info(`Creating default user profile in Firestore for User ID: ${userCredential.user.uid}`, 'useAuth');
         await userService.updateUserProfile(userCredential.user.uid, defaultUser);
-        console.log('Default user profile created successfully.');
+        logger.info('Default user profile created successfully.', 'useAuth');
         const updatedUser = await userService.getUserProfile(userCredential.user.uid);
         if (updatedUser) {
           setUser(updatedUser);
@@ -286,7 +287,7 @@ export function useAuth() {
       await updatePassword(user, newPassword);
       
       // Log the security event
-      console.log('Password updated successfully for user:', user.email);
+      logger.info(`Password updated successfully for user: ${user.email}`, 'useAuth');
       
       toast.success('Password updated successfully');
       return true;
