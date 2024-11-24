@@ -72,10 +72,12 @@ export function useBookings() {
         where('userId', '==', user.id)
       );
       const snapshot = await getDocs(bookingsQuery);
-      const bookings = snapshot.docs.map(doc => ({
+      const bookings: Booking[] = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       } as Booking));
+      console.log('Bookings fetched:', bookings);
+      return bookings;
     } catch (error) {
       toast.error('Failed to fetch bookings');
       console.error(error);
