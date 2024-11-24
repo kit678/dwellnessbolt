@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import stripeRoutes from './stripe';
+import webhookRoutes from './webhook';
 import { sendBookingConfirmation, sendBookingReminder } from '../src/lib/email';
 import { db } from '../src/lib/firebase';
 
@@ -12,6 +13,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/stripe', stripeRoutes);
+app.use('/api/webhook', webhookRoutes);
 
 // Schedule reminders for upcoming sessions
 const scheduleReminders = async () => {
