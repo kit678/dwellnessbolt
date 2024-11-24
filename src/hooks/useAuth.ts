@@ -123,7 +123,10 @@ export function useAuth() {
               bookings: []
             };
             await userService.updateUserProfile(firebaseUser.uid, defaultUser);
-            setUser(defaultUser);
+            const updatedUser = await userService.getUserProfile(firebaseUser.uid);
+            if (updatedUser) {
+              setUser(updatedUser);
+            }
             logger.info('User profile created successfully', 'useAuth');
           }
         } catch (error) {
