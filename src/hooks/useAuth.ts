@@ -130,33 +130,6 @@ export function useAuth() {
           } else {
             setUser(userData);
             setIsAuthenticated(true);
-          } else {
-            // Create default user profile if it doesn't exist
-            const defaultUser: User = {
-              id: firebaseUser.uid,
-              uid: firebaseUser.uid,
-              email: firebaseUser.email || '',
-              displayName: firebaseUser.displayName || '',
-              name: firebaseUser.displayName || '',
-              role: 'user',
-              authProvider: firebaseUser.providerData[0]?.providerId === 'google.com' ? 'google' : 'email',
-              createdAt: new Date().toISOString(),
-              lastLoginAt: new Date().toISOString(),
-              quizCompleted: false,
-              dosha: null,
-              secondaryDosha: null,
-              quizResults: [],
-              lastQuizDate: null,
-              bookings: []
-            };
-            await userService.updateUserProfile(firebaseUser.uid, defaultUser);
-            const updatedUser = await userService.getUserProfile(firebaseUser.uid);
-            if (updatedUser) {
-              setUser(updatedUser);
-              setIsAuthenticated(true);
-            }
-            logger.info('User profile created successfully', 'useAuth');
-          }
         } catch (error) {
           if (error instanceof Error) {
             logger.error('Failed to fetch user data', error, 'useAuth');
