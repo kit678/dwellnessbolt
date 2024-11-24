@@ -91,7 +91,7 @@ export function useAuth() {
           const userData = await userService.getUserProfile(firebaseUser.uid);
           if (userData) {
             setUser(userData);
-          } else {
+            logger.info('Creating default user profile', 'useAuth');
             // Create default user profile if it doesn't exist
             const defaultUser: User = {
               id: firebaseUser.uid,
@@ -111,13 +111,15 @@ export function useAuth() {
               bookings: []
             };
             setUser(defaultUser);
+            logger.info('User profile created successfully', 'useAuth');
           }
         } catch (error) {
-          console.error('Failed to fetch user data:', error);
+          logger.error('Failed to fetch user data', error, 'useAuth');
         }
       } else {
         setUser(null);
       }
+      logger.info('User state updated', 'useAuth');
       setLoading(false);
     });
 
@@ -143,7 +145,11 @@ export function useAuth() {
     } catch (error) {
       setLoginAttempts(prev => prev + 1);
       setLastLoginAttempt(new Date());
-      handleAuthError(error);
+      if (isFirebaseError(error) && error.code === 'auth/email-already-in-use') {
+        handleAuthError(new Error('This email is already associated with an account. Please sign in with Google if you previously used Google Sign-in.'));
+      } else {
+        handleAuthError(error);
+      }
     } finally {
       setLoading(false);
     }
