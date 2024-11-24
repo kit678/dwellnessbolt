@@ -135,7 +135,6 @@ export function useAuth() {
             setUser(userData);
             setIsAuthenticated(true);
           }
-          navigate('/dashboard'); // Navigate to dashboard after authentication
         } catch (error) {
           if (error instanceof Error) {
             logger.error('Failed to fetch user data', error, 'useAuth');
