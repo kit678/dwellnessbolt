@@ -153,7 +153,9 @@ export function useAuth() {
     try {
       checkRateLimit();
       
+      console.log('Attempting to sign in with email and password:', email);
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      console.log('Sign-in successful. User ID:', userCredential.user.uid);
       
       if (!userCredential.user.emailVerified) {
         throw new Error('Please verify your email before logging in');
@@ -161,7 +163,9 @@ export function useAuth() {
 
       setLoginAttempts(0);
       setLastLoginAttempt(null);
+      console.log('Fetching user profile from Firestore for User ID:', userCredential.user.uid);
       const userData = await userService.getUserProfile(userCredential.user.uid);
+      console.log('User profile fetched:', userData);
       if (userData) {
         setUser(userData);
       } else {
@@ -183,7 +187,9 @@ export function useAuth() {
           lastQuizDate: null,
           bookings: []
         };
+        console.log('Creating default user profile in Firestore for User ID:', userCredential.user.uid);
         await userService.updateUserProfile(userCredential.user.uid, defaultUser);
+        console.log('Default user profile created successfully.');
         const updatedUser = await userService.getUserProfile(userCredential.user.uid);
         if (updatedUser) {
           setUser(updatedUser);
