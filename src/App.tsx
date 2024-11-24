@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
 import Navbar from './components/Navbar';
-import { useAuthStore } from './store/authStore';
+
 import Home from './pages/Home';
 import Playground from './pages/Playground';
 
