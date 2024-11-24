@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { User } from '../types/index';
 import { logger } from '../utils/logger';
-import { 
+import { FirebaseError, 
   signInWithPopup,
   onAuthStateChanged,
   signOut,
