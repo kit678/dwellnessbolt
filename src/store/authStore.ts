@@ -32,7 +32,7 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>((set) => {
   // Initialize loading state
-  set({ loading: true });
+  set({ loading: true }); // Add missing semicolon
 
   // Listen to authentication state changes
   onAuthStateChanged(auth, async (firebaseUser) => {
