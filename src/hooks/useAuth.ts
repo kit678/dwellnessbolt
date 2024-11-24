@@ -1,9 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { 
   signInWithPopup,
   onAuthStateChanged,
   signOut,
   signInWithEmailAndPassword,
+  sendEmailVerification,
+  sendPasswordResetEmail,
+  createUserWithEmailAndPassword,
+  updateProfile,
+  EmailAuthProvider,
+  reauthenticateWithCredential,
+  updatePassword,
+  AuthErrorCodes
 } from 'firebase/auth';
 import { auth, googleProvider } from '../lib/firebase';
 import { useAuthStore } from '../store/authStore';
@@ -13,7 +21,66 @@ import toast from 'react-hot-toast';
 
 export function useAuth() {
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [loginAttempts, setLoginAttempts] = useState(0);
+  const [lastLoginAttempt, setLastLoginAttempt] = useState<Date | null>(null);
   const { setUser, logout: storeLogout } = useAuthStore();
+
+  const handleAuthError = useCallback((error: any) => {
+    let errorMessage = 'An unexpected error occurred';
+    
+    if (typeof error === 'object' && error !== null && 'code' in error) {
+      switch (error.code) {
+        case AuthErrorCodes.USER_DISABLED:
+          errorMessage = 'This account has been disabled';
+          break;
+        case AuthErrorCodes.USER_DELETED:
+          errorMessage = 'Account not found';
+          break;
+        case AuthErrorCodes.INVALID_EMAIL:
+          errorMessage = 'Invalid email address';
+          break;
+        case AuthErrorCodes.INVALID_PASSWORD:
+          errorMessage = 'Incorrect password';
+          break;
+        case AuthErrorCodes.EMAIL_EXISTS:
+          errorMessage = 'Email already in use';
+          break;
+        case AuthErrorCodes.WEAK_PASSWORD:
+          errorMessage = 'Password is too weak';
+          break;
+        case AuthErrorCodes.TOO_MANY_ATTEMPTS_TRY_LATER:
+          errorMessage = 'Too many attempts. Please try again later';
+          break;
+        case AuthErrorCodes.POPUP_CLOSED_BY_USER:
+          // Don't show error for user-closed popups
+          return;
+        default:
+          errorMessage = error.message || errorMessage;
+      }
+    }
+
+    setError(errorMessage);
+    toast.error(errorMessage);
+    return errorMessage;
+  }, []);
+
+  const checkRateLimit = useCallback(() => {
+    const MAX_ATTEMPTS = 5;
+    const LOCKOUT_DURATION = 15 * 60 * 1000; // 15 minutes
+
+    if (lastLoginAttempt && loginAttempts >= MAX_ATTEMPTS) {
+      const timeSinceLastAttempt = Date.now() - lastLoginAttempt.getTime();
+      if (timeSinceLastAttempt < LOCKOUT_DURATION) {
+        const remainingTime = Math.ceil((LOCKOUT_DURATION - timeSinceLastAttempt) / 60000);
+        throw new Error(`Too many login attempts. Please try again in ${remainingTime} minutes`);
+      } else {
+        // Reset attempts after lockout period
+        setLoginAttempts(0);
+        setLastLoginAttempt(null);
+      }
+    }
+  }, [lastLoginAttempt, loginAttempts]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
@@ -55,12 +122,100 @@ export function useAuth() {
 
   const login = async (email: string, password: string) => {
     setLoading(true);
+    setError(null);
+    
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      checkRateLimit();
+      
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      
+      if (!userCredential.user.emailVerified) {
+        throw new Error('Please verify your email before logging in');
+      }
+
+      setLoginAttempts(0);
+      setLastLoginAttempt(null);
       toast.success('Successfully signed in!');
     } catch (error) {
-      console.error('Login error:', error);
-      toast.error('Failed to sign in. Please try again.');
+      setLoginAttempts(prev => prev + 1);
+      setLastLoginAttempt(new Date());
+      handleAuthError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const signup = async (email: string, password: string, displayName: string) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      
+      // Update profile with display name
+      await updateProfile(userCredential.user, { displayName });
+      
+      // Send verification email
+      await sendEmailVerification(userCredential.user);
+      
+      toast.success('Account created! Please check your email for verification.');
+      return userCredential.user;
+    } catch (error) {
+      handleAuthError(error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const resetPassword = async (email: string) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      await sendPasswordResetEmail(auth, email);
+      toast.success('Password reset email sent!');
+    } catch (error) {
+      handleAuthError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateUserPassword = async (currentPassword: string, newPassword: string) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const user = auth.currentUser;
+      if (!user || !user.email) throw new Error('No user logged in');
+
+      // Re-authenticate user before password change
+      const credential = EmailAuthProvider.credential(user.email, currentPassword);
+      await reauthenticateWithCredential(user, credential);
+      
+      // Update password
+      await updatePassword(user, newPassword);
+      toast.success('Password updated successfully');
+    } catch (error) {
+      handleAuthError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const resendVerificationEmail = async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const user = auth.currentUser;
+      if (!user) throw new Error('No user logged in');
+      
+      await sendEmailVerification(user);
+      toast.success('Verification email sent!');
+    } catch (error) {
+      handleAuthError(error);
     } finally {
       setLoading(false);
     }
@@ -108,9 +263,14 @@ export function useAuth() {
 
   return {
     login,
+    signup,
     signInWithGoogle,
     logout,
+    resetPassword,
+    updateUserPassword,
+    resendVerificationEmail,
     loading,
+    error,
     user: useAuthStore.getState().user,
     updateUserProfile
   };
