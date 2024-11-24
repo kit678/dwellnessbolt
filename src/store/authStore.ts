@@ -31,9 +31,11 @@ interface AuthState {
 export const useAuthStore = create<AuthState>((set) => ({
   ...initialState,
   login: async (email, password) => {
+    console.log('Login initiated');
     set({ loading: true, error: null });
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      console.log('User signed in:', userCredential.user.uid);
       if (!userCredential.user.emailVerified) {
         throw new Error('Please verify your email before logging in');
       }
@@ -45,6 +47,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({ error: error.message });
       toast.error(error.message);
     } finally {
+      console.log('Login process completed');
       set({ loading: false });
     }
   },

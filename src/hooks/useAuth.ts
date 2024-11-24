@@ -95,7 +95,9 @@ export function useAuth() {
   }, [lastLoginAttempt, loginAttempts]);
 
   useEffect(() => {
+    console.log('useAuth hook initialized');
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      console.log('Auth state changed:', firebaseUser);
       setLoading(true);
       if (firebaseUser) {
         try {
@@ -139,6 +141,7 @@ export function useAuth() {
           }
         }
       } else {
+        console.log('No user is authenticated');
         setUser(null);
         setIsAuthenticated(false);
       }

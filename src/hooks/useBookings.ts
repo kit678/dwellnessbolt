@@ -10,7 +10,9 @@ export function useBookings() {
   const { user } = useAuthStore();
 
   const bookSession = async (session: RecurringSession, scheduledDate: string) => {
+    console.log('getUserBookings called');
     if (!user) {
+      console.error('User or user ID is undefined');
       toast.error('Please log in to book a session');
       return;
       return;
@@ -44,7 +46,10 @@ export function useBookings() {
 
       toast.success('Booking confirmed successfully!');
       
+      console.log('Bookings fetched:', bookings);
+      return bookings;
     } catch (error) {
+      console.error('Error fetching bookings:', error);
       console.error('Booking error:', error);
       toast.error('Failed to process booking');
     } finally {
@@ -61,12 +66,13 @@ export function useBookings() {
     }
 
     try {
+      console.log('Querying bookings for user:', user.id);
       const bookingsQuery = query(
         collection(db, 'bookings'),
         where('userId', '==', user.id)
       );
       const snapshot = await getDocs(bookingsQuery);
-      return snapshot.docs.map(doc => ({
+      const bookings = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       } as Booking));

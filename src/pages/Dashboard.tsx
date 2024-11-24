@@ -9,7 +9,10 @@ import { useUser } from '../hooks/useUser';
 import { useBookings } from '../hooks/useBookings';
 import OnboardingQuiz from '../components/OnboardingQuiz';
 
+console.log('Dashboard component rendered');
+
 export default function Dashboard() {
+  console.log('Dashboard component mounted');
   const { user, loading: authLoading } = useAuthStore();
   const { } = useUser(); // We'll add hooks back here when needed
   const { getUserBookings, loading: bookingsLoading } = useBookings();
@@ -28,14 +31,16 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (!hasFetched && user) {
+      console.log('Fetching bookings for user:', user);
       console.log('Dashboard mounted. User:', user);
       console.log('Quiz Results:', user.quizResults);
       console.log('Latest Quiz Result:', user.quizResults?.[user.quizResults.length - 1]);
       const fetchBookings = async () => {
         try {
-          console.log('Fetching bookings for user:', user);
+          console.log('Attempting to fetch bookings for user:', user);
           const userBookings = await getUserBookings();
           console.log('Fetched bookings:', userBookings);
+          console.log('Setting bookings state');
           setBookings(userBookings);
           setHasFetched(true);
           
