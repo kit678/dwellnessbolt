@@ -22,5 +22,5 @@
     "composite": true,
     "declaration": true
   },
-  "include": ["vite.config.ts"]
+  "include": ["vite.config.mts"]
 }
