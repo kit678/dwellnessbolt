@@ -39,7 +39,7 @@ export function useBookings() {
         scheduledDate
       });
 
-      const response = await fetch('/api/stripe/create-checkout-session', {
+      const response = await fetch('/stripe/create-checkout-session', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

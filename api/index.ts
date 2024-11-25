@@ -13,7 +13,7 @@ app.use(express.json());
 
 
 // Routes
-app.use('/api/stripe', stripeRoutes);
+app.use('/stripe', stripeRoutes);
 app.use('/api/webhook', webhookRoutes);
 
 // Schedule reminders for upcoming sessions
