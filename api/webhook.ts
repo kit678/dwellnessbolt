@@ -54,6 +54,10 @@ router.post('/webhook', async (req, res) => {
           console.log(`Booking ${bookingId} confirmed.`);
         } else {
           console.error(`Booking ${bookingId} not found.`);
+          // Handle pending status if booking not found
+          await updateDoc(bookingRef, {
+            status: 'pending',
+          });
         }
 
         // Fetch user email from Firestore

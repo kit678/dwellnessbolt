@@ -12,22 +12,6 @@ const stripe = new Stripe(stripeSecretKey, {
   apiVersion: '2023-10-16',
 });
 
-// Mock webhook endpoint for local development
-router.post('/mock-webhook', async (req, res) => {
-  const { bookingId } = req.body;
-  
-  try {
-    const bookingRef = doc(db, 'bookings', bookingId);
-    await updateDoc(bookingRef, {
-      status: 'confirmed',
-      paidAt: new Date().toISOString(),
-    });
-    res.json({ success: true });
-  } catch (error) {
-    console.error('Error updating booking:', error);
-    res.status(500).json({ error: 'Failed to update booking' });
-  }
-});
 
 router.post('/create-checkout-session', async (req, res) => {
   try {

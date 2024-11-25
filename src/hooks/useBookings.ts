@@ -15,7 +15,6 @@ export function useBookings() {
       console.error('User or user ID is undefined');
       toast.error('Please log in to book a session');
       return null;
-      return;
     }
     try {
       const bookingRef = await addDoc(collection(db, 'bookings'), {
