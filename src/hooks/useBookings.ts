@@ -6,7 +6,7 @@ import { useAuth } from './useAuth';
 import { RecurringSession, Booking } from '../types/index';
 import toast from 'react-hot-toast';
 
-export function useBookings() {
+export function useBookings(): { bookSession: (session: RecurringSession, scheduledDate: string) => Promise<string | null> } {
   const { user } = useAuth();
 
   const bookSession = async (session: RecurringSession, scheduledDate: string) => {
