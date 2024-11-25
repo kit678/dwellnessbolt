@@ -1,6 +1,6 @@
-import express from 'express';
+import express, { Router } from 'express';
 import Stripe from 'stripe';
-const router = express.Router();
+const router: Router = express.Router();
 const stripeSecretKey =
   process.env.NODE_ENV === 'development'
     ? process.env.VITE_STRIPE_TEST_SECRET_KEY!
