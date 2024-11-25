@@ -22,6 +22,6 @@
     "composite": true,
     "declaration": true
   },
-  "include": ["api/**/*", "vite.config.mts"],
-  "exclude": ["src/**/*"]
+  "include": ["api/**/*", "src/lib/**/*", "vite.config.mts"],
+  "exclude": []
 }
