@@ -1,23 +1,18 @@
 
 
-const stripeSecretKey = process.env.NODE_ENV === 'development'
-  ? process.env.VITE_STRIPE_TEST_SECRET_KEY
-  : process.env.VITE_STRIPE_SECRET_KEY;
-
-if (!stripeSecretKey) {
-  throw new Error('Stripe secret key is not defined');
-}
+const router = express.Router();
 
 
-// Stripe requires the raw body to construct the event
+const stripe = new Stripe(stripeSecretKey, {
+  apiVersion: '2023-10-16',
+});
+
 export const config = {
   api: {
     bodyParser: false,
   },
 };
 
-router.post('/webhook', async (req, res) => {
-  const sig = req.headers['stripe-signature'];
 
   let event: Stripe.Event;
 
