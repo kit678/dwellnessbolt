@@ -3,6 +3,7 @@ import cors from 'cors';
 import stripeRouter from './stripe.js';
 import webhookRouter from './webhook.js'; // Import your webhook router if you have one
 
+console.log('NODE_ENV:', process.env.NODE_ENV);
 const app = express();
 
 app.use(cors());
