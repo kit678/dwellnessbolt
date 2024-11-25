@@ -25,6 +25,7 @@ export default function BookingModal({ session, isOpen, onClose }: BookingModalP
     cvc: '',
     name: ''
   });
+  const [loading, setLoading] = useState(false);
 
   // Generate next 4 available dates based on rotation
   const getAvailableDates = () => {
@@ -60,7 +61,8 @@ export default function BookingModal({ session, isOpen, onClose }: BookingModalP
 
   const handlePayment = async (e: React.FormEvent) => {
     e.preventDefault();
-                    
+    setLoading(true);
+                        
     try {
       const sessionId = await bookSession(session, selectedDate);
       if (sessionId) {
