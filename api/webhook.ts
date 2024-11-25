@@ -30,6 +30,7 @@ const stripe = new Stripe(stripeSecretKey, {
         return res.status(400).send('Session metadata is missing');
       }
 
+
       try {
         await db.collection('bookings').doc(bookingId).update({
           status: 'confirmed',
