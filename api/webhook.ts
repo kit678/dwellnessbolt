@@ -90,3 +90,5 @@ router.post('/webhook', async (req, res) => {
 
 export default router;
 
+import { logger } from '../src/utils/logger.js';
+import { googleProvider } from '../lib/firebase.js';
