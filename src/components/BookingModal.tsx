@@ -2,10 +2,10 @@ import { useState, useMemo } from 'react';
 import { Dialog } from '@headlessui/react';
 import { m } from 'framer-motion';
 import { Clock, Users, DollarSign } from 'lucide-react';
-import { RecurringSession } from '../types/index';
+import { RecurringSession } from '../types/index.js';
 import { format, parseISO } from 'date-fns';
 import { useBookings } from '../hooks/useBookings';
-import { stripePromise } from '../lib/stripe';
+import { stripePromise } from '../lib/stripe.js';
 import toast from 'react-hot-toast';
 
 interface BookingModalProps {
