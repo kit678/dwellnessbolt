@@ -4,6 +4,7 @@ import stripeRoutes from './stripe';
 import webhookRoutes from './webhook';
 import { sendBookingConfirmation, sendBookingReminder } from '../src/lib/email';
 import { db } from '../src/lib/firebase';
+import { collection, doc, updateDoc, getDoc, where, query, getDocs } from 'firebase/firestore';
 
 const app = express();
 
@@ -21,16 +22,18 @@ const scheduleReminders = async () => {
   const twentyFourHoursFromNow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
 
   try {
-    const bookingsSnapshot = await db
-      .collection('bookings')
-      .where('status', '==', 'confirmed')
-      .where('session.startTime', '>=', now)
-      .where('session.startTime', '<=', twentyFourHoursFromNow)
-      .get();
+    const bookingsRef = collection(db, 'bookings');
+    const q = query(
+      bookingsRef,
+      where('status', '==', 'confirmed'),
+      where('session.startTime', '>=', now),
+      where('session.startTime', '<=', twentyFourHoursFromNow)
+    );
+    const bookingsSnapshot = await getDocs(q);
 
     for (const doc of bookingsSnapshot.docs) {
       const booking = doc.data();
-      const userRef = await db.collection('users').doc(booking.userId).get();
+      const userDoc = await getDoc(doc(collection(db, 'users'), booking.userId));
       const userEmail = userRef.data()?.email;
 
       if (userEmail) {
