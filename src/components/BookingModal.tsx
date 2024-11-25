@@ -55,18 +55,13 @@ export default function BookingModal({
     return dates;
   }, [session]);
 
-  const handleContinueToPayment = () => {
+  const handleContinueToPayment = async () => {
     if (!selectedDate) {
       toast.error('Please select a date');
       return;
     }
-    setShowPayment(true);
-  };
 
-  const handlePayment = async (e: React.FormEvent) => {
-    e.preventDefault();
     setLoading(true);
-
     try {
       const sessionId = await bookSession(session, selectedDate);
       if (sessionId) {
@@ -77,8 +72,7 @@ export default function BookingModal({
           toast.error('Failed to redirect to payment');
         }
       } else {
-        toast.success('Booking confirmed! Check your email for confirmation.');
-        onClose();
+        toast.error('Failed to create checkout session');
       }
     } catch (error) {
       console.error('Booking failed:', error);
