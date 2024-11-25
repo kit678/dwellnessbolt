@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Dialog } from '@headlessui/react';
 import { m } from 'framer-motion';
 import { Clock, Users, DollarSign, CreditCard } from 'lucide-react';
 import { RecurringSession } from '../types/index';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { useBookings } from '../hooks/useBookings';
 import { stripePromise } from '../lib/stripe';
 import toast from 'react-hot-toast';
@@ -14,26 +14,31 @@ interface BookingModalProps {
   onClose: () => void;
 }
 
-export default function BookingModal({ session, isOpen, onClose }: BookingModalProps) {
+export default function BookingModal({
+  session,
+  isOpen,
+  onClose,
+}: BookingModalProps) {
   const { bookSession } = useBookings();
-  const [selectedDate, setSelectedDate] = useState<string | undefined>(undefined);
+  const [selectedDate, setSelectedDate] = useState('');
   const [showPayment, setShowPayment] = useState(false);
   const [paymentDetails, setPaymentDetails] = useState({
     cardNumber: '',
     expiry: '',
     cvc: '',
-    name: ''
+    name: '',
   });
   const [loading, setLoading] = useState(false);
 
-  // Generate next 4 available dates based on rotation
-  const getAvailableDates = () => {
-    const dates: Date[] = [];
+  // Memoized available dates to prevent them from changing between renders
+  const availableDates = useMemo(() => {
+    const dates: string[] = [];
     const recurringDays = session.recurringDays || [];
-    
+
     if (recurringDays.length === 0) return dates;
 
     const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set time to midnight
     let currentDate = new Date(today);
 
     while (dates.length < 4) {
@@ -41,14 +46,14 @@ export default function BookingModal({ session, isOpen, onClose }: BookingModalP
       const dayOfWeek = currentDate.getDay();
 
       if (recurringDays.includes(dayOfWeek)) {
-        dates.push(new Date(currentDate));
+        // Format date as 'yyyy-MM-dd' to ensure consistency
+        const dateStr = format(currentDate, 'yyyy-MM-dd');
+        dates.push(dateStr);
       }
     }
 
     return dates;
-  };
-
-  const availableDates = getAvailableDates();
+  }, [session]);
 
   const handleContinueToPayment = () => {
     if (!selectedDate) {
@@ -61,9 +66,9 @@ export default function BookingModal({ session, isOpen, onClose }: BookingModalP
   const handlePayment = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-                        
+
     try {
-      const sessionId = await bookSession(session, selectedDate!);
+      const sessionId = await bookSession(session, selectedDate);
       if (sessionId) {
         const stripe = await stripePromise;
         const { error } = await stripe!.redirectToCheckout({ sessionId });
@@ -131,13 +136,14 @@ export default function BookingModal({ session, isOpen, onClose }: BookingModalP
                     Select Date
                   </label>
                   <select
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    value={selectedDate}
                     onChange={(e) => setSelectedDate(e.target.value)}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                   >
                     <option value="">Choose a date</option>
-                    {availableDates.map((date) => (
-                      <option key={date.toISOString()} value={date.toISOString()}>
-                        {format(date, 'EEEE, MMMM d, yyyy')}
+                    {availableDates.map((dateStr) => (
+                      <option key={dateStr} value={dateStr}>
+                        {format(parseISO(dateStr), 'EEEE, MMMM d, yyyy')}
                       </option>
                     ))}
                   </select>
@@ -174,7 +180,12 @@ export default function BookingModal({ session, isOpen, onClose }: BookingModalP
                     placeholder="4242 4242 4242 4242"
                     className="pl-10 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                     value={paymentDetails.cardNumber}
-                    onChange={(e) => setPaymentDetails({...paymentDetails, cardNumber: e.target.value})}
+                    onChange={(e) =>
+                      setPaymentDetails({
+                        ...paymentDetails,
+                        cardNumber: e.target.value,
+                      })
+                    }
                   />
                 </div>
               </div>
@@ -190,7 +201,12 @@ export default function BookingModal({ session, isOpen, onClose }: BookingModalP
                     placeholder="MM/YY"
                     className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                     value={paymentDetails.expiry}
-                    onChange={(e) => setPaymentDetails({...paymentDetails, expiry: e.target.value})}
+                    onChange={(e) =>
+                      setPaymentDetails({
+                        ...paymentDetails,
+                        expiry: e.target.value,
+                      })
+                    }
                   />
                 </div>
                 <div>
@@ -203,7 +219,12 @@ export default function BookingModal({ session, isOpen, onClose }: BookingModalP
                     placeholder="123"
                     className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                     value={paymentDetails.cvc}
-                    onChange={(e) => setPaymentDetails({...paymentDetails, cvc: e.target.value})}
+                    onChange={(e) =>
+                      setPaymentDetails({
+                        ...paymentDetails,
+                        cvc: e.target.value,
+                      })
+                    }
                   />
                 </div>
               </div>
@@ -218,7 +239,12 @@ export default function BookingModal({ session, isOpen, onClose }: BookingModalP
                   placeholder="John Doe"
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                   value={paymentDetails.name}
-                  onChange={(e) => setPaymentDetails({...paymentDetails, name: e.target.value})}
+                  onChange={(e) =>
+                    setPaymentDetails({
+                      ...paymentDetails,
+                      name: e.target.value,
+                    })
+                  }
                 />
               </div>
 
