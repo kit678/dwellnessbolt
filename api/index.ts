@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
-import stripeRouter from './stripe.ts';
-import webhookRouter from './webhook.ts'; // Import your webhook router if you have one
+import stripeRouter from './stripe';
+import webhookRouter from './webhook'; // Import your webhook router if you have one
 
 const app = express();
 
