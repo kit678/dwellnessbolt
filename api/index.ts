@@ -1,5 +1,5 @@
-import express from 'express';
-import cors from 'cors';
+const express = require('express');
+const cors = require('cors');
 import stripeRouter from './stripe';
 import webhookRouter from './webhook'; // Import your webhook router if you have one
 
@@ -20,4 +20,4 @@ app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
 
-export default app;
+module.exports = app;
