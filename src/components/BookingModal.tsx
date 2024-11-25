@@ -16,7 +16,7 @@ interface BookingModalProps {
 
 export default function BookingModal({ session, isOpen, onClose }: BookingModalProps) {
   const { bookSession } = useBookings();
-  const [selectedDate, setSelectedDate] = useState<string>('');
+  const [selectedDate, setSelectedDate] = useState<string | undefined>(undefined);
   const [showPayment, setShowPayment] = useState(false);
   const [paymentDetails, setPaymentDetails] = useState({
     cardNumber: '',
