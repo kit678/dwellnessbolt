@@ -61,6 +61,7 @@ const stripe = new Stripe(stripeSecretKey, {
   }
 
   res.json({ received: true });
+  export default router;
 });
 
 
@@ -102,11 +103,11 @@ router.post('/webhook', async (req, res) => {
   switch (event.type) {
     case 'checkout.session.completed':
       const session = event.data.object as Stripe.Checkout.Session;
-      const bookingId = session.metadata.bookingId;
-      const userId = session.metadata.userId;
-      const sessionTitle = session.metadata.sessionTitle;
-      const sessionDate = session.metadata.sessionDate;
-      const sessionPrice = session.metadata.sessionPrice;
+      const bookingId = metadata.bookingId;
+      const userId = metadata.userId;
+      const sessionTitle = metadata.sessionTitle;
+      const sessionDate = metadata.sessionDate;
+      const sessionPrice = metadata.sessionPrice;
 
       try {
         await db.collection('bookings').doc(bookingId).update({
