@@ -1,8 +1,8 @@
 import express from 'express';
 import Stripe from 'stripe';
 import { buffer } from 'micro';
-import { db } from '../src/lib/firebase';
-import { sendBookingConfirmation } from '../src/lib/email';
+import { db } from '../lib/firebase';
+import { sendBookingConfirmation } from '../lib/email';
 
 const router = express.Router();
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY!;
