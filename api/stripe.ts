@@ -1,8 +1,5 @@
 import express from 'express';
 import Stripe from 'stripe';
-import { doc, updateDoc } from 'firebase/firestore';
-import { db } from '../src/lib/firebase';
-
 const router = express.Router();
 const stripeSecretKey =
   process.env.NODE_ENV === 'development'
