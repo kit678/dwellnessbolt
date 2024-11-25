@@ -16,7 +16,7 @@ interface BookingModalProps {
 }
 
 export default function BookingModal({ session, isOpen, onClose }: BookingModalProps) {
-  const { bookSession, loading } = useBookings();
+  const { bookSession } = useBookings();
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [showPayment, setShowPayment] = useState(false);
   const [paymentDetails, setPaymentDetails] = useState({
@@ -154,7 +154,7 @@ export default function BookingModal({ session, isOpen, onClose }: BookingModalP
                 </button>
                 <button
                   onClick={handleContinueToPayment}
-                  disabled={loading || !selectedDate}
+                  disabled={!selectedDate}
                   className="flex-1 py-2 px-4 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50"
                 >
                   Continue to Payment

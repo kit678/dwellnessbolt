@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { collection, addDoc, query, where, getDocs, updateDoc, doc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useAuth } from './useAuth';
@@ -53,12 +52,10 @@ export function useBookings() {
       console.error('Booking error:', error);
       toast.error('Failed to process booking');
     } finally {
-      setLoading(false);
     }
   }
 
   const getUserBookings = async (): Promise<Booking[]> => {
-    setLoading(true);
     if (!user) {
       console.error('User or user ID is undefined');
       setLoading(false);
