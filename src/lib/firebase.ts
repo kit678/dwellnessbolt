@@ -1,5 +1,9 @@
 /// <reference types="vite/client" />
+import { config } from 'dotenv';
 import { initializeApp, getApps } from 'firebase/app';
+
+// Load environment variables from .env file
+config();
 import { getAuth, setPersistence, browserSessionPersistence, GoogleAuthProvider } from 'firebase/auth';
 import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from 'firebase/firestore';
 
