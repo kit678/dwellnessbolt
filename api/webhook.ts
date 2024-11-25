@@ -1,10 +1,4 @@
-import express from 'express';
-import Stripe from 'stripe';
-import { buffer } from 'micro';
-import { db } from '../lib/firebase';
-import { sendBookingConfirmation } from '../lib/email';
 
-const router = express.Router();
 
 const stripeSecretKey = process.env.NODE_ENV === 'development'
   ? process.env.VITE_STRIPE_TEST_SECRET_KEY
@@ -14,9 +8,6 @@ if (!stripeSecretKey) {
   throw new Error('Stripe secret key is not defined');
 }
 
-const stripe = new Stripe(stripeSecretKey, {
-  apiVersion: '2023-10-16',
-});
 
 // Stripe requires the raw body to construct the event
 export const config = {
@@ -47,11 +38,6 @@ router.post('/webhook', async (req, res) => {
         console.error('Session metadata is missing');
         return res.status(400).send('Session metadata is missing');
       }
-      const bookingId = metadata.bookingId;
-      const userId = metadata.userId;
-      const sessionTitle = metadata.sessionTitle;
-      const sessionDate = metadata.sessionDate;
-      const sessionPrice = metadata.sessionPrice;
 
       try {
         await db.collection('bookings').doc(bookingId).update({
@@ -85,22 +71,8 @@ router.post('/webhook', async (req, res) => {
   res.json({ received: true });
 });
 
-export default router;
-import express from 'express';
-import Stripe from 'stripe';
-import { buffer } from 'micro';
-import { db } from '../lib/firebase';
-import { sendBookingConfirmation } from '../lib/email';
 
-const router = express.Router();
 
-const stripeSecretKey = process.env.NODE_ENV === 'development'
-  ? process.env.VITE_STRIPE_TEST_SECRET_KEY
-  : process.env.VITE_STRIPE_SECRET_KEY;
-
-const stripe = new Stripe(stripeSecretKey, {
-  apiVersion: '2023-10-16',
-});
 
 // Stripe requires the raw body to construct the event
 export const config = {
@@ -164,7 +136,6 @@ router.post('/webhook', async (req, res) => {
   res.json({ received: true });
 });
 
-export default router;
 import express from 'express';
 import Stripe from 'stripe';
 import { buffer } from 'micro';
@@ -173,13 +144,6 @@ import { sendBookingConfirmation } from '../lib/email';
 
 const router = express.Router();
 
-const stripeSecretKey = process.env.NODE_ENV === 'development'
-  ? process.env.VITE_STRIPE_TEST_SECRET_KEY
-  : process.env.VITE_STRIPE_SECRET_KEY;
-
-const stripe = new Stripe(stripeSecretKey, {
-  apiVersion: '2023-10-16',
-});
 
 // Stripe requires the raw body to construct the event
 export const config = {
@@ -243,4 +207,3 @@ router.post('/webhook', async (req, res) => {
   res.json({ received: true });
 });
 
-export default router;
