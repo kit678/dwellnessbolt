@@ -1,12 +1,12 @@
 import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
-  host: import.meta.env.VITE_EMAIL_HOST,
-  port: parseInt(import.meta.env.VITE_EMAIL_PORT),
+  host: process.env.VITE_EMAIL_HOST,
+  port: parseInt(process.env.VITE_EMAIL_PORT!),
   secure: true,
   auth: {
-    user: import.meta.env.VITE_EMAIL_USER,
-    pass: import.meta.env.VITE_EMAIL_PASSWORD,
+    user: process.env.VITE_EMAIL_USER,
+    pass: process.env.VITE_EMAIL_PASSWORD,
   },
 });
 
