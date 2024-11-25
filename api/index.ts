@@ -32,7 +32,7 @@ const scheduleReminders = async () => {
     const bookingsSnapshot = await getDocs(q);
 
     for (const bookingDoc of bookingsSnapshot.docs) {
-      const booking = doc.data();
+      const booking = bookingDoc.data();
       const userDoc = await getDoc(doc(collection(db, 'users'), booking.userId));
       const userEmail = userDoc.data()?.email;
 
