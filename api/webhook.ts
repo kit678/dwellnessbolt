@@ -1,5 +1,9 @@
 
-
+import express from 'express';
+import Stripe from 'stripe';
+import { buffer } from 'micro';
+import { db } from '../lib/firebase';
+import { sendBookingConfirmation } from '../lib/email';
 const router = express.Router();
 
 
@@ -70,11 +74,7 @@ const stripe = new Stripe(stripeSecretKey, {
 // Stripe requires the raw body to construct the event
 
 
-import express from 'express';
-import Stripe from 'stripe';
-import { buffer } from 'micro';
-import { db } from '../lib/firebase';
-import { sendBookingConfirmation } from '../lib/email';
+
 
 const router = express.Router();
 
