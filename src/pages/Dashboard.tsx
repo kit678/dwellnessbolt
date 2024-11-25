@@ -16,12 +16,13 @@ logger.info('Dashboard component rendered', 'Dashboard');
 export default function Dashboard() {
   logger.info('Dashboard component mounted', 'Dashboard');
   const { user, loading: authLoading } = useAuth();
-  const { getUserBookings, loading: bookingsLoading } = useBookings();
+  const { getUserBookings } = useBookings();
   const { results } = useQuizStore();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [quizOpen, setQuizOpen] = useState<boolean>(false);
   const [hasFetched, setHasFetched] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   // Effect to handle automatic quiz modal display
   useEffect(() => {
@@ -38,6 +39,7 @@ export default function Dashboard() {
       logger.info(`Quiz Results: ${JSON.stringify(results)}`, 'Dashboard');
       logger.info(`Latest Quiz Result: ${JSON.stringify(user.quizResults?.[user.quizResults.length - 1])}`, 'Dashboard');
       const fetchBookings = async () => {
+        setLoading(true);
         try {
           logger.info(`Attempting to fetch bookings for user: ${user}`, 'Dashboard');
           const userBookings = await getUserBookings();
@@ -45,13 +47,15 @@ export default function Dashboard() {
           console.log('Setting bookings state');
           setBookings(userBookings);
           setHasFetched(true);
-        
+            
           if (user.quizCompleted) {
             console.log('Quiz results fetched:', user.dosha);
           }
         } catch (err) {
           console.error('Failed to fetch bookings:', err);
           setError('Failed to load bookings. Please try again later.');
+        } finally {
+          setLoading(false);
         }
       };
       fetchBookings();
@@ -59,7 +63,7 @@ export default function Dashboard() {
   }, [user, hasFetched, getUserBookings]);
 
 
-  if (bookingsLoading || authLoading) {
+  if (loading || authLoading) {
     console.log('Loading bookings...');
     return (
       <div className="flex items-center justify-center min-h-screen">

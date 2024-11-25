@@ -79,7 +79,6 @@ export function useBookings() {
       console.error(error);
       return [];
     } finally {
-      setLoading(false);
     }
   };
 
