@@ -1,5 +1,3 @@
-// api/index.ts
-
 import express from 'express';
 import cors from 'cors';
 import stripeRouter from './stripe.js';
