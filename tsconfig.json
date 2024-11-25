@@ -18,6 +18,7 @@
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "typeRoots": ["./node_modules/@types", "./src/types"],
+    "types": ["vite/client"],
     "jsx": "react-jsx"
   },
   "include": ["src"],
