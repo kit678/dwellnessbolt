@@ -48,9 +48,7 @@ export function useBookings() {
 
     } catch (error) {
       console.error('Error processing booking:', error);
-      console.error('Booking error:', error);
-      toast.error('Failed to process booking');
-    } finally {
+      toast.error('Failed to process booking. Please try again later.');
     }
   }
 
