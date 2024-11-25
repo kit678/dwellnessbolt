@@ -16,7 +16,7 @@ logger.info('Dashboard component rendered', 'Dashboard');
 export default function Dashboard() {
   logger.info('Dashboard component mounted', 'Dashboard');
   const { user, loading: authLoading } = useAuth();
-  const { getUserBookings, cancelBooking } = useBookings();
+  const { getUserBookings } = useBookings();
   const { results } = useQuizStore();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [error, setError] = useState<string | null>(null);

@@ -63,7 +63,7 @@ export default function BookingModal({ session, isOpen, onClose }: BookingModalP
     setLoading(true);
                         
     try {
-      const sessionId = await bookSession(session, selectedDate);
+      const sessionId = await bookSession(session, selectedDate!);
       if (sessionId) {
         const stripe = await stripePromise;
         const { error } = await stripe!.redirectToCheckout({ sessionId });
