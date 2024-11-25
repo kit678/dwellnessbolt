@@ -61,6 +61,7 @@ export interface RecurringSession {
   enrolled: number;
   price: number;
   specializedTopic?: string;
+  recurringDays: number[];
 }
 
 export type SpecializedTopic = 

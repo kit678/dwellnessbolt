@@ -6,7 +6,6 @@ import { RecurringSession } from '../types/index';
 import { format } from 'date-fns';
 import { useBookings } from '../hooks/useBookings';
 import { stripePromise } from '../lib/stripe';
-import { getNextDayOccurrence } from '../utils/dateUtils';
 import toast from 'react-hot-toast';
 
 interface BookingModalProps {
