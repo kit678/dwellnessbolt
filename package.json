@@ -4,7 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"vite\" \"ts-node-dev --ignore src api/index.ts\"",
+    "dev": "vite",
+    "dev:server": "ts-node-dev --esm api/index.ts",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
