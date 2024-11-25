@@ -3,6 +3,7 @@ import Stripe from 'stripe';
 import { buffer } from 'micro';
 import { db } from '../src/lib/firebase';
 import { sendBookingConfirmation } from '../src/lib/email';
+import { collection, doc, updateDoc, getDoc } from 'firebase/firestore';
 
 const router = express.Router();
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY!;
@@ -43,14 +44,14 @@ router.post('/webhook', async (req, res) => {
       }
 
       try {
-        await db.collection('bookings').doc(bookingId).update({
+        await updateDoc(doc(collection(db, 'bookings'), bookingId), {
           status: 'confirmed',
           paidAt: new Date().toISOString(),
         });
         console.log(`Booking ${bookingId} confirmed.`);
 
         // Fetch user email from Firestore
-        const userDoc = await db.collection('users').doc(userId).get();
+        const userDoc = await getDoc(doc(collection(db, 'users'), userId));
         const userData = userDoc.data();
         if (userData && userData.email) {
           await sendBookingConfirmation(userData.email, {
