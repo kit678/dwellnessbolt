@@ -132,7 +132,6 @@ export default function BookingModal({ session, isOpen, onClose }: BookingModalP
                   </label>
                   <select
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                    value={selectedDate}
                     onChange={(e) => setSelectedDate(e.target.value)}
                   >
                     <option value="">Choose a date</option>
