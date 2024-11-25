@@ -5,8 +5,8 @@ import { db } from '../src/lib/firebase';
 
 const router = express.Router();
 const stripeSecretKey = process.env.NODE_ENV === 'development'
-  ? process.env.VITE_STRIPE_TEST_SECRET_KEY
-  : process.env.VITE_STRIPE_SECRET_KEY;
+  ? process.env.VITE_STRIPE_TEST_SECRET_KEY!
+  : process.env.VITE_STRIPE_SECRET_KEY!;
 
 const stripe = new Stripe(stripeSecretKey, {
   apiVersion: '2023-10-16',
