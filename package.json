@@ -5,7 +5,7 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",
-    "dev:server": "ts-node --loader ts-node/esm --project tsconfig.node.json ./api/index.ts",
+    "dev:server": "node --loader ts-node/esm ./api/index.ts",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
