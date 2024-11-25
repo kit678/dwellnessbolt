@@ -6,7 +6,7 @@ import { useAuth } from './useAuth';
 import { RecurringSession, Booking } from '../types/index';
 import toast from 'react-hot-toast';
 
-export function useBookings(): { bookSession: (session: RecurringSession, scheduledDate: string) => Promise<string | null> } {
+export function useBookings(): { bookSession: (session: RecurringSession, scheduledDate: string) => Promise<string | null> } | undefined {
   const { user } = useAuth();
 
   const bookSession = async (session: RecurringSession, scheduledDate: string) => {
@@ -64,5 +64,6 @@ export function useBookings(): { bookSession: (session: RecurringSession, schedu
     }
   };
 
-  // ... rest of your code
+  return { bookSession };
+}
 }
