@@ -6,7 +6,9 @@ const stripeSecretKey =
     ? process.env.VITE_STRIPE_TEST_SECRET_KEY!
     : process.env.VITE_STRIPE_SECRET_KEY!;
 
-const stripe = new Stripe(stripeSecretKey, {
+console.log('Stripe Secret Key:', stripeSecretKey ? 'Loaded' : 'Not Loaded');
+
+const stripe = new Stripe(stripeSecretKey || '', {
   apiVersion: '2023-10-16',
 });
 
