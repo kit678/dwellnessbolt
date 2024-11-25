@@ -4,7 +4,7 @@ import Stripe from 'stripe';
 import { buffer } from 'micro';
 import { db } from '../lib/firebase';
 import { sendBookingConfirmation } from '../lib/email';
-const router = express.Router();
+// Removed duplicate router initialization
 
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY!;
@@ -65,13 +65,11 @@ const stripe = new Stripe(stripeSecretKey, {
   }
 
   res.json({ received: true });
-  export default router;
 });
 
 
 
 
-// Stripe requires the raw body to construct the event
 
 
 
@@ -103,11 +101,6 @@ router.post('/webhook', async (req, res) => {
   switch (event.type) {
     case 'checkout.session.completed':
       const session = event.data.object as Stripe.Checkout.Session;
-      const bookingId = metadata.bookingId;
-      const userId = metadata.userId;
-      const sessionTitle = metadata.sessionTitle;
-      const sessionDate = metadata.sessionDate;
-      const sessionPrice = metadata.sessionPrice;
 
       try {
         await db.collection('bookings').doc(bookingId).update({
