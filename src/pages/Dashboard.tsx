@@ -247,7 +247,7 @@ export default function Dashboard() {
                   }`}>
                     {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
                   </span>
-                  {booking.status === 'pending' && (
+                  {booking.status !== 'confirmed' && (
                     <button
                       onClick={() => {
                         // Logic to rebook or complete booking
