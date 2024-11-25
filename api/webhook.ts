@@ -1,8 +1,8 @@
-import express, { Router } from 'express';
+import express from 'express';
 import Stripe from 'stripe';
 import { buffer } from 'micro';
-import { db } from '../src/lib/firebase';
-import { sendBookingConfirmation } from '../src/lib/email';
+import { db } from '../src/lib/firebase.js';
+import { sendBookingConfirmation } from '../src/lib/email.js';
 import { collection, doc, updateDoc, getDoc } from 'firebase/firestore';
 
 const router = express.Router();
