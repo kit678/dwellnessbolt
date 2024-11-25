@@ -7,7 +7,7 @@ import toast from 'react-hot-toast';
 
 export function useBookings() {
   const { user } = useAuth();
-  const [loading, setLoading] = useState(false);
+  
 
 
   const bookSession = async (session: RecurringSession, scheduledDate: string) => {
@@ -107,7 +107,6 @@ export function useBookings() {
   };
 
   return {
-    loading,
     bookSession,
     getUserBookings,
     cancelBooking,
