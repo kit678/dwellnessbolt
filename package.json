@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"vite\" \"ts-node --esm -r tsconfig-paths/register api/index.ts\"",
+    "dev": "concurrently \"vite\" \"node --loader ts-node/esm -r tsconfig-paths/register api/index.ts\"",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
@@ -13,7 +13,7 @@
     "check-db": "node src/scripts/checkSessions.js",
     "test-connection": "node src/scripts/testConnection.js",
     "create-test-user": "node src/scripts/createTestUser.js",
-    "start": "ts-node --esm -r tsconfig-paths/register api/index.ts"
+    "start": "node --loader ts-node/esm -r tsconfig-paths/register api/index.ts"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.18",
