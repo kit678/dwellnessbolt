@@ -9,8 +9,8 @@
       // Add more aliases as needed
     },
     "target": "es2021",
-    "module": "ESNext",
-    "moduleResolution": "node",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
