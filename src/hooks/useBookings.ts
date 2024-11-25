@@ -58,7 +58,6 @@ export function useBookings() {
   const getUserBookings = async (): Promise<Booking[]> => {
     if (!user) {
       console.error('User or user ID is undefined');
-      setLoading(false);
       return [];
     }
 

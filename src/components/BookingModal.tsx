@@ -60,7 +60,6 @@ export default function BookingModal({ session, isOpen, onClose }: BookingModalP
 
   const handlePayment = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
                     
     try {
       const sessionId = await bookSession(session, selectedDate);
