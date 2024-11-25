@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { Dialog } from '@headlessui/react';
 import { m } from 'framer-motion';
-import { Clock, Users, DollarSign, CreditCard } from 'lucide-react';
+import { Clock, Users, DollarSign } from 'lucide-react';
 import { RecurringSession } from '../types/index';
 import { format, parseISO } from 'date-fns';
 import { useBookings } from '../hooks/useBookings';
@@ -21,7 +21,7 @@ export default function BookingModal({
 }: BookingModalProps) {
   const { bookSession } = useBookings();
   const [selectedDate, setSelectedDate] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [, setLoading] = useState(false);
 
   // Memoized available dates to prevent them from changing between renders
   const availableDates = useMemo(() => {
@@ -150,7 +150,6 @@ export default function BookingModal({
                   Continue to Payment
                 </button>
               </div>
-          )}
         </m.div>
       </div>
     </Dialog>
