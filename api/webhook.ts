@@ -34,6 +34,7 @@ router.post('/webhook', async (req, res) => {
   switch (event.type) {
     case 'checkout.session.completed':
       const session = event.data.object as Stripe.Checkout.Session;
+      const metadata = session.metadata as { [key: string]: string };
       const { bookingId, userId, sessionTitle, sessionDate, sessionPrice } = metadata;
 
       if (!bookingId || !userId) {
