@@ -239,13 +239,26 @@ export default function Dashboard() {
                   </h3>
                   <p className="text-gray-600 mt-1">{booking.session.description}</p>
                 </div>
-                <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                  booking.status === 'confirmed'
-                    ? 'bg-green-100 text-green-800'
-                    : 'bg-red-100 text-red-800'
-                }`}>
-                  {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
-                </span>
+                <div className="flex items-center space-x-2">
+                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                    booking.status === 'confirmed'
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-red-100 text-red-800'
+                  }`}>
+                    {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
+                  </span>
+                  {booking.status === 'pending' && (
+                    <button
+                      onClick={() => {
+                        // Logic to rebook or complete booking
+                        // This could involve redirecting to the booking modal or payment page
+                      }}
+                      className="text-indigo-600 hover:underline"
+                    >
+                      Complete Booking
+                    </button>
+                  )}
+                </div>
               </div>
 
               <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">

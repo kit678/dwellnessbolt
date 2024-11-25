@@ -17,6 +17,19 @@ export function useBookings() {
       return null;
     }
     try {
+      // Check for existing bookings for the same session and date
+      const existingBookingsQuery = query(
+        collection(db, 'bookings'),
+        where('userId', '==', user.id),
+        where('sessionId', '==', session.id),
+        where('scheduledDate', '==', scheduledDate)
+      );
+      const existingBookingsSnapshot = await getDocs(existingBookingsQuery);
+      if (!existingBookingsSnapshot.empty) {
+        toast.error('You already have a booking for this session on the selected date.');
+        return null;
+      }
+
       const bookingRef = await addDoc(collection(db, 'bookings'), {
         userId: user.id,
         sessionId: session.id,
