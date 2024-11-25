@@ -31,10 +31,10 @@ const scheduleReminders = async () => {
     );
     const bookingsSnapshot = await getDocs(q);
 
-    for (const doc of bookingsSnapshot.docs) {
+    for (const bookingDoc of bookingsSnapshot.docs) {
       const booking = doc.data();
       const userDoc = await getDoc(doc(collection(db, 'users'), booking.userId));
-      const userEmail = userRef.data()?.email;
+      const userEmail = userDoc.data()?.email;
 
       if (userEmail) {
         await sendBookingReminder(userEmail, booking);
