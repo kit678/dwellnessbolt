@@ -44,11 +44,17 @@ router.post('/webhook', async (req, res) => {
       }
 
       try {
-        await updateDoc(doc(collection(db, 'bookings'), bookingId), {
-          status: 'confirmed',
-          paidAt: new Date().toISOString(),
-        });
-        console.log(`Booking ${bookingId} confirmed.`);
+        const bookingRef = doc(collection(db, 'bookings'), bookingId);
+        const bookingDoc = await getDoc(bookingRef);
+        if (bookingDoc.exists()) {
+          await updateDoc(bookingRef, {
+            status: 'confirmed',
+            paidAt: new Date().toISOString(),
+          });
+          console.log(`Booking ${bookingId} confirmed.`);
+        } else {
+          console.error(`Booking ${bookingId} not found.`);
+        }
 
         // Fetch user email from Firestore
         const userDoc = await getDoc(doc(collection(db, 'users'), userId));

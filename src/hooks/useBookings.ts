@@ -14,7 +14,7 @@ export function useBookings() {
     if (!user) {
       console.error('User or user ID is undefined');
       toast.error('Please log in to book a session');
-      return;
+      return null;
       return;
     }
     try {
@@ -48,7 +48,7 @@ export function useBookings() {
       return data.sessionId;
 
     } catch (error) {
-      console.error('Error fetching bookings:', error);
+      console.error('Error processing booking:', error);
       console.error('Booking error:', error);
       toast.error('Failed to process booking');
     } finally {

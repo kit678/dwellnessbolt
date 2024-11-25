@@ -33,15 +33,6 @@ router.post('/create-checkout-session', async (req, res) => {
   try {
     const { sessionId, bookingId, userId, amount } = req.body;
 
-    // For local development, immediately confirm the booking
-    if (process.env.NODE_ENV === 'development') {
-      const bookingRef = doc(db, 'bookings', bookingId);
-      await updateDoc(bookingRef, {
-        status: 'confirmed',
-        paidAt: new Date().toISOString(),
-      });
-      return res.json({ success: true });
-    }
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
