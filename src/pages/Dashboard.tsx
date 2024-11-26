@@ -97,6 +97,7 @@ export default function Dashboard() {
       setBookings((prevBookings) => prevBookings.filter(b => b.id !== booking.id));
     }
   };
+  return (
     <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
       {/* User Profile Section */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-8">
