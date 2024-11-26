@@ -1,5 +1,3 @@
-import dotenv from 'dotenv';
-dotenv.config();
 import { loadStripe } from '@stripe/stripe-js';
 
 const isDevelopment = import.meta.env.VITE_NODE_ENV === 'development';
