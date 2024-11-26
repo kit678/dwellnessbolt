@@ -22,6 +22,7 @@ export default defineConfig({
     ]
   },
   server: {
+    // Proxy API calls to the Express server running on port 5000
     proxy: {
       '/api': {
         target: 'http://localhost:5000',
@@ -29,6 +30,7 @@ export default defineConfig({
         secure: false,
       },
     },
+    // Vite development server settings for serving static files on port 5173
     fs: {
       strict: false
     },
