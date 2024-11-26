@@ -19,6 +19,7 @@ export const config = {
 };
 
 router.post('/webhook', async (req, res) => {
+  console.log('Webhook triggered');
   const sig = req.headers['stripe-signature'];
 
   let event: Stripe.Event;
@@ -47,6 +48,7 @@ router.post('/webhook', async (req, res) => {
         const bookingRef = doc(collection(db, 'bookings'), bookingId);
         const bookingDoc = await getDoc(bookingRef);
         if (bookingDoc.exists()) {
+          console.log(`Booking ${bookingId} found. Updating status to confirmed.`);
           await updateDoc(bookingRef, {
             status: 'confirmed',
             paidAt: new Date().toISOString(),
@@ -64,6 +66,7 @@ router.post('/webhook', async (req, res) => {
         const userDoc = await getDoc(doc(collection(db, 'users'), userId));
         const userData = userDoc.data();
         if (userData && userData.email) {
+          console.log(`Sending booking confirmation email to ${userData.email}`);
           await sendBookingConfirmation(userData.email, {
             session: {
               title: sessionTitle,
