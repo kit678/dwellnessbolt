@@ -4,7 +4,7 @@ import express, { Router } from 'express';
 import Stripe from 'stripe';
 const router: Router = express.Router();
 const stripeSecretKey =
-  process.env.NODE_ENV === 'development'
+  process.env.VITE_NODE_ENV === 'development'
     ? process.env.VITE_STRIPE_TEST_SECRET_KEY!
     : process.env.VITE_STRIPE_SECRET_KEY!;
 

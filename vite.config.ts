@@ -30,10 +30,12 @@ export default defineConfig({
         secure: false,
       },
     },
-    // Vite development server settings for serving static files on port 5173
+    // Vite development server settings
     fs: {
       strict: false
     },
+    // Optionally, specify the port if you want to ensure it's on 5173
+    port: 5173,
   },
   build: {
     sourcemap: true,
@@ -60,11 +62,6 @@ export default defineConfig({
         'fileURLToPath'
       ]
     }
-  },
-  server: {
-    fs: {
-      strict: false
-    },
   },
   resolve: {
     alias: {
