@@ -42,6 +42,7 @@ router.post('/create-checkout-session', async (req, res) => {
       },
     });
 
+    console.log(`Checkout session created successfully: ${session.id}`);
     res.json({ sessionId: session.id });
   } catch (error) {
     console.error('Error creating checkout session:', error);
