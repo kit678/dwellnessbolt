@@ -5,7 +5,7 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",
-    "dev:server": "node --loader ts-node/esm ./api/index.ts",
+    "dev:server": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' ./api/index.ts",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
