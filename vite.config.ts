@@ -21,6 +21,15 @@ export default defineConfig({
       'react-hot-toast'
     ]
   },
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
   build: {
     sourcemap: true,
     rollupOptions: {
