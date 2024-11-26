@@ -33,8 +33,8 @@ router.post('/create-checkout-session', async (req, res) => {
         },
       ],
       mode: 'payment',
-      success_url: `${process.env.CLIENT_URL}/dashboard?success=true`,
-      cancel_url: `${process.env.CLIENT_URL}/dashboard?canceled=true`,
+      success_url: `${process.env.VITE_CLIENT_URL}/dashboard?success=true`,
+      cancel_url: `${process.env.VITE_CLIENT_URL}/dashboard?canceled=true`,
       metadata: {
         bookingId,
         userId,
