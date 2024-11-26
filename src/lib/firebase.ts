@@ -1,3 +1,5 @@
+import dotenv from 'dotenv';
+dotenv.config();
 import { initializeApp, getApps } from 'firebase/app';
 import { getAuth, setPersistence, browserSessionPersistence, GoogleAuthProvider } from 'firebase/auth';
 import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from 'firebase/firestore';
