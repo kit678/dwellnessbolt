@@ -29,6 +29,9 @@ export default defineConfig({
         secure: false,
       },
     },
+    fs: {
+      strict: false
+    },
   },
   build: {
     sourcemap: true,
