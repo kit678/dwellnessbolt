@@ -91,7 +91,12 @@ export default function Dashboard() {
     return isNaN(time.getTime()) ? 'Invalid time' : format(time, 'h:mm a');
   };
 
-  return (
+  const handleCancelBooking = (booking: Booking) => {
+    if (window.confirm('Are you sure you want to cancel this booking?')) {
+      cancelBooking(booking.id);
+      setBookings((prevBookings) => prevBookings.filter(b => b.id !== booking.id));
+    }
+  };
     <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
       {/* User Profile Section */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-8">
@@ -258,6 +263,15 @@ export default function Dashboard() {
                       Complete Booking
                     </button>
                   )}
+                </div>
+                <div className="mt-4">
+                  <button
+                    onClick={() => handleCancelBooking(booking)}
+                    disabled={new Date(booking.scheduledDate).getTime() - Date.now() < 24 * 60 * 60 * 1000}
+                    className="text-red-600 hover:underline disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
                 </div>
               </div>
 

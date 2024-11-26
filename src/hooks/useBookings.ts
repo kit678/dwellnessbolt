@@ -87,7 +87,7 @@ export function useBookings() {
     }
   };
 
-  const cancelBooking = async (bookingId: string) => {
+  const cancelBooking = async (bookingId: string): Promise<void> => {
     try {
       await updateDoc(doc(db, 'bookings', bookingId), {
         status: 'cancelled'
