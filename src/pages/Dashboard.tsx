@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
+import { Dialog } from '../components/ui/Dialog';
 import { m } from 'framer-motion';
 import { Calendar, Clock, DollarSign, User } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
@@ -19,6 +20,10 @@ export default function Dashboard() {
   const { getUserBookings, cancelBooking } = useBookings();
   const { results } = useQuizStore();
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+  const [dialogMessage, setDialogMessage] = useState<string>('');
+  const [dialogTitle, setDialogTitle] = useState<string>('');
+  const [dialogConfirmAction, setDialogConfirmAction] = useState<(() => void) | undefined>(undefined);
   const [error, setError] = useState<string | null>(null);
   const [quizOpen, setQuizOpen] = useState<boolean>(false);
   const [hasFetched, setHasFetched] = useState<boolean>(false);
@@ -91,19 +96,28 @@ export default function Dashboard() {
     return isNaN(time.getTime()) ? 'Invalid time' : format(time, 'h:mm a');
   };
 
-  const handleCancelBooking = (booking: Booking) => {
+  const handleCancelBooking = useCallback((booking: Booking) => {
     const bookingDate = new Date(booking.scheduledDate).getTime();
     const now = Date.now();
     const isWithin24Hours = bookingDate - now < 24 * 60 * 60 * 1000;
     const isInPast = bookingDate < now;
 
     if (isInPast || isWithin24Hours) {
-      alert('This booking cannot be canceled because it is either in the past or within 24 hours of the scheduled time.');
-    } else if (window.confirm('Are you sure you want to cancel this booking?')) {
-      cancelBooking(booking.id);
-      setBookings((prevBookings) => prevBookings.filter(b => b.id !== booking.id));
+      setDialogTitle('Cannot Cancel Booking');
+      setDialogMessage('This booking cannot be canceled because it is either in the past or within 24 hours of the scheduled time.');
+      setDialogConfirmAction(undefined);
+      setDialogOpen(true);
+    } else {
+      setDialogTitle('Cancel Booking');
+      setDialogMessage('Are you sure you want to cancel this booking?');
+      setDialogConfirmAction(() => () => {
+        cancelBooking(booking.id);
+        setBookings((prevBookings) => prevBookings.filter(b => b.id !== booking.id));
+        setDialogOpen(false);
+      });
+      setDialogOpen(true);
     }
-  };
+  }, [cancelBooking]);
   return (
     <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
       {/* User Profile Section */}
@@ -304,6 +318,15 @@ export default function Dashboard() {
         )}
       </div>
       <OnboardingQuiz isOpen={quizOpen} onClose={() => setQuizOpen(false)} onComplete={(_scores) => setQuizOpen(false)} />
+      <Dialog
+        isOpen={dialogOpen}
+        title={dialogTitle}
+        message={dialogMessage}
+        onClose={() => setDialogOpen(false)}
+        onConfirm={dialogConfirmAction}
+        confirmText="Yes"
+        cancelText="No"
+      />
     </div>
   );
 }
