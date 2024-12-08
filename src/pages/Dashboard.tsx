@@ -29,43 +29,42 @@ const [quizOpen, setQuizOpen] = useState<boolean>(false);
 const [hasFetched, setHasFetched] = useState<boolean>(false);
 const [loading, setLoading] = useState<boolean>(false);
 
-// Effect to handle automatic quiz modal display
 useEffect(() => {
-  if (user && !user.quizCompleted) {
-    logger.info('User has not completed quiz - showing modal', 'Dashboard');
-    setQuizOpen(true);
-  }
-}, [user]);
+  if (user) {
+    if (!user.quizCompleted) {
+      logger.info('User has not completed quiz - showing modal', 'Dashboard');
+      setQuizOpen(true);
+    }
 
-useEffect(() => {
-  if (!hasFetched && user) {
-    logger.info(`Fetching bookings for user: ${user}`, 'Dashboard');
-    logger.info(`Dashboard mounted. User: ${user}`, 'Dashboard');
-    logger.info(`Quiz Results: ${JSON.stringify(results)}`, 'Dashboard');
-    logger.info(`Latest Quiz Result: ${JSON.stringify(user.quizResults?.[user.quizResults.length - 1])}`, 'Dashboard');
-    const fetchBookings = async () => {
-      setLoading(true);
-      try {
-        logger.info(`Attempting to fetch bookings for user: ${user}`, 'Dashboard');
-        const userBookings = await getUserBookings();
-        console.log('Fetched bookings:', userBookings);
-        console.log('Setting bookings state');
-        setBookings(userBookings);
-        setHasFetched(true);
-          
-        if (user.quizCompleted) {
-          console.log('Quiz results fetched:', user.dosha);
+    if (!hasFetched) {
+      logger.info(`Fetching bookings for user: ${user}`, 'Dashboard');
+      logger.info(`Dashboard mounted. User: ${user}`, 'Dashboard');
+      logger.info(`Quiz Results: ${JSON.stringify(results)}`, 'Dashboard');
+      logger.info(`Latest Quiz Result: ${JSON.stringify(user.quizResults?.[user.quizResults.length - 1])}`, 'Dashboard');
+      const fetchBookings = async () => {
+        setLoading(true);
+        try {
+          logger.info(`Attempting to fetch bookings for user: ${user}`, 'Dashboard');
+          const userBookings = await getUserBookings();
+          console.log('Fetched bookings:', userBookings);
+          console.log('Setting bookings state');
+          setBookings(userBookings);
+          setHasFetched(true);
+            
+          if (user.quizCompleted) {
+            console.log('Quiz results fetched:', user.dosha);
+          }
+        } catch (err) {
+          console.error('Failed to fetch bookings:', err);
+          setError('Failed to load bookings. Please try again later.');
+        } finally {
+          setLoading(false);
         }
-      } catch (err) {
-        console.error('Failed to fetch bookings:', err);
-        setError('Failed to load bookings. Please try again later.');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchBookings();
+      };
+      fetchBookings();
+    }
   }
-}, [user, hasFetched, getUserBookings]);
+}, [user, hasFetched, getUserBookings, results]);
 
 
   if (loading || authLoading) {
