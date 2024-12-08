@@ -92,7 +92,10 @@ export default function Dashboard() {
   };
 
   const handleCancelBooking = (booking: Booking) => {
-    if (window.confirm('Are you sure you want to cancel this booking?')) {
+    const isWithin24Hours = new Date(booking.scheduledDate).getTime() - Date.now() < 24 * 60 * 60 * 1000;
+    if (isWithin24Hours) {
+      alert('This booking cannot be canceled because it is within 24 hours of the scheduled time.');
+    } else if (window.confirm('Are you sure you want to cancel this booking?')) {
       cancelBooking(booking.id);
       setBookings((prevBookings) => prevBookings.filter(b => b.id !== booking.id));
     }
