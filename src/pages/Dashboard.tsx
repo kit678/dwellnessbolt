@@ -97,10 +97,8 @@ export default function Dashboard() {
     const isWithin24Hours = bookingDate - now < 24 * 60 * 60 * 1000;
     const isInPast = bookingDate < now;
 
-    if (isInPast) {
-      alert('This booking cannot be canceled because it is in the past.');
-    } else if (isWithin24Hours) {
-      alert('This booking cannot be canceled because it is within 24 hours of the scheduled time.');
+    if (isInPast || isWithin24Hours) {
+      alert('This booking cannot be canceled because it is either in the past or within 24 hours of the scheduled time.');
     } else if (window.confirm('Are you sure you want to cancel this booking?')) {
       cancelBooking(booking.id);
       setBookings((prevBookings) => prevBookings.filter(b => b.id !== booking.id));
@@ -254,7 +252,7 @@ export default function Dashboard() {
                   </h3>
                   <p className="text-gray-600 mt-1">{booking.session.description}</p>
                 </div>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-4">
                   <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                     booking.status === 'confirmed'
                       ? 'bg-green-100 text-green-800'
@@ -268,17 +266,14 @@ export default function Dashboard() {
                         // Logic to rebook or complete booking
                         // This could involve redirecting to the booking modal or payment page
                       }}
-                      className="text-indigo-600 hover:underline"
+                      className="px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 hover:bg-blue-200"
                     >
                       Complete Booking
                     </button>
                   )}
-                </div>
-                <div className="mt-4">
                   <button
                     onClick={() => handleCancelBooking(booking)}
-                    disabled={new Date(booking.scheduledDate).getTime() - Date.now() < 24 * 60 * 60 * 1000}
-                    className="text-red-600 hover:underline disabled:opacity-50"
+                    className="px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800 hover:bg-red-200"
                   >
                     Cancel
                   </button>
