@@ -37,12 +37,13 @@ export default function Dashboard() {
     return isNaN(date.getTime()) ? 'Invalid date' : format(date, 'MMMM d, yyyy');
   };
 
-  const formatTime = (timeString: string, timeZone: string) => {
+  const formatTime = (timeString: string, fromTimeZone: string, toTimeZone: string) => {
     const [hours, minutes] = timeString.split(':').map(Number);
     const date = new Date();
     date.setHours(hours, minutes, 0, 0);
-    const zonedDate = utcToZonedTime(date, timeZone);
-    return formatTz(zonedDate, 'h:mm a zzz', { timeZone });
+    const zonedDate = utcToZonedTime(date, fromTimeZone);
+    const localDate = utcToZonedTime(zonedDate, toTimeZone);
+    return formatTz(localDate, 'h:mm a zzz', { timeZone: toTimeZone });
   };
 
   const handleCancelBooking = useCallback((booking: Booking) => {
@@ -312,7 +313,7 @@ export default function Dashboard() {
                 <div className="flex items-center text-gray-600">
                   <Clock className="h-5 w-5 mr-2" />
                   <span>
-                    {formatTime(booking.session.startTime, Intl.DateTimeFormat().resolvedOptions().timeZone)} - {formatTime(booking.session.endTime, Intl.DateTimeFormat().resolvedOptions().timeZone)}
+                    {formatTime(booking.session.startTime, 'America/Denver', Intl.DateTimeFormat().resolvedOptions().timeZone)} - {formatTime(booking.session.endTime, 'America/Denver', Intl.DateTimeFormat().resolvedOptions().timeZone)}
                   </span>
                 </div>
                 <div className="flex items-center text-gray-600">
