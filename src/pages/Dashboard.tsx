@@ -4,6 +4,7 @@ import { m } from 'framer-motion';
 import { Calendar, Clock, DollarSign, User } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { format } from 'date-fns';
+import { utcToZonedTime, format as formatTz } from 'date-fns-tz';
 import { Booking } from '../types/index';
 
 import { logger } from '../utils/logger';
@@ -36,11 +37,12 @@ export default function Dashboard() {
     return isNaN(date.getTime()) ? 'Invalid date' : format(date, 'MMMM d, yyyy');
   };
 
-  const formatTime = (timeString: string) => {
+  const formatTime = (timeString: string, timeZone: string) => {
     const [hours, minutes] = timeString.split(':').map(Number);
-    const time = new Date();
-    time.setHours(hours, minutes, 0, 0);
-    return format(time, 'h:mm a');
+    const date = new Date();
+    date.setHours(hours, minutes, 0, 0);
+    const zonedDate = utcToZonedTime(date, timeZone);
+    return formatTz(zonedDate, 'h:mm a zzz', { timeZone });
   };
 
   const handleCancelBooking = useCallback((booking: Booking) => {
@@ -310,7 +312,7 @@ export default function Dashboard() {
                 <div className="flex items-center text-gray-600">
                   <Clock className="h-5 w-5 mr-2" />
                   <span>
-                    {formatTime(booking.session.startTime)} - {formatTime(booking.session.endTime)}
+                    {formatTime(booking.session.startTime, Intl.DateTimeFormat().resolvedOptions().timeZone)} - {formatTime(booking.session.endTime, Intl.DateTimeFormat().resolvedOptions().timeZone)}
                   </span>
                 </div>
                 <div className="flex items-center text-gray-600">
