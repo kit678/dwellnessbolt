@@ -317,6 +317,10 @@ export default function Dashboard() {
                   <DollarSign className="h-5 w-5 mr-2" />
                   <span>${booking.session.price}</span>
                 </div>
+                <div className="flex items-center text-gray-600">
+                  <Clock className="h-5 w-5 mr-2" />
+                  <span>Booked At: {formatDate(booking.bookedAt)} {formatTime(new Date(booking.bookedAt).toLocaleTimeString())}</span>
+                </div>
               </div>
             </m.div>
           ))
