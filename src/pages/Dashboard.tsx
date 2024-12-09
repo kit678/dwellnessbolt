@@ -9,7 +9,7 @@ import { Booking } from '../types/index';
 import { logger } from '../utils/logger';
 import { useBookings } from '../hooks/useBookings';
 import OnboardingQuiz from '../components/OnboardingQuiz';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '../hooks/useAuth'; // FIXED: Using a relative import consistent with other files
 import { useQuizStore } from '@/store/quizStore';
 
 logger.info('Dashboard component rendered', 'Dashboard');
@@ -18,74 +18,19 @@ export default function Dashboard() {
   logger.info('Dashboard component mounted', 'Dashboard');
   const { user, loading: authLoading } = useAuth();
   const { getUserBookings, cancelBooking } = useBookings();
-const { results } = useQuizStore();
-const [bookings, setBookings] = useState<Booking[]>([]);
-const [dialogOpen, setDialogOpen] = useState<boolean>(false);
-const [dialogMessage, setDialogMessage] = useState<string>('');
-const [dialogTitle, setDialogTitle] = useState<string>('');
-const [dialogConfirmAction, setDialogConfirmAction] = useState<(() => void) | undefined>(undefined);
-const [error, setError] = useState<string | null>(null);
-const [quizOpen, setQuizOpen] = useState<boolean>(false);
-const [hasFetched, setHasFetched] = useState<boolean>(false);
-const [loading, setLoading] = useState<boolean>(false);
+  const { results } = useQuizStore();
 
-useEffect(() => {
-  if (!user) return;
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+  const [dialogMessage, setDialogMessage] = useState<string>('');
+  const [dialogTitle, setDialogTitle] = useState<string>('');
+  const [dialogConfirmAction, setDialogConfirmAction] = useState<(() => void) | undefined>(undefined);
+  const [error, setError] = useState<string | null>(null);
+  const [quizOpen, setQuizOpen] = useState<boolean>(false);
+  const [hasFetched, setHasFetched] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  const fetchBookings = async () => {
-    setLoading(true);
-    try {
-      logger.info(`Attempting to fetch bookings for user: ${user}`, 'Dashboard');
-      const userBookings = await getUserBookings();
-      console.log('Fetched bookings:', userBookings);
-      console.log('Setting bookings state');
-      setBookings(userBookings);
-      setHasFetched(true);
-
-      if (user.quizCompleted) {
-        console.log('Quiz results fetched:', user.dosha);
-      }
-    } catch (err) {
-      console.error('Failed to fetch bookings:', err);
-      setError('Failed to load bookings. Please try again later.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (!user.quizCompleted) {
-    logger.info('User has not completed quiz - showing modal', 'Dashboard');
-    setQuizOpen(true);
-  }
-
-  if (!hasFetched) {
-    logger.info(`Fetching bookings for user: ${user}`, 'Dashboard');
-    logger.info(`Dashboard mounted. User: ${user}`, 'Dashboard');
-    logger.info(`Quiz Results: ${JSON.stringify(results)}`, 'Dashboard');
-    logger.info(`Latest Quiz Result: ${JSON.stringify(user.quizResults?.[user.quizResults.length - 1])}`, 'Dashboard');
-    fetchBookings();
-  }
-}, [user, hasFetched, getUserBookings, results]);
-
-
-  if (loading || authLoading) {
-    console.log('Loading bookings...');
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600" />
-      </div>
-    );
-  }
-
-  if (error) {
-    console.log('Error loading bookings:', error);
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p className="text-red-600">{error}</p>
-      </div>
-    );
-  }
-
+  // FIXED: Move all helper functions and hooks above any return conditions
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return isNaN(date.getTime()) ? 'Invalid date' : format(date, 'MMMM d, yyyy');
@@ -118,6 +63,64 @@ useEffect(() => {
       setDialogOpen(true);
     }
   }, [cancelBooking]);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchBookings = async () => {
+      setLoading(true);
+      try {
+        logger.info(`Attempting to fetch bookings for user: ${user}`, 'Dashboard');
+        const userBookings = await getUserBookings();
+        console.log('Fetched bookings:', userBookings);
+        console.log('Setting bookings state');
+        setBookings(userBookings);
+        setHasFetched(true);
+
+        if (user.quizCompleted) {
+          console.log('Quiz results fetched:', user.dosha);
+        }
+      } catch (err) {
+        console.error('Failed to fetch bookings:', err);
+        setError('Failed to load bookings. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (!user.quizCompleted) {
+      logger.info('User has not completed quiz - showing modal', 'Dashboard');
+      setQuizOpen(true);
+    }
+
+    if (!hasFetched) {
+      logger.info(`Fetching bookings for user: ${user}`, 'Dashboard');
+      logger.info(`Dashboard mounted. User: ${user}`, 'Dashboard');
+      logger.info(`Quiz Results: ${JSON.stringify(results)}`, 'Dashboard');
+      logger.info(`Latest Quiz Result: ${JSON.stringify(user.quizResults?.[user.quizResults.length - 1])}`, 'Dashboard');
+      fetchBookings();
+    }
+  }, [user, hasFetched, getUserBookings, results]);
+
+  // Now the conditional returns occur AFTER all hooks have been defined
+  if (loading || authLoading) {
+    console.log('Loading bookings...');
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600" />
+      </div>
+    );
+  }
+
+  if (error) {
+    console.log('Error loading bookings:', error);
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-red-600">{error}</p>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
       {/* User Profile Section */}
@@ -278,7 +281,6 @@ useEffect(() => {
                     <button
                       onClick={() => {
                         // Logic to rebook or complete booking
-                        // This could involve redirecting to the booking modal or payment page
                       }}
                       className="px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 hover:bg-blue-200"
                     >
@@ -297,15 +299,12 @@ useEffect(() => {
               <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
                 <div className="flex items-center text-gray-600">
                   <Calendar className="h-5 w-5 mr-2" />
-                  <span>
-                    {formatDate(booking.scheduledDate)}
-                  </span>
+                  <span>{formatDate(booking.scheduledDate)}</span>
                 </div>
                 <div className="flex items-center text-gray-600">
                   <Clock className="h-5 w-5 mr-2" />
                   <span>
-                    {formatTime(booking.session.startTime)} -{' '}
-                    {formatTime(booking.session.endTime)}
+                    {formatTime(booking.session.startTime)} - {formatTime(booking.session.endTime)}
                   </span>
                 </div>
                 <div className="flex items-center text-gray-600">
