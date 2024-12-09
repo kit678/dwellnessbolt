@@ -4,7 +4,7 @@ import { m } from 'framer-motion';
 import { Calendar, Clock, DollarSign, User } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { format } from 'date-fns';
-import { utcToZonedTime, format as formatTz } from 'date-fns-tz';
+import { toZonedTime, format as formatTz } from 'date-fns-tz';
 import { Booking } from '../types/index';
 
 import { logger } from '../utils/logger';
@@ -322,7 +322,7 @@ export default function Dashboard() {
                 </div>
                 <div className="flex items-center text-gray-600">
                   <Clock className="h-5 w-5 mr-2" />
-                  <span>Booked At: {formatDate(booking.bookedAt)} {formatTime(new Date(booking.bookedAt).toLocaleTimeString())}</span>
+                  <span>Booked At: {formatDate(booking.bookedAt)} {formatTime(new Date(booking.bookedAt).toLocaleTimeString(), 'America/Denver', Intl.DateTimeFormat().resolvedOptions().timeZone)}</span>
                 </div>
               </div>
             </m.div>
