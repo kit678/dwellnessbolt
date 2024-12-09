@@ -41,8 +41,8 @@ export default function Dashboard() {
     const [hours, minutes] = timeString.split(':').map(Number);
     const date = new Date();
     date.setHours(hours, minutes, 0, 0);
-    const zonedDate = toZonedTime(date, fromTimeZone);
-    const localDate = toZonedTime(zonedDate, toTimeZone);
+    const zonedDate = utcToZonedTime(date, fromTimeZone);
+    const localDate = utcToZonedTime(zonedDate, toTimeZone);
     return formatTz(localDate, 'h:mm a zzz', { timeZone: toTimeZone });
   };
 
