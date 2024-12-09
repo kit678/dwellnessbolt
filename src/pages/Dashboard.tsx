@@ -4,7 +4,7 @@ import { m } from 'framer-motion';
 import { Calendar, Clock, DollarSign, User } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { format } from 'date-fns';
-import { format as formatTz } from 'date-fns-tz';
+import { format as formatTz, utcToZonedTime } from 'date-fns-tz';
 import { Booking } from '../types/index';
 
 import { logger } from '../utils/logger';
@@ -41,8 +41,8 @@ export default function Dashboard() {
     const [hours, minutes] = timeString.split(':').map(Number);
     const date = new Date();
     date.setHours(hours, minutes, 0, 0);
-    const zonedDate = toZonedTime(date, fromTimeZone);
-    const localDate = toZonedTime(zonedDate, toTimeZone);
+    const zonedDate = utcToZonedTime(date, fromTimeZone);
+    const localDate = utcToZonedTime(zonedDate, toTimeZone);
     return formatTz(localDate, 'h:mm a zzz', { timeZone: toTimeZone });
   };
 
