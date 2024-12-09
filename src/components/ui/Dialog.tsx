@@ -35,9 +35,11 @@ export const Dialog: React.FC<DialogProps> = ({
               <h2 className="text-xl font-bold mb-4">{title}</h2>
               <p className="text-gray-700 mb-6">{message}</p>
               <div className="flex justify-end space-x-4">
-                <Button variant="outline" onClick={onClose}>
-                  {cancelText}
-                </Button>
+                {cancelText && (
+                  <Button variant="outline" onClick={onClose}>
+                    {cancelText}
+                  </Button>
+                )}
                 {onConfirm && (
                   <Button onClick={onConfirm}>
                     {confirmText}
