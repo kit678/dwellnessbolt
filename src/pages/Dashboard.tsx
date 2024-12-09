@@ -50,8 +50,8 @@ export default function Dashboard() {
     if (isInPast || isWithin24Hours) {
       setDialogTitle('Cannot Cancel Booking');
       setDialogMessage('This booking cannot be canceled because it is either in the past or within 24 hours of the scheduled time.');
-      setDialogConfirmAction(undefined);
-      setDialogOpen(true);
+      setDialogTitle('Cannot Cancel Booking');
+      setDialogMessage('This booking cannot be canceled because it is either in the past or within 24 hours of the scheduled time.');
       setDialogConfirmAction(() => () => setDialogOpen(false));
       setDialogOpen(true);
     } else {
@@ -325,8 +325,8 @@ export default function Dashboard() {
         message={dialogMessage}
         onClose={() => setDialogOpen(false)}
         onConfirm={dialogConfirmAction}
-        confirmText="Yes"
-        cancelText="No"
+        confirmText={dialogTitle === 'Cannot Cancel Booking' ? 'Ok' : 'Yes'}
+        cancelText={dialogTitle === 'Cannot Cancel Booking' ? undefined : 'No'}
       />
     </div>
   );
