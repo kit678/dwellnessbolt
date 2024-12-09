@@ -1,4 +1,6 @@
 import { create } from 'zustand';
+import { QuizResult } from '../types/index';
+import { logger } from '../utils/logger';
 
 interface QuizState {
   isCompleted: boolean;
