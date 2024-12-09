@@ -52,6 +52,8 @@ export default function Dashboard() {
       setDialogMessage('This booking cannot be canceled because it is either in the past or within 24 hours of the scheduled time.');
       setDialogConfirmAction(undefined);
       setDialogOpen(true);
+      setDialogConfirmAction(() => () => setDialogOpen(false));
+      setDialogOpen(true);
     } else {
       setDialogTitle('Cancel Booking');
       setDialogMessage('Are you sure you want to cancel this booking?');
