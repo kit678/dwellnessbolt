@@ -37,8 +37,10 @@ export default function Dashboard() {
   };
 
   const formatTime = (timeString: string) => {
-    const time = new Date(timeString);
-    return isNaN(time.getTime()) ? 'Invalid time' : format(time, 'h:mm a');
+    const [hours, minutes] = timeString.split(':').map(Number);
+    const time = new Date();
+    time.setHours(hours, minutes, 0, 0);
+    return format(time, 'h:mm a');
   };
 
   const handleCancelBooking = useCallback((booking: Booking) => {
