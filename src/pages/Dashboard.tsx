@@ -289,12 +289,14 @@ export default function Dashboard() {
                       Complete Booking
                     </button>
                   )}
-                  <button
-                    onClick={() => handleCancelBooking(booking)}
-                    className="px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800 hover:bg-red-200"
-                  >
-                    Cancel
-                  </button>
+                  {booking.status !== 'cancelled' && (
+                    <button
+                      onClick={() => handleCancelBooking(booking)}
+                      className="px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800 hover:bg-red-200"
+                    >
+                      Cancel
+                    </button>
+                  )}
                 </div>
               </div>
 
