@@ -3,7 +3,6 @@ import { Dialog } from '../components/ui/Dialog';
 import { m } from 'framer-motion';
 import { Calendar, Clock, DollarSign, User } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
-import { format } from 'date-fns';
 import { DateTime } from 'luxon';
 import { Booking } from '../types/index';
 
