@@ -16,7 +16,8 @@
       "@hooks/*": ["./src/hooks/*"],
       "@utils/*": ["./src/utils/*"]
       // Add more aliases as needed
-    }
+    },
+    "declaration": false
   },
   "include": ["src", "api"], // Include your 'api' directory
   "files": [],
