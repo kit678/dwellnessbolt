@@ -4,13 +4,13 @@ import { m } from 'framer-motion';
 import { Calendar, Clock, DollarSign, User } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { format } from 'date-fns';
-import { format as formatTz, zonedTimeToUtc } from 'date-fns-tz';
+import { format as formatTz, zonedTimeToUtc, utcToZonedTime } from 'date-fns-tz'; // Ensure date-fns-tz is at least v1.0.0
 import { Booking } from '../types/index';
 
 import { logger } from '../utils/logger';
 import { useBookings } from '../hooks/useBookings';
 import OnboardingQuiz from '../components/OnboardingQuiz';
-import { useAuth } from '../hooks/useAuth'; // FIXED: Using a relative import consistent with other files
+import { useAuth } from '../hooks/useAuth';
 import { useQuizStore } from '@/store/quizStore';
 
 logger.info('Dashboard component rendered', 'Dashboard');
@@ -31,7 +31,6 @@ export default function Dashboard() {
   const [hasFetched, setHasFetched] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
-  // FIXED: Move all helper functions and hooks above any return conditions
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return isNaN(date.getTime()) ? 'Invalid date' : format(date, 'MMMM d, yyyy');
@@ -39,11 +38,14 @@ export default function Dashboard() {
 
   const formatTime = (timeString: string, fromTimeZone: string, toTimeZone: string) => {
     const [hours, minutes] = timeString.split(':').map(Number);
-    const date = new Date();
-    date.setHours(hours, minutes, 0, 0);
-    const zonedDate = utcToZonedTime(date, fromTimeZone);
-    const localDate = utcToZonedTime(zonedDate, toTimeZone);
-    return formatTz(localDate, 'h:mm a zzz', { timeZone: toTimeZone });
+    const baseDate = new Date();
+    baseDate.setHours(hours, minutes, 0, 0);
+
+    // Convert local date in fromTimeZone to UTC
+    const utcDate = zonedTimeToUtc(baseDate, fromTimeZone);
+    // Then convert UTC date to toTimeZone
+    const zonedDate = utcToZonedTime(utcDate, toTimeZone);
+    return formatTz(zonedDate, 'h:mm a zzz', { timeZone: toTimeZone });
   };
 
   const handleCancelBooking = useCallback((booking: Booking) => {
@@ -53,8 +55,6 @@ export default function Dashboard() {
     const isInPast = bookingDate < now;
 
     if (isInPast || isWithin24Hours) {
-      setDialogTitle('Cannot Cancel Booking');
-      setDialogMessage('This booking cannot be canceled because it is either in the past or within 24 hours of the scheduled time.');
       setDialogTitle('Cannot Cancel Booking');
       setDialogMessage('This booking cannot be canceled because it is either in the past or within 24 hours of the scheduled time.');
       setDialogConfirmAction(() => () => setDialogOpen(false));
@@ -109,7 +109,6 @@ export default function Dashboard() {
     }
   }, [user, hasFetched, getUserBookings, results]);
 
-  // Now the conditional returns occur AFTER all hooks have been defined
   if (loading || authLoading) {
     console.log('Loading bookings...');
     return (
