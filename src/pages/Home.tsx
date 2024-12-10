@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import { m } from 'framer-motion';
 import { Calendar, Users, Clock } from 'lucide-react';
