@@ -4,7 +4,7 @@ import { m } from 'framer-motion';
 import { Calendar, Clock, DollarSign, User } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { format } from 'date-fns';
-import { format as formatTz, zonedTimeToUtc, utcToZonedTime } from 'date-fns-tz'; // Ensure date-fns-tz is at least v1.0.0
+import { DateTime } from 'luxon';
 import { Booking } from '../types/index';
 
 import { logger } from '../utils/logger';
@@ -32,20 +32,14 @@ export default function Dashboard() {
   const [loading, setLoading] = useState<boolean>(false);
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return isNaN(date.getTime()) ? 'Invalid date' : format(date, 'MMMM d, yyyy');
+    const date = DateTime.fromISO(dateString);
+    return date.isValid ? date.toFormat('MMMM d, yyyy') : 'Invalid date';
   };
 
   const formatTime = (timeString: string, fromTimeZone: string, toTimeZone: string) => {
-    const [hours, minutes] = timeString.split(':').map(Number);
-    const baseDate = new Date();
-    baseDate.setHours(hours, minutes, 0, 0);
-
-    // Convert local date in fromTimeZone to UTC
-    const utcDate = zonedTimeToUtc(baseDate, fromTimeZone);
-    // Then convert UTC date to toTimeZone
-    const zonedDate = utcToZonedTime(utcDate, toTimeZone);
-    return formatTz(zonedDate, 'h:mm a zzz', { timeZone: toTimeZone });
+    const date = DateTime.fromFormat(timeString, 'HH:mm', { zone: fromTimeZone });
+    const zonedDate = date.setZone(toTimeZone);
+    return zonedDate.toFormat('h:mm a zzz');
   };
 
   const handleCancelBooking = useCallback((booking: Booking) => {
