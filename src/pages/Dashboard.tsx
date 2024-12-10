@@ -184,7 +184,7 @@ export default function Dashboard() {
                           <Cell fill="#FF6B6B" /> {/* Pitta */}
                           <Cell fill="#4ECDC4" /> {/* Kapha */}
                         </Pie>
-                        <Tooltip formatter={(value: number) => `${Math.round(value)}%`} />
+                        <Tooltip formatter={(value: string | number | (string | number)[]) => `${Math.round(Number(value))}%`} />
                       </PieChart>
                     </ResponsiveContainer>
                   </div>
