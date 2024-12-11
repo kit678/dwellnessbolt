@@ -19,7 +19,7 @@ export const config = {
 };
 
 router.post('/webhook', async (req, res) => {
-  console.log('Webhook triggered');
+  logger.info('Webhook triggered', 'Webhook');
   const sig = req.headers['stripe-signature'];
 
   let event: Stripe.Event;
@@ -28,13 +28,14 @@ router.post('/webhook', async (req, res) => {
     const rawBody = await buffer(req);
     event = stripe.webhooks.constructEvent(rawBody, sig!, process.env.STRIPE_WEBHOOK_SECRET!);
   } catch (err: any) {
-    console.error('Webhook signature verification failed.', err);
+    logger.error('Webhook signature verification failed.', err, 'Webhook');
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
   // Handle the event
   switch (event.type) {
     case 'checkout.session.completed':
+      logger.info('Processing checkout.session.completed event', 'Webhook');
       const session = event.data.object as Stripe.Checkout.Session;
       const metadata = session.metadata as { [key: string]: string };
       const { bookingId, userId, sessionTitle, sessionDate, sessionPrice } = metadata;
@@ -45,17 +46,18 @@ router.post('/webhook', async (req, res) => {
       }
 
       try {
+        logger.info(`Updating booking status to confirmed for bookingId: ${bookingId}`, 'Webhook');
         const bookingRef = doc(collection(db, 'bookings'), bookingId);
         const bookingDoc = await getDoc(bookingRef);
         if (bookingDoc.exists()) {
-          console.log(`Booking ${bookingId} found. Updating status to confirmed.`);
+          logger.info(`Booking ${bookingId} found. Updating status to confirmed.`, 'Webhook');
           await updateDoc(bookingRef, {
             status: 'confirmed',
             paidAt: new Date().toISOString(),
           });
-          console.log(`Booking ${bookingId} confirmed.`);
+          logger.info(`Booking ${bookingId} confirmed.`, 'Webhook');
         } else {
-          console.error(`Booking ${bookingId} not found.`);
+          logger.error(`Booking ${bookingId} not found.`, 'Webhook');
           // Handle pending status if booking not found
           await updateDoc(bookingRef, {
             status: 'pending',
@@ -66,7 +68,7 @@ router.post('/webhook', async (req, res) => {
         const userDoc = await getDoc(doc(collection(db, 'users'), userId));
         const userData = userDoc.data();
         if (userData && userData.email) {
-          console.log(`Sending booking confirmation email to ${userData.email}`);
+          logger.info(`Sending booking confirmation email to ${userData.email}`, 'Webhook');
           await sendBookingConfirmation(userData.email, {
             session: {
               title: sessionTitle,
@@ -75,12 +77,12 @@ router.post('/webhook', async (req, res) => {
               price: sessionPrice,
             },
           });
-          console.log(`Confirmation email sent to ${userData.email}`);
+          logger.info(`Confirmation email sent to ${userData.email}`, 'Webhook');
         } else {
           console.error('User data or email not found for booking confirmation email.');
         }
       } catch (error) {
-        console.error('Error updating booking or sending confirmation email:', error);
+        logger.error('Error updating booking or sending confirmation email:', error, 'Webhook');
       }
       break;
     // ... handle other event types
