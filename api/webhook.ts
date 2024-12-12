@@ -28,7 +28,7 @@ router.post('/', async (req, res) => {
 
   try {
     const rawBody = await buffer(req);
-    event = stripe.webhooks.constructEvent(rawBody, sig!, process.env.STRIPE_WEBHOOK_SECRET!);
+    event = stripe.webhooks.constructEvent(rawBody, sig!, process.env.VITE_STRIPE_TEST_WEBHOOK_SECRET!);
     logger.debug(`Received event type: ${event.type} at /webhook`, 'Webhook');
     logger.debug(`Event data: ${JSON.stringify(event.data)}`, 'Webhook');
     logger.debug(`Event details: ${JSON.stringify(event.data)}`, 'Webhook');
