@@ -58,8 +58,6 @@ router.post('/', async (req, res) => {
       if (!bookingId || !userId) {
         logger.error('Missing bookingId or userId in session metadata', 'Webhook');
         return res.status(400).send('Missing bookingId or userId in session metadata');
-        logger.error('Missing bookingId or userId in session metadata', 'Webhook');
-        return res.status(400).send('Missing bookingId or userId in session metadata');
       }
 
       try {
@@ -103,6 +101,7 @@ router.post('/', async (req, res) => {
         } else {
           logger.error('User data or email not found for booking confirmation email.', 'Webhook');
         }
+        res.json({ received: true });
       } catch (error: unknown) {
         if (error instanceof Error) {
           logger.error('Error occurred while updating booking or sending confirmation email:', 'Webhook', error);
@@ -111,6 +110,7 @@ router.post('/', async (req, res) => {
           logger.error('Unknown error occurred while updating booking or sending confirmation email.', 'Webhook');
         }
       }
+      // Default response for unhandled event types
       res.json({ received: true });
       break;
     // ... handle other event types
