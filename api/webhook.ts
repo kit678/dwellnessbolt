@@ -21,6 +21,7 @@ export const config = {
 
 router.post('/', async (req, res) => {
   logger.info('Webhook triggered', 'Webhook');
+  logger.debug(`Received headers: ${JSON.stringify(req.headers)}`, 'Webhook');
   const sig = req.headers['stripe-signature'];
 
   let event: Stripe.Event;
@@ -30,6 +31,7 @@ router.post('/', async (req, res) => {
     event = stripe.webhooks.constructEvent(rawBody, sig!, process.env.STRIPE_WEBHOOK_SECRET!);
   } catch (err: any) {
     logger.error('Webhook signature verification failed.', err, 'Webhook');
+    logger.debug(`Error details: ${err.message}`, 'Webhook');
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
@@ -37,6 +39,7 @@ router.post('/', async (req, res) => {
   switch (event.type) {
     case 'checkout.session.completed':
       logger.info('Processing checkout.session.completed event', 'Webhook');
+      logger.debug(`Session metadata: ${JSON.stringify(metadata)}`, 'Webhook');
       const session = event.data.object as Stripe.Checkout.Session;
       const metadata = session.metadata as { [key: string]: string };
       const { bookingId, userId, sessionTitle, sessionDate, sessionPrice } = metadata;
@@ -86,6 +89,7 @@ router.post('/', async (req, res) => {
         }
       } catch (error) {
         logger.error('Error occurred while updating booking or sending confirmation email:', error, 'Webhook');
+        logger.debug(`Error details: ${error.message}`, 'Webhook');
       }
       break;
     // ... handle other event types
