@@ -33,14 +33,14 @@ router.post('/', async (req, res) => {
     logger.debug(`Event data: ${JSON.stringify(event.data)}`, 'Webhook');
     logger.debug(`Event details: ${JSON.stringify(event.data)}`, 'Webhook');
     logger.debug(`Received headers at /webhook: ${JSON.stringify(req.headers)}`, 'Webhook');
-  } catch (err: any) {
+  } catch (err: unknown) {
     if (err instanceof Error) {
       logger.error('Webhook signature verification failed.', 'Webhook', err);
       logger.debug(`Error details: ${err.message}`, 'Webhook');
     } else {
-      logger.error('Webhook signature verification failed with unknown error.', 'Webhook');
+      logger.error('Webhook signature verification failed with unknown error.', 'Webhook', new Error('Unknown verification error'));
     }
-    return res.status(400).send(`Webhook Error: ${err.message}`);
+    return res.status(400).send(`Webhook Error: ${(err as Error)?.message || 'Unknown error'}`);
   }
 
   // Handle the event
@@ -56,7 +56,7 @@ router.post('/', async (req, res) => {
       logger.debug(`Extracted metadata: bookingId=${bookingId}, userId=${userId}`, 'Webhook');
 
       if (!bookingId || !userId) {
-        logger.error('Missing bookingId or userId in session metadata', 'Webhook');
+        logger.error('Missing bookingId or userId in session metadata', 'Webhook', new Error('Missing bookingId or userId'));
         return res.status(400).send('Missing bookingId or userId in session metadata');
       }
 
@@ -74,7 +74,7 @@ router.post('/', async (req, res) => {
           });
           logger.info(`Booking ${bookingId} successfully updated to confirmed.`, 'Webhook');
         } else {
-          logger.error(`Booking ${bookingId} not found in Firestore.`, 'Webhook');
+          logger.error(`Booking ${bookingId} not found in Firestore.`, 'Webhook', new Error(`Booking ${bookingId} not found`));
           // Handle pending status if booking not found
           await updateDoc(bookingRef, {
             status: 'pending',
@@ -99,7 +99,7 @@ router.post('/', async (req, res) => {
           });
           logger.info(`Booking confirmation email successfully sent to ${userData.email}`, 'Webhook');
         } else {
-          logger.error('User data or email not found for booking confirmation email.', 'Webhook');
+          logger.error('User data or email not found for booking confirmation email.', 'Webhook', new Error('No user email found'));
         }
         res.json({ received: true });
       } catch (error: unknown) {
@@ -107,18 +107,17 @@ router.post('/', async (req, res) => {
           logger.error('Error occurred while updating booking or sending confirmation email:', 'Webhook', error);
           logger.debug(`Error details: ${error.message}`, 'Webhook');
         } else {
-          logger.error('Unknown error occurred while updating booking or sending confirmation email.', 'Webhook');
+          logger.error('Unknown error occurred while updating booking or sending confirmation email.', 'Webhook', new Error('Unknown booking update error'));
         }
+        // Even if there's an error, we can still send a response. Adjust as needed.
+        res.status(500).json({ error: 'Internal Server Error' });
       }
-      // Default response for unhandled event types
-      res.json({ received: true });
       break;
     // ... handle other event types
     default:
       console.log(`Unhandled event type ${event.type}`);
+      res.json({ received: true });
   }
-
-  res.json({ received: true });
 });
 
 export default router;
