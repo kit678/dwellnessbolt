@@ -12,7 +12,7 @@ interface LogConfig {
 }
 
 const defaultConfig: LogConfig = {
-  enabled: process.env.NODE_ENV !== 'production',
+  enabled: true,
   level: LogLevel.INFO
 };
 

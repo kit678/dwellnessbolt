@@ -93,6 +93,7 @@ router.post('/', async (req, res) => {
         logger.error('Error occurred while updating booking or sending confirmation email:', error, 'Webhook');
         logger.debug(`Error details: ${error.message}`, 'Webhook');
       }
+      res.json({ received: true });
       break;
     // ... handle other event types
     default:
