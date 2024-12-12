@@ -18,7 +18,7 @@ export const config = {
   },
 };
 
-router.post('/webhook', async (req, res) => {
+router.post('/', async (req, res) => {
   logger.info('Webhook triggered', 'Webhook');
   const sig = req.headers['stripe-signature'];
 
