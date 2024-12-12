@@ -56,7 +56,7 @@ router.post('/', async (req, res) => {
       logger.debug(`Extracted metadata: bookingId=${bookingId}, userId=${userId}`, 'Webhook');
 
       if (!bookingId || !userId) {
-        logger.error('Missing bookingId or userId in session metadata', 'Webhook', new Error('Missing bookingId or userId'));
+        logger.error('Missing bookingId or userId in session metadata', new Error('Missing bookingId or userId'), 'Webhook');
         return res.status(400).send('Missing bookingId or userId in session metadata');
       }
 
