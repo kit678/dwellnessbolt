@@ -21,9 +21,6 @@ export const config = {
 
 router.post('/', async (req, res) => {
   logger.info('Webhook triggered', 'Webhook');
-  logger.debug(`Received event type: ${event.type}`, 'Webhook');
-  logger.debug(`Event details: ${JSON.stringify(event.data)}`, 'Webhook');
-  logger.debug(`Received headers: ${JSON.stringify(req.headers)}`, 'Webhook');
   const sig = req.headers['stripe-signature'];
 
   let event: Stripe.Event;
@@ -31,6 +28,9 @@ router.post('/', async (req, res) => {
   try {
     const rawBody = await buffer(req);
     event = stripe.webhooks.constructEvent(rawBody, sig!, process.env.STRIPE_WEBHOOK_SECRET!);
+    logger.debug(`Received event type: ${event.type}`, 'Webhook');
+    logger.debug(`Event details: ${JSON.stringify(event.data)}`, 'Webhook');
+    logger.debug(`Received headers: ${JSON.stringify(req.headers)}`, 'Webhook');
   } catch (err: any) {
     logger.error('Webhook signature verification failed.', err, 'Webhook');
     logger.debug(`Error details: ${err.message}`, 'Webhook');
