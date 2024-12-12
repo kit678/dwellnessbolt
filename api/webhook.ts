@@ -34,8 +34,12 @@ router.post('/', async (req, res) => {
     logger.debug(`Event details: ${JSON.stringify(event.data)}`, 'Webhook');
     logger.debug(`Received headers at /webhook: ${JSON.stringify(req.headers)}`, 'Webhook');
   } catch (err: any) {
-    logger.error('Webhook signature verification failed.', err, 'Webhook');
-    logger.debug(`Error details: ${err.message}`, 'Webhook');
+    if (err instanceof Error) {
+      logger.error('Webhook signature verification failed.', err, 'Webhook');
+      logger.debug(`Error details: ${err.message}`, 'Webhook');
+    } else {
+      logger.error('Webhook signature verification failed with unknown error.', undefined, 'Webhook');
+    }
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
@@ -100,8 +104,12 @@ router.post('/', async (req, res) => {
           logger.error('User data or email not found for booking confirmation email.', 'Webhook');
         }
       } catch (error: unknown) {
-        logger.error('Error occurred while updating booking or sending confirmation email:', error, 'Webhook');
-        logger.debug(`Error details: ${error.message}`, 'Webhook');
+        if (error instanceof Error) {
+          logger.error('Error occurred while updating booking or sending confirmation email:', error, 'Webhook');
+          logger.debug(`Error details: ${error.message}`, 'Webhook');
+        } else {
+          logger.error('Unknown error occurred while updating booking or sending confirmation email.', undefined, 'Webhook');
+        }
       }
       res.json({ received: true });
       break;
