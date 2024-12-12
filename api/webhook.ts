@@ -1,6 +1,7 @@
 import express from 'express';
 import Stripe from 'stripe';
 import { buffer } from 'micro';
+import { logger } from '../src/utils/logger';
 import { db } from '../src/lib/firebase.js';
 import { sendBookingConfirmation } from '../src/lib/email.js';
 import { collection, doc, updateDoc, getDoc } from 'firebase/firestore';
