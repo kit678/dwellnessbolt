@@ -42,34 +42,36 @@ router.post('/', async (req, res) => {
       const { bookingId, userId, sessionTitle, sessionDate, sessionPrice } = metadata;
 
       if (!bookingId || !userId) {
-        console.error('Missing bookingId or userId in session metadata');
+        logger.error('Missing bookingId or userId in session metadata', 'Webhook');
         return res.status(400).send('Missing bookingId or userId in session metadata');
       }
 
       try {
-        logger.info(`Updating booking status to confirmed for bookingId: ${bookingId}`, 'Webhook');
+        logger.info(`Attempting to update booking status to confirmed for bookingId: ${bookingId}`, 'Webhook');
         const bookingRef = doc(collection(db, 'bookings'), bookingId);
         const bookingDoc = await getDoc(bookingRef);
         if (bookingDoc.exists()) {
-          logger.info(`Booking ${bookingId} found. Updating status to confirmed.`, 'Webhook');
+          logger.info(`Booking ${bookingId} found. Proceeding to update status to confirmed.`, 'Webhook');
           await updateDoc(bookingRef, {
             status: 'confirmed',
             paidAt: new Date().toISOString(),
           });
-          logger.info(`Booking ${bookingId} confirmed.`, 'Webhook');
+          logger.info(`Booking ${bookingId} successfully updated to confirmed.`, 'Webhook');
         } else {
-          logger.error(`Booking ${bookingId} not found.`, 'Webhook');
+          logger.error(`Booking ${bookingId} not found in Firestore.`, 'Webhook');
           // Handle pending status if booking not found
           await updateDoc(bookingRef, {
             status: 'pending',
           });
+          logger.info(`Booking ${bookingId} status set to pending due to non-existence.`, 'Webhook');
         }
 
         // Fetch user email from Firestore
+        logger.info(`Fetching user data for userId: ${userId}`, 'Webhook');
         const userDoc = await getDoc(doc(collection(db, 'users'), userId));
         const userData = userDoc.data();
         if (userData && userData.email) {
-          logger.info(`Sending booking confirmation email to ${userData.email}`, 'Webhook');
+          logger.info(`User data found. Sending booking confirmation email to ${userData.email}`, 'Webhook');
           await sendBookingConfirmation(userData.email, {
             session: {
               title: sessionTitle,
@@ -78,12 +80,12 @@ router.post('/', async (req, res) => {
               price: sessionPrice,
             },
           });
-          logger.info(`Confirmation email sent to ${userData.email}`, 'Webhook');
+          logger.info(`Booking confirmation email successfully sent to ${userData.email}`, 'Webhook');
         } else {
-          console.error('User data or email not found for booking confirmation email.');
+          logger.error('User data or email not found for booking confirmation email.', 'Webhook');
         }
       } catch (error) {
-        logger.error('Error updating booking or sending confirmation email:', error, 'Webhook');
+        logger.error('Error occurred while updating booking or sending confirmation email:', error, 'Webhook');
       }
       break;
     // ... handle other event types
