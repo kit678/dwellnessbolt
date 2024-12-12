@@ -1,7 +1,7 @@
 import express from 'express';
 import Stripe from 'stripe';
 import { buffer } from 'micro';
-import { logger } from '../src/utils/logger';
+import { logger } from '../src/utils/logger.js';
 import { db } from '../src/lib/firebase.js';
 import { sendBookingConfirmation } from '../src/lib/email.js';
 import { collection, doc, updateDoc, getDoc } from 'firebase/firestore';
@@ -43,11 +43,11 @@ router.post('/', async (req, res) => {
   switch (event.type) {
     case 'checkout.session.completed':
       logger.info('Processing checkout.session.completed event', 'Webhook');
-      logger.debug(`Session metadata: ${JSON.stringify(metadata)}`, 'Webhook');
-      logger.debug(`Session object: ${JSON.stringify(session)}`, 'Webhook');
       const session = event.data.object as Stripe.Checkout.Session;
       logger.debug(`Session object after casting: ${JSON.stringify(session)}`, 'Webhook');
       const metadata = session.metadata as { [key: string]: string };
+      logger.debug(`Session metadata: ${JSON.stringify(metadata)}`, 'Webhook');
+      logger.debug(`Session object: ${JSON.stringify(session)}`, 'Webhook');
       const { bookingId, userId, sessionTitle, sessionDate, sessionPrice } = metadata;
       logger.debug(`Extracted metadata: bookingId=${bookingId}, userId=${userId}`, 'Webhook');
 
@@ -99,7 +99,7 @@ router.post('/', async (req, res) => {
         } else {
           logger.error('User data or email not found for booking confirmation email.', 'Webhook');
         }
-      } catch (error) {
+      } catch (error: any) {
         logger.error('Error occurred while updating booking or sending confirmation email:', error, 'Webhook');
         logger.debug(`Error details: ${error.message}`, 'Webhook');
       }
