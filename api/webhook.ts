@@ -74,7 +74,7 @@ router.post('/', async (req, res) => {
           });
           logger.info(`Booking ${bookingId} successfully updated to confirmed.`, 'Webhook');
         } else {
-          logger.error(`Booking ${bookingId} not found in Firestore.`, 'Webhook', new Error(`Booking ${bookingId} not found`));
+          logger.error(`Booking ${bookingId} not found in Firestore.`, new Error(`Booking ${bookingId} not found`), 'Webhook');
           // Handle pending status if booking not found
           await updateDoc(bookingRef, {
             status: 'pending',
@@ -107,7 +107,7 @@ router.post('/', async (req, res) => {
           logger.error('Error occurred while updating booking or sending confirmation email:', error, 'Webhook');
           logger.debug(`Error details: ${error.message}`, 'Webhook');
         } else {
-          logger.error('Unknown error occurred while updating booking or sending confirmation email.', 'Webhook', new Error('Unknown booking update error'));
+          logger.error('Unknown error occurred while updating booking or sending confirmation email.', new Error('Unknown booking update error'), 'Webhook');
         }
         // Even if there's an error, we can still send a response. Adjust as needed.
         res.status(500).json({ error: 'Internal Server Error' });
