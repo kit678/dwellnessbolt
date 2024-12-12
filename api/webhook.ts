@@ -99,7 +99,7 @@ router.post('/', async (req, res) => {
         } else {
           logger.error('User data or email not found for booking confirmation email.', 'Webhook');
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
         logger.error('Error occurred while updating booking or sending confirmation email:', error, 'Webhook');
         logger.debug(`Error details: ${error.message}`, 'Webhook');
       }
