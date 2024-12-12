@@ -12,8 +12,7 @@ app.use(express.json());
 // Mount the Stripe routes
 app.use('/api/stripe', stripeRouter);
 
-// Mount the webhook route
-app.use('/api/webhook', webhookRouter);
+app.use('/webhook', webhookRouter);
 
 // Start the server
 const PORT = process.env.PORT || 5000; // You can choose your port
