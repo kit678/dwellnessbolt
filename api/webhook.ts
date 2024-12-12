@@ -35,10 +35,10 @@ router.post('/', async (req, res) => {
     logger.debug(`Received headers at /webhook: ${JSON.stringify(req.headers)}`, 'Webhook');
   } catch (err: unknown) {
     if (err instanceof Error) {
-      logger.error('Webhook signature verification failed.', 'Webhook', err);
+      logger.error('Webhook signature verification failed.', err, 'Webhook');
       logger.debug(`Error details: ${err.message}`, 'Webhook');
     } else {
-      logger.error('Webhook signature verification failed with unknown error.', 'Webhook', new Error('Unknown verification error'));
+      logger.error('Webhook signature verification failed with unknown error.', new Error('Unknown verification error'), 'Webhook');
     }
     return res.status(400).send(`Webhook Error: ${(err as Error)?.message || 'Unknown error'}`);
   }
@@ -104,7 +104,7 @@ router.post('/', async (req, res) => {
         res.json({ received: true });
       } catch (error: unknown) {
         if (error instanceof Error) {
-          logger.error('Error occurred while updating booking or sending confirmation email:', 'Webhook', error);
+          logger.error('Error occurred while updating booking or sending confirmation email:', error, 'Webhook');
           logger.debug(`Error details: ${error.message}`, 'Webhook');
         } else {
           logger.error('Unknown error occurred while updating booking or sending confirmation email.', 'Webhook', new Error('Unknown booking update error'));
