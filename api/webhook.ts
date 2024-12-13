@@ -35,7 +35,7 @@ router.post('/', async (req, res) => {
     logger.debug(`Event details: ${JSON.stringify(event.data)}`, 'Webhook');
     logger.debug(`Received headers at /webhook: ${JSON.stringify(req.headers)}`, 'Webhook');
   } catch (err: unknown) {
-    logger.error('Error processing webhook event', err, 'Webhook');
+    logger.error('Error processing webhook event', err instanceof Error ? err : new Error('Unknown error'), 'Webhook');
     res.status(400).send(`Webhook Error: ${(err as Error)?.message || 'Unknown error'}`);
     if (err instanceof Error) {
       logger.error('Webhook signature verification failed.', err, 'Webhook');
