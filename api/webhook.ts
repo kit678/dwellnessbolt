@@ -21,7 +21,6 @@ export const config = {
 
 router.post('/', async (req, res) => {
   logger.info('Webhook triggered at /webhook', 'Webhook');
-  res.status(200).send('Webhook received'); // Immediately send a response to avoid timeouts
   logger.debug(`Request headers: ${JSON.stringify(req.headers)}`, 'Webhook');
   const sig = req.headers['stripe-signature'];
 
