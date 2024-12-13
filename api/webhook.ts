@@ -21,6 +21,7 @@ export const config = {
 
 router.post('/', async (req, res) => {
   logger.info('Webhook triggered at /webhook', 'Webhook');
+  res.status(200).send('Webhook received'); // Immediately send a response to avoid timeouts
   logger.debug(`Request headers: ${JSON.stringify(req.headers)}`, 'Webhook');
   const sig = req.headers['stripe-signature'];
 
@@ -34,6 +35,8 @@ router.post('/', async (req, res) => {
     logger.debug(`Event details: ${JSON.stringify(event.data)}`, 'Webhook');
     logger.debug(`Received headers at /webhook: ${JSON.stringify(req.headers)}`, 'Webhook');
   } catch (err: unknown) {
+    logger.error('Error processing webhook event', err, 'Webhook');
+    res.status(400).send(`Webhook Error: ${(err as Error)?.message || 'Unknown error'}`);
     if (err instanceof Error) {
       logger.error('Webhook signature verification failed.', err, 'Webhook');
       logger.debug(`Error details: ${err.message}`, 'Webhook');
@@ -112,6 +115,7 @@ router.post('/', async (req, res) => {
         // Even if there's an error, we can still send a response. Adjust as needed.
         res.status(500).json({ error: 'Internal Server Error' });
       }
+      res.json({ received: true });
       break;
     // ... handle other event types
     default:
