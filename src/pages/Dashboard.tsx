@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { Dialog } from '../components/ui/Dialog';
 import { m } from 'framer-motion';
 import { Calendar, Clock, DollarSign, User } from 'lucide-react';
@@ -17,7 +17,7 @@ logger.info('Dashboard component rendered', 'Dashboard');
 export default function Dashboard() {
   logger.info('Dashboard component mounted', 'Dashboard');
   const { user, loading: authLoading } = useAuth();
-  const { getUserBookings, cancelBooking, deleteBooking } = useBookings();
+  const { getUserBookings, cancelBooking, deleteBooking } = useBookings() as any;
   const { results } = useQuizStore();
 
   const [bookings, setBookings] = useState<Booking[]>([]);
