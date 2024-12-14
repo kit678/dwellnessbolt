@@ -1,10 +1,11 @@
+import dotenv from 'dotenv';
+dotenv.config();
 import express from 'express';
 import cors from 'cors';
 import stripeRouter from './stripe.js';
 import webhookRouter from './webhook.js';
 
 console.log('NODE_ENV:', process.env.NODE_ENV);
-dotenv.config();
 
 // Create the express app
 const app = express();
