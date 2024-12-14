@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Dialog } from '../components/ui/Dialog';
 import { m } from 'framer-motion';
 import { Calendar, Clock, DollarSign, User } from 'lucide-react';
@@ -17,7 +17,7 @@ logger.info('Dashboard component rendered', 'Dashboard');
 export default function Dashboard() {
   logger.info('Dashboard component mounted', 'Dashboard');
   const { user, loading: authLoading } = useAuth();
-  const { getUserBookings, cancelBooking } = useBookings();
+  const { getUserBookings, cancelBooking, deleteBooking } = useBookings();
   const { results } = useQuizStore();
 
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -43,20 +43,26 @@ export default function Dashboard() {
 
   const isDevelopment = useMemo(() => import.meta.env.VITE_NODE_ENV === 'development', []);
   
-  const handleDeleteBooking = useCallback((bookingId: string) => {
-    setDialogTitle('Delete Booking');
-    setDialogMessage('Are you sure you want to delete this booking? This action cannot be undone.');
-    setDialogConfirmAction(() => async () => {
-      await deleteBooking(bookingId);
-      setBookings((prevBookings) => prevBookings.filter(b => b.id !== bookingId));
-      setDialogOpen(false);
-    });
-    setDialogOpen(true);
-  }, [deleteBooking]);
-    const bookingDate = new Date(booking.scheduledDate).getTime();
-    const now = Date.now();
-    const isWithin24Hours = bookingDate - now < 24 * 60 * 60 * 1000;
-    const isInPast = bookingDate < now;
+  const handleDeleteBooking = useCallback(
+    (bookingId: string) => {
+      setDialogTitle('Delete Booking');
+      setDialogMessage('Are you sure you want to delete this booking? This action cannot be undone.');
+      setDialogConfirmAction(() => async () => {
+        await deleteBooking(bookingId);
+        setBookings((prevBookings) => prevBookings.filter(b => b.id !== bookingId));
+        setDialogOpen(false);
+      });
+      setDialogOpen(true);
+    },
+    [deleteBooking]
+  );
+
+  const handleCancelBooking = useCallback(
+    (booking: Booking) => {
+      const bookingDate = new Date(booking.scheduledDate).getTime();
+      const now = Date.now();
+      const isWithin24Hours = bookingDate - now < 24 * 60 * 60 * 1000;
+      const isInPast = bookingDate < now;
 
     if (isInPast || isWithin24Hours) {
       setDialogTitle('Cannot Cancel Booking');
