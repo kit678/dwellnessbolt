@@ -1,6 +1,15 @@
 import dotenv from 'dotenv';
 dotenv.config();
 import express from 'express';
+import admin from 'firebase-admin';
+import serviceAccount from './path/to/your/serviceAccountKey.json'; // Update with the correct path
+
+// Initialize Firebase Admin SDK
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
+
+console.log('Firebase Admin initialized');
 import cors from 'cors';
 import stripeRouter from './stripe.js';
 import webhookRouter from './webhook.js';
