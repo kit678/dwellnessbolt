@@ -1,7 +1,6 @@
-import express from 'express';
 import dotenv from 'dotenv';
-
 dotenv.config();
+import express from 'express';
 
 console.log('Environment Variables:');
 console.log('VITE_FIREBASE_API_KEY:', process.env.VITE_FIREBASE_API_KEY);
