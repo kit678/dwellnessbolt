@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { collection, addDoc, query, where, getDocs, updateDoc, doc } from 'firebase/firestore';
+import { collection, addDoc, query, where, getDocs, updateDoc, doc, deleteDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useAuth } from './useAuth';
 import { RecurringSession, Booking } from '../types/index';
@@ -101,9 +101,7 @@ export function useBookings() {
 
   const deleteBooking = async (bookingId: string): Promise<void> => {
     try {
-      await updateDoc(doc(db, 'bookings', bookingId), {
-        status: 'deleted'
-      });
+      await deleteDoc(doc(db, 'bookings', bookingId));
       toast.success('Booking deleted successfully');
     } catch (error) {
       toast.error('Failed to delete booking');
