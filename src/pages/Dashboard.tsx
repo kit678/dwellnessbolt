@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { Dialog } from '../components/ui/Dialog';
 import { m } from 'framer-motion';
 import { Calendar, Clock, DollarSign, User } from 'lucide-react';
@@ -41,7 +41,18 @@ export default function Dashboard() {
     return zonedDate.toFormat('h:mm a zzz');
   };
 
-  const handleCancelBooking = useCallback((booking: Booking) => {
+  const isDevelopment = useMemo(() => import.meta.env.VITE_NODE_ENV === 'development', []);
+  
+  const handleDeleteBooking = useCallback((bookingId: string) => {
+    setDialogTitle('Delete Booking');
+    setDialogMessage('Are you sure you want to delete this booking? This action cannot be undone.');
+    setDialogConfirmAction(() => async () => {
+      await deleteBooking(bookingId);
+      setBookings((prevBookings) => prevBookings.filter(b => b.id !== bookingId));
+      setDialogOpen(false);
+    });
+    setDialogOpen(true);
+  }, [deleteBooking]);
     const bookingDate = new Date(booking.scheduledDate).getTime();
     const now = Date.now();
     const isWithin24Hours = bookingDate - now < 24 * 60 * 60 * 1000;
@@ -284,6 +295,14 @@ export default function Dashboard() {
                       className="px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 hover:bg-blue-200"
                     >
                       Complete Booking
+                    </button>
+                  )}
+                  {isDevelopment && (
+                    <button
+                      onClick={() => handleDeleteBooking(booking.id)}
+                      className="px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800 hover:bg-gray-200"
+                    >
+                      Trash
                     </button>
                   )}
                   {booking.status !== 'cancelled' && (

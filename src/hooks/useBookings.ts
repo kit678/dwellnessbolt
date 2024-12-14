@@ -99,7 +99,17 @@ export function useBookings() {
     }
   };
 
-  const getNextSpecializedTopic = (currentDate: Date): string => {
+  const deleteBooking = async (bookingId: string): Promise<void> => {
+    try {
+      await updateDoc(doc(db, 'bookings', bookingId), {
+        status: 'deleted'
+      });
+      toast.success('Booking deleted successfully');
+    } catch (error) {
+      toast.error('Failed to delete booking');
+      console.error(error);
+    }
+  };
     const topics = ['Stress Management', 'Diabetes & Hypertension', 'Weight Loss', 'PCOS/Women\'s Health', 'Meditation & Breathwork', 'General Wellness Class'];
     const startDate = new Date('2023-01-01'); // Example start date
     const weeksSinceStart = Math.floor((currentDate.getTime() - startDate.getTime()) / (7 * 24 * 60 * 60 * 1000));
@@ -111,6 +121,7 @@ export function useBookings() {
     bookSession,
     getUserBookings,
     cancelBooking,
-    getNextSpecializedTopic
+    getNextSpecializedTopic,
+    deleteBooking
   };
 }
