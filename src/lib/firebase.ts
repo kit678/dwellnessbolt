@@ -15,9 +15,9 @@ import {
 
 // Function to get environment variables
 function getEnvVariable(key: string): string | undefined {
-  // Use import.meta.env for Vite environment variables
-  if (typeof import.meta !== 'undefined' && import.meta.env) {
-    return import.meta.env[key];
+  // Use process.env for server-side environment variables
+  if (typeof process !== 'undefined' && process.env) {
+    return process.env[key];
   }
 
   console.warn(`Environment variable ${key} is not defined.`);
