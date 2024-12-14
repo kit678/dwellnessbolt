@@ -1,17 +1,10 @@
-import dotenv from 'dotenv';
-dotenv.config();
 import express from 'express';
-
-console.log('Environment Variables:');
-console.log('VITE_FIREBASE_API_KEY:', process.env.VITE_FIREBASE_API_KEY);
-console.log('VITE_FIREBASE_AUTH_DOMAIN:', process.env.VITE_FIREBASE_AUTH_DOMAIN);
-console.log('VITE_FIREBASE_PROJECT_ID:', process.env.VITE_FIREBASE_PROJECT_ID);
-console.log('VITE_FIREBASE_STORAGE_BUCKET:', process.env.VITE_FIREBASE_STORAGE_BUCKET);
-console.log('VITE_FIREBASE_MESSAGING_SENDER_ID:', process.env.VITE_FIREBASE_MESSAGING_SENDER_ID);
-console.log('VITE_FIREBASE_APP_ID:', process.env.VITE_FIREBASE_APP_ID);
-
-import webhookRouter from './webhook.js';
+import cors from 'cors';
 import stripeRouter from './stripe.js';
+import webhookRouter from './webhook.js';
+
+console.log('NODE_ENV:', process.env.NODE_ENV);
+dotenv.config();
 
 // Create the express app
 const app = express();
@@ -29,7 +22,17 @@ app.use('/api/stripe', stripeRouter);
 // You can mount other routes as needed
 // app.use('/other-routes', otherRouter);
 
-const port = process.env.PORT || 5000;
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+app.use(cors());
+app.use(express.json());
+
+// Mount the Stripe routes
+app.use('/api/stripe', stripeRouter);
+
+// Mount the webhook route
+app.use('/api/webhook', webhookRouter);
+
+// Start the server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
