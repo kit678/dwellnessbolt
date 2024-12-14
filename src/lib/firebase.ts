@@ -13,26 +13,13 @@ import {
   persistentMultipleTabManager,
 } from 'firebase/firestore';
 
-function getEnvVariable(key: string): string | undefined {
-  if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env[key]) {
-    return import.meta.env[key];
-  }
-
-  if (typeof process !== 'undefined' && process.env && process.env[key]) {
-    return process.env[key];
-  }
-
-  console.warn(`Environment variable ${key} is not defined.`);
-  return undefined;
-}
-
 const firebaseConfig = {
-  apiKey: getEnvVariable('VITE_FIREBASE_API_KEY'),
-  authDomain: getEnvVariable('VITE_FIREBASE_AUTH_DOMAIN'),
-  projectId: getEnvVariable('VITE_FIREBASE_PROJECT_ID'),
-  storageBucket: getEnvVariable('VITE_FIREBASE_STORAGE_BUCKET'),
-  messagingSenderId: getEnvVariable('VITE_FIREBASE_MESSAGING_SENDER_ID'),
-  appId: getEnvVariable('VITE_FIREBASE_APP_ID'),
+  apiKey: process.env.VITE_FIREBASE_API_KEY,
+  authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.VITE_FIREBASE_APP_ID,
 };
 
 // Initialize Firebase app
