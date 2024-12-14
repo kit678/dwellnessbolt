@@ -86,15 +86,23 @@ router.post(
           // Fetch the booking document to ensure it exists
           const bookingDoc = await getDoc(bookingRef);
           if (bookingDoc.exists()) {
-            // Update the booking status to confirmed
-            await updateDoc(bookingRef, {
-              status: 'confirmed',
-              paidAt: new Date().toISOString(),
-            });
-            logger.info(
-              `Booking ${bookingId} successfully updated to confirmed.`,
-              'Webhook'
-            );
+            try {
+              // Update the booking status to confirmed
+              await updateDoc(bookingRef, {
+                status: 'confirmed',
+                paidAt: new Date().toISOString(),
+              });
+              logger.info(
+                `Booking ${bookingId} successfully updated to confirmed.`,
+                'Webhook'
+              );
+            } catch (updateError) {
+              logger.error(
+                'Error updating booking status to confirmed.',
+                updateError,
+                'Webhook'
+              );
+            }
           } else {
             logger.error(
               `Booking ${bookingId} not found in Firestore.`,
