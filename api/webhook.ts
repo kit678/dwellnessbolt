@@ -82,32 +82,16 @@ router.post(
             'Webhook'
           );
           const bookingRef = doc(collection(db, 'bookings'), bookingId);
-          const bookingDoc = await getDoc(bookingRef);
 
-          if (bookingDoc.exists()) {
-            await updateDoc(bookingRef, {
-              status: 'confirmed',
-              paidAt: new Date().toISOString(),
-            });
-            logger.info(
-              `Booking ${bookingId} successfully updated to confirmed.`,
-              'Webhook'
-            );
-          } else {
-            logger.error(
-              `Booking ${bookingId} not found in Firestore.`,
-              new Error(`Booking ${bookingId} not found`),
-              'Webhook'
-            );
-            // If booking not found, handle accordingly. For now, set pending.
-            await updateDoc(bookingRef, {
-              status: 'pending',
-            });
-            logger.info(
-              `Booking ${bookingId} status set to pending due to non-existence.`,
-              'Webhook'
-            );
-          }
+          // Update the booking status to confirmed
+          await updateDoc(bookingRef, {
+            status: 'confirmed',
+            paidAt: new Date().toISOString(),
+          });
+          logger.info(
+            `Booking ${bookingId} successfully updated to confirmed.`,
+            'Webhook'
+          );
 
           // Fetch user email
           const userDoc = await getDoc(doc(collection(db, 'users'), userId));
