@@ -140,13 +140,10 @@ router.post(
           }
 
           return res.json({ received: true });
-        } catch (error: unknown) {
-          if (error instanceof Error) {
-            logger.error('Error updating booking or sending email:', error, 'Webhook');
-            logger.debug(`Error details: ${error.message}`, 'Webhook');
-          } else {
-            logger.error('Unknown error occurred while updating booking or sending email.', new Error('Unknown error'), 'Webhook');
-          }
+        } catch (error) {
+          const err = error instanceof Error ? error : new Error('Unknown error');
+          logger.error('Error updating booking or sending email:', err, 'Webhook');
+          logger.debug(`Error details: ${err.message}`, 'Webhook');
           return res.status(500).json({ error: 'Internal Server Error' });
         }
 
