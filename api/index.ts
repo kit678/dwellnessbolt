@@ -1,5 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
+
+// Load environment variables from .env file
 dotenv.config();
 
 import webhookRouter from './webhook.js';
