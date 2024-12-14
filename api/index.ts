@@ -1,8 +1,15 @@
 import express from 'express';
 import dotenv from 'dotenv';
 
-// Load environment variables from .env file
 dotenv.config();
+
+console.log('Environment Variables:');
+console.log('VITE_FIREBASE_API_KEY:', process.env.VITE_FIREBASE_API_KEY);
+console.log('VITE_FIREBASE_AUTH_DOMAIN:', process.env.VITE_FIREBASE_AUTH_DOMAIN);
+console.log('VITE_FIREBASE_PROJECT_ID:', process.env.VITE_FIREBASE_PROJECT_ID);
+console.log('VITE_FIREBASE_STORAGE_BUCKET:', process.env.VITE_FIREBASE_STORAGE_BUCKET);
+console.log('VITE_FIREBASE_MESSAGING_SENDER_ID:', process.env.VITE_FIREBASE_MESSAGING_SENDER_ID);
+console.log('VITE_FIREBASE_APP_ID:', process.env.VITE_FIREBASE_APP_ID);
 
 import webhookRouter from './webhook.js';
 import stripeRouter from './stripe.js';
