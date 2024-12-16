@@ -27,7 +27,7 @@ export const sendBookingConfirmation = async (to: string, booking: any) => {
     });
     console.log('Email sent:', info.response);
     console.log('Message ID:', info.messageId);
-    console.log('Preview URL:', nodemailer.getTestMessageUrl(info));
+    console.log('Preview URL:', nodemailer.getTestMessageUrl(info) || 'No preview URL available');
     console.log('Message ID:', info.messageId);
     console.log('Preview URL:', nodemailer.getTestMessageUrl(info));
     return true;
