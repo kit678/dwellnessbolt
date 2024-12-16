@@ -11,7 +11,7 @@ export function useBookings() {
 
 
   const bookSession = async (session: RecurringSession, scheduledDate: string) => {
-    console.log('bookSession called');
+    console.log('bookSession called with user:', user);
     if (!user) {
       console.error('User or user ID is undefined');
       toast.error('Please log in to book a session');
