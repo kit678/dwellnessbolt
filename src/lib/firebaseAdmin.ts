@@ -6,7 +6,7 @@ import { resolve } from 'path';
 
 // Load the service account key JSON file
 const serviceAccount = JSON.parse(
-  readFileSync(resolve(__dirname, '../../config/serviceAccountKey.json'), 'utf8')
+  readFileSync(resolve(__dirname, '../../../config/serviceAccountKey.json'), 'utf8')
 );
 
 admin.initializeApp({
