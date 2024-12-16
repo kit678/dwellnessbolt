@@ -130,8 +130,10 @@ router.post(
                 'Webhook'
               );
             } else {
+              // Add an Error object here
               logger.error(
                 `Failed to send booking confirmation email to ${userData.email}`,
+                new Error('Failed to send booking confirmation email'),
                 'Webhook'
               );
             }
