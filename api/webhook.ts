@@ -22,7 +22,6 @@ const stripe = new Stripe(stripeSecretKey, {
 });
 
 // Define the POST route for the webhook with the raw body parser applied inline.
-// This ensures that this specific route receives the raw, unparsed request body.
 router.post(
   '/',
   express.raw({ type: 'application/json' }),
@@ -34,24 +33,19 @@ router.post(
     let event: Stripe.Event;
 
     try {
-      // req.body will be a Buffer because of express.raw()
+      // req.body is a Buffer due to express.raw()
       event = stripe.webhooks.constructEvent(req.body, sig!, endpointSecret);
       logger.debug(`Received event type: ${event.type} at /webhook`, 'Webhook');
     } catch (err: unknown) {
-      logger.error(
-        'Error processing webhook event',
-        err instanceof Error ? err : new Error('Unknown error'),
-        'Webhook'
-      );
+      const errorObj = err instanceof Error ? err : new Error('Unknown error');
+      logger.error('Error processing webhook event', errorObj, 'Webhook');
       if (err instanceof Error) {
         logger.error('Webhook signature verification failed.', err, 'Webhook');
         logger.debug(`Error details: ${err.message}`, 'Webhook');
       }
       return res
         .status(400)
-        .send(
-          `Webhook Error: ${(err as Error)?.message || 'Unknown error'}`
-        );
+        .send(`Webhook Error: ${errorObj.message}`);
     }
 
     // Handle the event
@@ -62,8 +56,7 @@ router.post(
         const metadata = session.metadata as { [key: string]: string };
         logger.debug(`Session metadata: ${JSON.stringify(metadata)}`, 'Webhook');
 
-        const { bookingId, userId, sessionTitle, sessionDate, sessionPrice } =
-          metadata;
+        const { bookingId, userId, sessionTitle, sessionDate, sessionPrice } = metadata;
 
         if (!bookingId || !userId) {
           logger.error(
@@ -96,10 +89,13 @@ router.post(
                 `Booking ${bookingId} successfully updated to confirmed.`,
                 'Webhook'
               );
-            } catch (updateError) {
+            } catch (updateError: unknown) {
+              const updateErrObj = updateError instanceof Error
+                ? updateError
+                : new Error(String(updateError));
               logger.error(
                 'Error updating booking status to confirmed.',
-                updateError,
+                updateErrObj,
                 'Webhook'
               );
             }
@@ -141,11 +137,10 @@ router.post(
 
           return res.json({ received: true });
         } catch (error: unknown) {
+          const errObj = error instanceof Error ? error : new Error(String(error));
+          logger.error('Error updating booking or sending email:', errObj, 'Webhook');
           if (error instanceof Error) {
-            logger.error('Error updating booking or sending email:', error, 'Webhook');
             logger.debug(`Error details: ${error.message}`, 'Webhook');
-          } else {
-            logger.error('Unknown error occurred while updating booking or sending email.', new Error('Unknown error'), 'Webhook');
           }
           return res.status(500).json({ error: 'Internal Server Error' });
         }
