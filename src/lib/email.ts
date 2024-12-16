@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer';
+import { logger } from '../utils/logger.js';
 
 const transporter = nodemailer.createTransport({
   host: process.env.VITE_EMAIL_HOST,
@@ -25,11 +26,9 @@ export const sendBookingConfirmation = async (to: string, booking: any) => {
         <p>Price: $${booking.session.price}</p>
       `,
     });
-    console.log('Email sent:', info.response);
-    console.log('Message ID:', info.messageId);
-    console.log('Preview URL:', nodemailer.getTestMessageUrl(info) || 'No preview URL available');
-    console.log('Message ID:', info.messageId);
-    console.log('Preview URL:', nodemailer.getTestMessageUrl(info));
+    logger.info(`Email sent: ${info.response}`, 'Email');
+    logger.info(`Message ID: ${info.messageId}`, 'Email');
+    logger.info(`Preview URL: ${nodemailer.getTestMessageUrl(info) || 'No preview URL available'}`, 'Email');
     return true;
   } catch (error) {
     console.error('Error sending email:', error);
