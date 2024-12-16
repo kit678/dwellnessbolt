@@ -28,7 +28,7 @@ export const sendBookingConfirmation = async (to: string, booking: any) => {
 
 export const sendBookingReminder = async (to: string, booking: any) => {
   await transporter.sendMail({
-    from: '"WellnessHub" <noreply@wellnesshub.com>',
+    from: '"WellnessHub" <admin@dwellness.club>',
     to,
     subject: 'Upcoming Session Reminder',
     html: `
