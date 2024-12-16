@@ -13,9 +13,6 @@ export default tseslint.config(
       ecmaVersion: 2020,
       globals: globals.browser,
     },
-    customRules: {
-      'no-process-env': require('./.eslint/rules/no-process-env'),
-    },
     plugins: {
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh,
