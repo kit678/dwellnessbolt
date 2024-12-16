@@ -4,7 +4,6 @@ import { logger } from '../src/utils/logger.js';
 import { db } from '../src/lib/firebaseAdmin.js';
 import { getAuth } from 'firebase/auth';
 import { sendBookingConfirmation } from '../src/lib/email.js';
-import { collection, doc, updateDoc, getDoc } from 'firebase-admin/firestore';
 
 const router = express.Router();
 
@@ -110,7 +109,7 @@ router.post(
           }
 
           // Fetch user email
-          const userDoc = await getDoc(doc(collection(db, 'users'), userId));
+          const userDoc = await db.collection('users').doc(userId).get();
           const userData = userDoc.data();
           if (userData && userData.email) {
             logger.info(
