@@ -10,7 +10,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const serviceAccount = JSON.parse(
-  readFileSync(resolve(__dirname, '../../../config/serviceAccountKey.json'), 'utf8')
+  readFileSync(resolve('D:/Dev/WellnessBolt/config/dwellness-93630-firebase-adminsdk-44foe-e02410b4b9.json'), 'utf8')
 );
 
 admin.initializeApp({
