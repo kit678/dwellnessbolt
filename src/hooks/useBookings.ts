@@ -27,6 +27,13 @@ export function useBookings() {
         scheduledDate
       });
 
+      console.log('Creating checkout session with:', {
+        sessionId: session.id,
+        bookingId: bookingRef.id,
+        userId: user.id,
+        amount: session.price * 100,
+      });
+
       const response = await fetch('/api/stripe/create-checkout-session', {
         method: 'POST',
         headers: {
@@ -41,15 +48,17 @@ export function useBookings() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to process booking');
+        const errorText = await response.text();
+        console.error('Failed to create checkout session:', errorText);
+        throw new Error('Failed to create checkout session');
       }
 
       const data = await response.json();
+      console.log('Checkout session created:', data);
       return data.sessionId;
 
     } catch (error) {
-      console.error('Error fetching bookings:', error);
-      console.error('Booking error:', error);
+      console.error('Error in bookSession:', error);
       toast.error('Failed to process booking');
     } finally {
       setLoading(false);
