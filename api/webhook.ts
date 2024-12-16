@@ -138,7 +138,7 @@ router.post(
           } else {
             logger.error(
               'User data or email not found for booking confirmation email.',
-              new Error('No user email found')
+              new Error('No user email found'),
               'Webhook'
             );
           }
