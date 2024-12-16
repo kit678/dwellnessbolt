@@ -116,7 +116,7 @@ router.post(
               `Sending booking confirmation email to ${userData.email}`,
               'Webhook'
             );
-            await sendBookingConfirmation(userData.email, {
+            const emailSent = await sendBookingConfirmation(userData.email, {
               session: {
                 title: sessionTitle,
                 startTime: sessionDate,
@@ -124,10 +124,17 @@ router.post(
                 price: sessionPrice,
               },
             });
-            logger.info(
-              `Booking confirmation email successfully sent to ${userData.email}`,
-              'Webhook'
-            );
+            if (emailSent) {
+              logger.info(
+                `Booking confirmation email successfully sent to ${userData.email}`,
+                'Webhook'
+              );
+            } else {
+              logger.error(
+                `Failed to send booking confirmation email to ${userData.email}`,
+                'Webhook'
+              );
+            }
           } else {
             logger.error(
               'User data or email not found for booking confirmation email.',

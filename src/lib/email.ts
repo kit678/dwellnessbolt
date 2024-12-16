@@ -11,19 +11,26 @@ const transporter = nodemailer.createTransport({
 });
 
 export const sendBookingConfirmation = async (to: string, booking: any) => {
-  await transporter.sendMail({
-    from: '"WellnessHub" <admin@dwellness.club>',
-    to,
-    subject: 'Booking Confirmation',
-    html: `
-      <h1>Booking Confirmation</h1>
-      <p>Thank you for booking ${booking.session.title}!</p>
-      <p>Date: ${new Date(booking.session.startTime).toLocaleDateString()}</p>
-      <p>Time: ${new Date(booking.session.startTime).toLocaleTimeString()} - 
-         ${new Date(booking.session.endTime).toLocaleTimeString()}</p>
-      <p>Price: $${booking.session.price}</p>
-    `,
-  });
+  try {
+    const info = await transporter.sendMail({
+      from: '"WellnessHub" <admin@dwellness.club>',
+      to,
+      subject: 'Booking Confirmation',
+      html: `
+        <h1>Booking Confirmation</h1>
+        <p>Thank you for booking ${booking.session.title}!</p>
+        <p>Date: ${new Date(booking.session.startTime).toLocaleDateString()}</p>
+        <p>Time: ${new Date(booking.session.startTime).toLocaleTimeString()} - 
+           ${new Date(booking.session.endTime).toLocaleTimeString()}</p>
+        <p>Price: $${booking.session.price}</p>
+      `,
+    });
+    console.log('Email sent:', info.response);
+    return true;
+  } catch (error) {
+    console.error('Error sending email:', error);
+    return false;
+  }
 };
 
 export const sendBookingReminder = async (to: string, booking: any) => {
