@@ -1,7 +1,7 @@
 import express from 'express';
 import Stripe from 'stripe';
 import { logger } from '../src/utils/logger.js';
-import { db, auth } from '../src/lib/firebase.js';
+import { db } from '../src/lib/firebaseAdmin.js';
 import { getAuth } from 'firebase/auth';
 import { sendBookingConfirmation } from '../src/lib/email.js';
 import { collection, doc, updateDoc, getDoc } from 'firebase/firestore';
@@ -76,44 +76,35 @@ router.post(
             'Webhook'
           );
           // Use the user's credentials to update the booking
-          const user = auth.currentUser;
-          if (user && user.uid === userId) {
-            const bookingRef = doc(collection(db, 'bookings'), bookingId);
+          const bookingRef = db.collection('bookings').doc(bookingId);
 
-            // Fetch the booking document to ensure it exists
-            const bookingDoc = await getDoc(bookingRef);
-            if (bookingDoc.exists()) {
-              try {
-                // Update the booking status to confirmed
-                await updateDoc(bookingRef, {
-                  status: 'confirmed',
-                  paidAt: new Date().toISOString(),
-                });
-                logger.info(
-                  `Booking ${bookingId} successfully updated to confirmed.`,
-                  'Webhook'
-                );
-              } catch (updateError: unknown) {
-                const updateErrObj = updateError instanceof Error
-                  ? updateError
-                  : new Error(String(updateError));
-                logger.error(
-                  'Error updating booking status to confirmed.',
-                  updateErrObj,
-                  'Webhook'
-                );
-              }
-            } else {
+          // Fetch the booking document to ensure it exists
+          const bookingDoc = await bookingRef.get();
+          if (bookingDoc.exists) {
+            try {
+              // Update the booking status to confirmed
+              await bookingRef.update({
+                status: 'confirmed',
+                paidAt: new Date().toISOString(),
+              });
+              logger.info(
+                `Booking ${bookingId} successfully updated to confirmed.`,
+                'Webhook'
+              );
+            } catch (updateError: unknown) {
+              const updateErrObj = updateError instanceof Error
+                ? updateError
+                : new Error(String(updateError));
               logger.error(
-                `Booking ${bookingId} not found in Firestore.`,
-                new Error(`Booking ${bookingId} not found`),
+                'Error updating booking status to confirmed.',
+                updateErrObj,
                 'Webhook'
               );
             }
           } else {
             logger.error(
-              'User is not authenticated or does not have permission to update this booking.',
-              new Error('Permission denied'),
+              `Booking ${bookingId} not found in Firestore.`,
+              new Error(`Booking ${bookingId} not found`),
               'Webhook'
             );
           }
