@@ -3,7 +3,7 @@ import nodemailer from 'nodemailer';
 const transporter = nodemailer.createTransport({
   host: process.env.VITE_EMAIL_HOST,
   port: parseInt(process.env.VITE_EMAIL_PORT!),
-  secure: true,
+  secure: true, // Use SSL
   auth: {
     user: process.env.VITE_EMAIL_USER,
     pass: process.env.VITE_EMAIL_PASSWORD,
