@@ -4,7 +4,7 @@ import { logger } from '../src/utils/logger.js';
 import { db } from '../src/lib/firebaseAdmin.js';
 import { getAuth } from 'firebase/auth';
 import { sendBookingConfirmation } from '../src/lib/email.js';
-import { collection, doc, updateDoc, getDoc } from 'firebase/firestore';
+import { collection, doc, updateDoc, getDoc } from 'firebase-admin/firestore';
 
 const router = express.Router();
 
