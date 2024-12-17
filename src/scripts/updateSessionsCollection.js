@@ -88,69 +88,6 @@ async function updateSessionsCollection() {
     // }
     console.log(`Final bookings object for session ${doc.id}:`, JSON.stringify(bookings, null, 2));
     console.log(`Finished processing session ${doc.id}.`);
-
-    // Initialize bookings for each recurring day
-    const computeAvailableDates = (recurringDays) => {
-      const dates = [];
-      if (recurringDays.length === 0) return dates;
-
-      const today = new Date();
-      today.setHours(0, 0, 0, 0); // Set time to midnight
-      let currentDate = new Date(today);
-
-      while (dates.length < 4) {
-        currentDate.setDate(currentDate.getDate() + 1);
-        const dayOfWeek = currentDate.getDay();
-
-        if (recurringDays.includes(dayOfWeek)) {
-          // Format date as 'yyyy-MM-dd' to ensure consistency
-          const dateStr = currentDate.toISOString().split('T')[0];
-          dates.push(dateStr);
-        }
-      }
-
-      return dates;
-    };
-
-    const availableDates = computeAvailableDates(sessionData.recurringDays || []);
-    console.log(`Available dates for session ${doc.id}:`, availableDates);
-    for (const dateKey of availableDates) {
-      try {
-        console.log(`Querying bookings for session ${doc.id} on date ${dateKey}`);
-        const bookingsQuery = db.collection('bookings')
-          .where('sessionId', '==', doc.id)
-          .where('scheduledDate', '==', dateKey)
-          .where('status', '==', 'confirmed');
-
-        const bookingsSnapshot = await bookingsQuery.get();
-        console.log(`Fetched ${bookingsSnapshot.size} bookings for session ${doc.id} on date ${dateKey}`);
-        const confirmedBookings = bookingsSnapshot.docs.map(bookingDoc => ({
-          userId: bookingDoc.data().userId,
-          bookingId: bookingDoc.id,
-        }));
-
-        bookings[dateKey] = {
-          confirmedBookings,
-          remainingCapacity: sessionData.capacity - confirmedBookings.length,
-        };
-
-        console.log(`Updated bookings for session ${doc.id} on date ${dateKey}:`, bookings[dateKey]);
-      } catch (error) {
-        console.error(`Error querying bookings for session ${doc.id} on date ${dateKey}:`, error);
-      }
-    }
-
-    // Commenting out the update to Firestore for now
-    // console.log(`Bookings object for session ${doc.id} before update:`, JSON.stringify(bookings, null, 2));
-    // try {
-    //   await db.collection('sessions').doc(doc.id).update({ bookings });
-    //   console.log(`Successfully updated session ${doc.id} with new bookings structure.`);
-    // } catch (error) {
-    //   console.error(`Failed to update session ${doc.id}:`, error);
-    // }
-    console.log(`Final bookings object for session ${doc.id}:`, JSON.stringify(bookings, null, 2));
-    console.log(`Finished processing session ${doc.id}.`);
-    console.log(`Finished processing session ${doc.id}.`);
   });
 }
 
