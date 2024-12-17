@@ -22,7 +22,6 @@ async function updateSessionsCollection() {
   sessionsSnapshot.forEach(async (doc) => {
     const sessionData = doc.data();
     console.log(`Processing session ${doc.id} with data:`, sessionData);
-    const sessionData = doc.data();
     if (!sessionData) {
       console.warn(`No data found for session ${doc.id}`);
       return;
