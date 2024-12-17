@@ -55,12 +55,14 @@ async function updateSessionsCollection() {
     console.log(`Available dates for session ${doc.id}:`, availableDates);
     for (const dateKey of availableDates) {
       try {
+        console.log(`Querying bookings for session ${doc.id} on date ${dateKey}`);
         const bookingsQuery = db.collection('bookings')
           .where('sessionId', '==', doc.id)
           .where('scheduledDate', '==', dateKey)
           .where('status', '==', 'confirmed');
 
         const bookingsSnapshot = await bookingsQuery.get();
+        console.log(`Fetched ${bookingsSnapshot.size} bookings for session ${doc.id} on date ${dateKey}`);
         const confirmedBookings = bookingsSnapshot.docs.map(bookingDoc => ({
           userId: bookingDoc.data().userId,
           bookingId: bookingDoc.id,
