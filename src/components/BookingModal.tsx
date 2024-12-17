@@ -24,10 +24,8 @@ export default function BookingModal({
   const [, setLoading] = useState(false);
 
   // Memoized available dates to prevent them from changing between renders
-  const availableDates = useMemo(() => {
+  const computeAvailableDates = (recurringDays: number[]) => {
     const dates: string[] = [];
-    const recurringDays = session.recurringDays || [];
-
     if (recurringDays.length === 0) return dates;
 
     const today = new Date();
@@ -46,7 +44,9 @@ export default function BookingModal({
     }
 
     return dates;
-  }, [session]);
+  };
+
+  const availableDates = useMemo(() => computeAvailableDates(session.recurringDays || []), [session]);
 
   const handleContinueToPayment = async () => {
     if (!selectedDate) {

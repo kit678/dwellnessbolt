@@ -29,8 +29,30 @@ async function updateSessionsCollection() {
     const bookings = sessionData.bookings || {};
 
     // Initialize bookings for each recurring day
-    (sessionData.recurringDays || []).forEach((day) => {
-      const dateKey = new Date().toISOString().split('T')[0]; // Example date key
+    const computeAvailableDates = (recurringDays) => {
+      const dates = [];
+      if (recurringDays.length === 0) return dates;
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Set time to midnight
+      let currentDate = new Date(today);
+
+      while (dates.length < 4) {
+        currentDate.setDate(currentDate.getDate() + 1);
+        const dayOfWeek = currentDate.getDay();
+
+        if (recurringDays.includes(dayOfWeek)) {
+          // Format date as 'yyyy-MM-dd' to ensure consistency
+          const dateStr = currentDate.toISOString().split('T')[0];
+          dates.push(dateStr);
+        }
+      }
+
+      return dates;
+    };
+
+    const availableDates = computeAvailableDates(sessionData.recurringDays || []);
+    availableDates.forEach((dateKey) => {
       if (!bookings[dateKey]) {
         bookings[dateKey] = {
           confirmedBookings: [],
