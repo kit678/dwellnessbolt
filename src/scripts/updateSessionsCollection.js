@@ -89,6 +89,7 @@ async function updateSessionsCollection() {
     // }
     console.log(`Final bookings object for session ${doc.id}:`, JSON.stringify(bookings, null, 2));
     console.log(`Finished processing session ${doc.id}.`);
+    console.log(`Finished processing session ${doc.id}.`);
   });
 }
 
