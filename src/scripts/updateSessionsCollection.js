@@ -20,6 +20,7 @@ async function updateSessionsCollection() {
   console.log(`Fetched ${sessionsSnapshot.size} sessions from Firestore`);
 
   sessionsSnapshot.forEach(async (doc) => {
+    const sessionData = doc.data();
     console.log(`Processing session ${doc.id} with data:`, sessionData);
     const sessionData = doc.data();
     if (!sessionData) {
@@ -63,13 +64,14 @@ async function updateSessionsCollection() {
     });
 
     // Update the session document with the new bookings structure
-    console.log(`Bookings object for session ${doc.id} before update:`, bookings);
+    console.log(`Bookings object for session ${doc.id} before update:`, JSON.stringify(bookings, null, 2));
     try {
       await db.collection('sessions').doc(doc.id).update({ bookings });
       console.log(`Successfully updated session ${doc.id} with new bookings structure.`);
     } catch (error) {
-      console.error(`Failed to update session ${doc.id}: ${error.message}`, error);
+      console.error(`Failed to update session ${doc.id}:`, error);
     }
+    console.log(`Bookings object for session ${doc.id} after update attempt:`, JSON.stringify(bookings, null, 2));
     console.log(`Finished processing session ${doc.id}.`);
   });
 }
