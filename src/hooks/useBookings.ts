@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { collection, addDoc, query, where, getDocs, updateDoc, doc, deleteDoc } from 'firebase/firestore';
+import { collection, addDoc, query, where, getDocs, updateDoc, doc, deleteDoc, arrayUnion } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useAuth } from './useAuth';
 import { RecurringSession, Booking } from '../types/index';
@@ -18,6 +18,33 @@ export function useBookings() {
       return;
     }
     try {
+      // Check for existing confirmed booking for the same session and date
+      const existingBookingsQuery = query(
+        collection(db, 'bookings'),
+        where('userId', '==', user.id),
+        where('sessionId', '==', session.id),
+        where('scheduledDate', '==', scheduledDate),
+        where('status', '==', 'confirmed')
+      );
+      const existingBookingsSnapshot = await getDocs(existingBookingsQuery);
+
+      if (!existingBookingsSnapshot.empty) {
+        toast.error('You have already booked this session on the selected date.');
+        return;
+      }
+
+      // Check session capacity
+      const sessionRef = doc(db, 'sessions', session.id);
+      const sessionDoc = await sessionRef.get();
+      const sessionData = sessionDoc.data();
+      const dateKey = scheduledDate;
+
+      if (sessionData.bookings && sessionData.bookings[dateKey] && sessionData.bookings[dateKey].remainingCapacity <= 0) {
+        toast.error('No available slots for the selected date.');
+        return;
+      }
+
+      // Create booking
       const bookingRef = await addDoc(collection(db, 'bookings'), {
         userId: user.id,
         sessionId: session.id,
@@ -25,6 +52,12 @@ export function useBookings() {
         status: 'pending',
         bookedAt: new Date().toISOString(),
         scheduledDate
+      });
+
+      // Update session capacity
+      await updateDoc(sessionRef, {
+        [`bookings.${dateKey}.confirmedBookings`]: arrayUnion({ userId: user.id, bookingId: bookingRef.id }),
+        [`bookings.${dateKey}.remainingCapacity`]: sessionData.bookings[dateKey].remainingCapacity - 1
       });
 
       console.log('Creating checkout session with:', {
