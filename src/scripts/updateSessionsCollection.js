@@ -20,7 +20,7 @@ async function updateSessionsCollection() {
   console.log(`Fetched ${sessionsSnapshot.size} sessions from Firestore`);
 
   sessionsSnapshot.forEach(async (doc) => {
-    console.log(`Processing session ${doc.id}`);
+    console.log(`Processing session ${doc.id} with data:`, sessionData);
     const sessionData = doc.data();
     if (!sessionData) {
       console.warn(`No data found for session ${doc.id}`);
@@ -52,6 +52,7 @@ async function updateSessionsCollection() {
     };
 
     const availableDates = computeAvailableDates(sessionData.recurringDays || []);
+    console.log(`Available dates for session ${doc.id}:`, availableDates);
     availableDates.forEach((dateKey) => {
       if (!bookings[dateKey]) {
         bookings[dateKey] = {
@@ -62,13 +63,14 @@ async function updateSessionsCollection() {
     });
 
     // Update the session document with the new bookings structure
+    console.log(`Bookings object for session ${doc.id} before update:`, bookings);
     try {
       await db.collection('sessions').doc(doc.id).update({ bookings });
-      console.log(`Updated session ${doc.id} with new bookings structure.`);
+      console.log(`Successfully updated session ${doc.id} with new bookings structure.`);
     } catch (error) {
       console.error(`Failed to update session ${doc.id}: ${error.message}`, error);
     }
-    console.log(`Updated session ${doc.id} with new bookings structure.`);
+    console.log(`Finished processing session ${doc.id}.`);
   });
 }
 
