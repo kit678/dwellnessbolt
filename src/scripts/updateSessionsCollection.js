@@ -62,10 +62,14 @@ function updateSessionsCollection() {
 
         bookingsQuery.get().then(bookingsSnapshot => {
           console.log(`Fetched ${bookingsSnapshot.size} bookings for session ${doc.id} on date ${dateKey}`);
-          const confirmedBookings = bookingsSnapshot.docs.map(bookingDoc => ({
-            userId: bookingDoc.data().userId,
-            bookingId: bookingDoc.id,
-          }));
+          const confirmedBookings = bookingsSnapshot.docs.map(bookingDoc => {
+            const bookingData = bookingDoc.data();
+            console.log(`Booking data for session ${doc.id} on date ${dateKey}:`, bookingData);
+            return {
+              userId: bookingData.userId,
+              bookingId: bookingDoc.id,
+            };
+          });
 
           bookings[dateKey] = {
             confirmedBookings,
