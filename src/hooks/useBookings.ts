@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { collection, addDoc, query, where, getDocs, updateDoc, doc, deleteDoc, arrayUnion } from 'firebase/firestore';
+import { collection, addDoc, query, where, getDocs, updateDoc, doc, deleteDoc, arrayUnion, getDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useAuth } from './useAuth';
 import { RecurringSession, Booking } from '../types/index';
@@ -35,7 +35,7 @@ export function useBookings() {
 
       // Check session capacity
       const sessionRef = doc(db, 'sessions', session.id);
-      const sessionDoc = await sessionRef.get();
+      const sessionDoc = await getDoc(sessionRef);
       const sessionData = sessionDoc.data();
       const dateKey = scheduledDate;
 
