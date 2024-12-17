@@ -53,14 +53,23 @@ async function updateSessionsCollection() {
 
     const availableDates = computeAvailableDates(sessionData.recurringDays || []);
     console.log(`Available dates for session ${doc.id}:`, availableDates);
-    availableDates.forEach((dateKey) => {
-      if (!bookings[dateKey]) {
-        bookings[dateKey] = {
-          confirmedBookings: [],
-          remainingCapacity: sessionData.capacity,
-        };
-      }
-    });
+    for (const dateKey of availableDates) {
+      const bookingsQuery = db.collection('bookings')
+        .where('sessionId', '==', doc.id)
+        .where('scheduledDate', '==', dateKey)
+        .where('status', '==', 'confirmed');
+
+      const bookingsSnapshot = await bookingsQuery.get();
+      const confirmedBookings = bookingsSnapshot.docs.map(bookingDoc => ({
+        userId: bookingDoc.data().userId,
+        bookingId: bookingDoc.id,
+      }));
+
+      bookings[dateKey] = {
+        confirmedBookings,
+        remainingCapacity: sessionData.capacity - confirmedBookings.length,
+      };
+    }
 
     // Update the session document with the new bookings structure
     console.log(`Bookings object for session ${doc.id} before update:`, JSON.stringify(bookings, null, 2));
