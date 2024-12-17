@@ -2,7 +2,6 @@ import { initializeApp, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
-import { logger } from '../../src/utils/logger.ts';
 
 // Initialize Firebase Admin SDK
 const serviceAccount = JSON.parse(
@@ -16,15 +15,15 @@ initializeApp({
 const db = getFirestore();
 
 async function updateSessionsCollection() {
-  logger.info('Starting update of sessions collection', 'UpdateSessions');
+  console.log('Starting update of sessions collection');
   const sessionsSnapshot = await db.collection('sessions').get();
-  logger.info(`Fetched ${sessionsSnapshot.size} sessions from Firestore`, 'UpdateSessions');
+  console.log(`Fetched ${sessionsSnapshot.size} sessions from Firestore`);
 
   sessionsSnapshot.forEach(async (doc) => {
-    logger.info(`Processing session ${doc.id}`, 'UpdateSessions');
+    console.log(`Processing session ${doc.id}`);
     const sessionData = doc.data();
     if (!sessionData) {
-      logger.warn(`No data found for session ${doc.id}`, 'UpdateSessions');
+      console.warn(`No data found for session ${doc.id}`);
       return;
     }
     const bookings = sessionData.bookings || {};
@@ -43,9 +42,9 @@ async function updateSessionsCollection() {
     // Update the session document with the new bookings structure
     try {
       await db.collection('sessions').doc(doc.id).update({ bookings });
-      logger.info(`Updated session ${doc.id} with new bookings structure.`, 'UpdateSessions');
+      console.log(`Updated session ${doc.id} with new bookings structure.`);
     } catch (error) {
-      logger.error(`Failed to update session ${doc.id}: ${error.message}`, error, 'UpdateSessions');
+      console.error(`Failed to update session ${doc.id}: ${error.message}`, error);
     }
     console.log(`Updated session ${doc.id} with new bookings structure.`);
   });
@@ -53,10 +52,10 @@ async function updateSessionsCollection() {
 
 updateSessionsCollection()
   .then(() => {
-    logger.info('Sessions collection update complete.', 'UpdateSessions');
+    console.log('Sessions collection update complete.');
     process.exit(0);
   })
   .catch((error) => {
-    logger.error('Error updating sessions collection:', error, 'UpdateSessions');
+    console.error('Error updating sessions collection:', error);
     process.exit(1);
   });
