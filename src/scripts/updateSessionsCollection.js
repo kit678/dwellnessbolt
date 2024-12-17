@@ -98,6 +98,7 @@ function updateSessionsCollection() {
           return processSessionsSequentially(docs, idx + 1);
         }
 
+        console.log(`Processing session ${doc.id} with data:`, sessionData);
         const bookings = sessionData.bookings || {};
         const availableDates = computeAvailableDates(sessionData.recurringDays || []);
         console.log(`Available dates for session ${doc.id}:`, availableDates);
