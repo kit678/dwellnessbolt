@@ -2,7 +2,7 @@ import { initializeApp, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
-import { logger } from '../../src/utils/logger.js';
+import { logger } from '../../src/utils/logger.ts';
 
 // Initialize Firebase Admin SDK
 const serviceAccount = JSON.parse(
