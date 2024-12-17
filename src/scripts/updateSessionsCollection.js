@@ -19,12 +19,12 @@ async function updateSessionsCollection() {
   const sessionsSnapshot = await db.collection('sessions').get();
   console.log(`Fetched ${sessionsSnapshot.size} sessions from Firestore`);
 
-  sessionsSnapshot.forEach(async (doc) => {
+  for (const doc of sessionsSnapshot.docs) {
     const sessionData = doc.data();
     console.log(`Processing session ${doc.id} with data:`, sessionData);
     if (!sessionData) {
       console.warn(`No data found for session ${doc.id}`);
-      return;
+      continue;
     }
     const bookings = sessionData.bookings || {};
 
@@ -89,7 +89,7 @@ async function updateSessionsCollection() {
     console.log(`Final bookings object for session ${doc.id}:`, JSON.stringify(bookings, null, 2));
     console.log(`Bookings object for session ${doc.id}:`, bookings);
     console.log(`Finished processing session ${doc.id}.`);
-  });
+  }
 }
 
 updateSessionsCollection()
