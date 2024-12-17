@@ -108,19 +108,15 @@ function updateSessionsCollection() {
           console.log(`Bookings object for session ${doc.id}:`, bookings);
           console.log(`Finished processing session ${doc.id}.`);
 
-          // If you want to update Firestore, uncomment this:
-          // db.collection('sessions').doc(doc.id).update({ bookings })
-          //   .then(() => {
-          //     console.log(`Successfully updated session ${doc.id} with new bookings structure.`);
-          //     processSessionsSequentially(docs, idx + 1);
-          //   })
-          //   .catch(error => {
-          //     console.error(`Failed to update session ${doc.id}:`, error);
-          //     processSessionsSequentially(docs, idx + 1);
-          //   });
-
-          // If not updating Firestore, just move on:
-          processSessionsSequentially(docs, idx + 1);
+          db.collection('sessions').doc(doc.id).update({ bookings })
+            .then(() => {
+              console.log(`Successfully updated session ${doc.id} with new bookings structure.`);
+              processSessionsSequentially(docs, idx + 1);
+            })
+            .catch(error => {
+              console.error(`Failed to update session ${doc.id}:`, error);
+              processSessionsSequentially(docs, idx + 1);
+            });
         });
       }
 
