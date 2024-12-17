@@ -53,6 +53,7 @@ function updateSessionsCollection() {
       const availableDates = computeAvailableDates(sessionData.recurringDays || []);
       console.log(`Available dates for session ${doc.id}:`, availableDates);
       availableDates.forEach(dateKey => {
+        bookings[dateKey] = { confirmedBookings: [], remainingCapacity: sessionData.capacity };
         console.log(`Querying bookings for session ${doc.id} on date ${dateKey}`);
         const bookingsQuery = db.collection('bookings')
           .where('sessionId', '==', doc.id)
