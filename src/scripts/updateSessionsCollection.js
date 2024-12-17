@@ -87,7 +87,7 @@ async function updateSessionsCollection() {
     // } catch (error) {
     //   console.error(`Failed to update session ${doc.id}:`, error);
     // }
-    console.log(`Bookings object for session ${doc.id}:`, JSON.stringify(bookings, null, 2));
+    console.log(`Final bookings object for session ${doc.id}:`, JSON.stringify(bookings, null, 2));
     console.log(`Finished processing session ${doc.id}.`);
   });
 }
