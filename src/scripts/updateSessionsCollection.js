@@ -77,15 +77,15 @@ async function updateSessionsCollection() {
       }
     }
 
-    // Update the session document with the new bookings structure
-    console.log(`Bookings object for session ${doc.id} before update:`, JSON.stringify(bookings, null, 2));
-    try {
-      await db.collection('sessions').doc(doc.id).update({ bookings });
-      console.log(`Successfully updated session ${doc.id} with new bookings structure.`);
-    } catch (error) {
-      console.error(`Failed to update session ${doc.id}:`, error);
-    }
-    console.log(`Bookings object for session ${doc.id} after update attempt:`, JSON.stringify(bookings, null, 2));
+    // Commenting out the update to Firestore for now
+    // console.log(`Bookings object for session ${doc.id} before update:`, JSON.stringify(bookings, null, 2));
+    // try {
+    //   await db.collection('sessions').doc(doc.id).update({ bookings });
+    //   console.log(`Successfully updated session ${doc.id} with new bookings structure.`);
+    // } catch (error) {
+    //   console.error(`Failed to update session ${doc.id}:`, error);
+    // }
+    console.log(`Bookings object for session ${doc.id}:`, JSON.stringify(bookings, null, 2));
     console.log(`Finished processing session ${doc.id}.`);
   });
 }
