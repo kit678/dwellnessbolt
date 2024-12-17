@@ -54,21 +54,27 @@ async function updateSessionsCollection() {
     const availableDates = computeAvailableDates(sessionData.recurringDays || []);
     console.log(`Available dates for session ${doc.id}:`, availableDates);
     for (const dateKey of availableDates) {
-      const bookingsQuery = db.collection('bookings')
-        .where('sessionId', '==', doc.id)
-        .where('scheduledDate', '==', dateKey)
-        .where('status', '==', 'confirmed');
+      try {
+        const bookingsQuery = db.collection('bookings')
+          .where('sessionId', '==', doc.id)
+          .where('scheduledDate', '==', dateKey)
+          .where('status', '==', 'confirmed');
 
-      const bookingsSnapshot = await bookingsQuery.get();
-      const confirmedBookings = bookingsSnapshot.docs.map(bookingDoc => ({
-        userId: bookingDoc.data().userId,
-        bookingId: bookingDoc.id,
-      }));
+        const bookingsSnapshot = await bookingsQuery.get();
+        const confirmedBookings = bookingsSnapshot.docs.map(bookingDoc => ({
+          userId: bookingDoc.data().userId,
+          bookingId: bookingDoc.id,
+        }));
 
-      bookings[dateKey] = {
-        confirmedBookings,
-        remainingCapacity: sessionData.capacity - confirmedBookings.length,
-      };
+        bookings[dateKey] = {
+          confirmedBookings,
+          remainingCapacity: sessionData.capacity - confirmedBookings.length,
+        };
+
+        console.log(`Updated bookings for session ${doc.id} on date ${dateKey}:`, bookings[dateKey]);
+      } catch (error) {
+        console.error(`Error querying bookings for session ${doc.id} on date ${dateKey}:`, error);
+      }
     }
 
     // Update the session document with the new bookings structure
