@@ -52,36 +52,37 @@ function updateSessionsCollection() {
 
       const availableDates = computeAvailableDates(sessionData.recurringDays || []);
       console.log(`Available dates for session ${doc.id}:`, availableDates);
-      availableDates.forEach(async dateKey => {
-        bookings[dateKey] = { confirmedBookings: [], remainingCapacity: sessionData.capacity };
-        console.log(`Querying bookings for session ${doc.id} on date ${dateKey}`);
-        const bookingsQuery = db.collection('bookings')
-          .where('sessionId', '==', doc.id)
-          .where('scheduledDate', '==', dateKey)
-          .where('status', '==', 'confirmed');
+      availableDates.reduce((promise, dateKey) => {
+        return promise.then(() => {
+          bookings[dateKey] = { confirmedBookings: [], remainingCapacity: sessionData.capacity };
+          console.log(`Querying bookings for session ${doc.id} on date ${dateKey}`);
+          const bookingsQuery = db.collection('bookings')
+            .where('sessionId', '==', doc.id)
+            .where('scheduledDate', '==', dateKey)
+            .where('status', '==', 'confirmed');
 
-        try {
-          const bookingsSnapshot = await bookingsQuery.get();
-          console.log(`Fetched ${bookingsSnapshot.size} bookings for session ${doc.id} on date ${dateKey}`);
-          const confirmedBookings = bookingsSnapshot.docs.map(bookingDoc => {
-            const bookingData = bookingDoc.data();
-            console.log(`Booking data for session ${doc.id} on date ${dateKey}:`, bookingData);
-            return {
-              userId: bookingData.userId,
-              bookingId: bookingDoc.id,
+          return bookingsQuery.get().then(bookingsSnapshot => {
+            console.log(`Fetched ${bookingsSnapshot.size} bookings for session ${doc.id} on date ${dateKey}`);
+            const confirmedBookings = bookingsSnapshot.docs.map(bookingDoc => {
+              const bookingData = bookingDoc.data();
+              console.log(`Booking data for session ${doc.id} on date ${dateKey}:`, bookingData);
+              return {
+                userId: bookingData.userId,
+                bookingId: bookingDoc.id,
+              };
+            });
+
+            bookings[dateKey] = {
+              confirmedBookings,
+              remainingCapacity: sessionData.capacity - confirmedBookings.length,
             };
+
+            console.log(`Updated bookings for session ${doc.id} on date ${dateKey}:`, bookings[dateKey]);
+          }).catch(error => {
+            console.error(`Error querying bookings for session ${doc.id} on date ${dateKey}:`, error);
           });
-
-          bookings[dateKey] = {
-            confirmedBookings,
-            remainingCapacity: sessionData.capacity - confirmedBookings.length,
-          };
-
-          console.log(`Updated bookings for session ${doc.id} on date ${dateKey}:`, bookings[dateKey]);
-        } catch (error) {
-          console.error(`Error querying bookings for session ${doc.id} on date ${dateKey}:`, error);
-        }
-      });
+        });
+      }, Promise.resolve());
 
       // Commenting out the update to Firestore for now
       // console.log(`Bookings object for session ${doc.id} before update:`, JSON.stringify(bookings, null, 2));
