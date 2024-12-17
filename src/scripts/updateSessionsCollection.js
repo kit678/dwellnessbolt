@@ -52,7 +52,7 @@ function updateSessionsCollection() {
 
       const availableDates = computeAvailableDates(sessionData.recurringDays || []);
       console.log(`Available dates for session ${doc.id}:`, availableDates);
-      availableDates.forEach(dateKey => {
+      availableDates.forEach(async dateKey => {
         bookings[dateKey] = { confirmedBookings: [], remainingCapacity: sessionData.capacity };
         console.log(`Querying bookings for session ${doc.id} on date ${dateKey}`);
         const bookingsQuery = db.collection('bookings')
@@ -60,7 +60,8 @@ function updateSessionsCollection() {
           .where('scheduledDate', '==', dateKey)
           .where('status', '==', 'confirmed');
 
-        bookingsQuery.get().then(bookingsSnapshot => {
+        try {
+          const bookingsSnapshot = await bookingsQuery.get();
           console.log(`Fetched ${bookingsSnapshot.size} bookings for session ${doc.id} on date ${dateKey}`);
           const confirmedBookings = bookingsSnapshot.docs.map(bookingDoc => {
             const bookingData = bookingDoc.data();
@@ -77,9 +78,9 @@ function updateSessionsCollection() {
           };
 
           console.log(`Updated bookings for session ${doc.id} on date ${dateKey}:`, bookings[dateKey]);
-        }).catch(error => {
+        } catch (error) {
           console.error(`Error querying bookings for session ${doc.id} on date ${dateKey}:`, error);
-        });
+        }
       });
 
       // Commenting out the update to Firestore for now
