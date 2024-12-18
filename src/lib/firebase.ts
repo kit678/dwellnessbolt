@@ -42,6 +42,7 @@ if (typeof window !== 'undefined') {
     });
 }
 
+/*
 export const signInWithGoogle = async () => {
   try {
     const result = await signInWithPopup(auth, googleProvider);
@@ -65,6 +66,7 @@ export const signInWithGoogle = async () => {
     console.error('Error signing in with Google:', error);
   }
 };
+*/
 
 // Configure Google Provider
 const googleProvider = new GoogleAuthProvider();
