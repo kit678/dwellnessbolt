@@ -34,6 +34,7 @@ export interface User {
   quizResults: QuizResult[];
   lastQuizDate: string | null;
   bookings: string[];
+  profile_pic?: string;
   quizProgress?: {
     currentQuestion: number;
     answers: number[];
