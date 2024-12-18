@@ -139,7 +139,10 @@ export default function OnboardingQuiz({ isOpen, onClose, onComplete }: Onboardi
             variant="ghost"
             size="icon"
             className="absolute top-4 right-4 text-white hover:bg-indigo-400 hover:text-white"
-            onClick={handleSkip}
+            onClick={() => {
+              handleSkip();
+              onClose();
+            }}
           >
             <X className="h-6 w-6" />
           </Button>
@@ -182,7 +185,10 @@ export default function OnboardingQuiz({ isOpen, onClose, onComplete }: Onboardi
           </AnimatePresence>
         </CardContent>
         <CardFooter className="bg-gray-50 p-6 flex justify-between items-center">
-          <Button variant="ghost" onClick={handleSkip}>
+          <Button variant="ghost" onClick={() => {
+            handleSkip();
+            onClose();
+          }}>
             Skip Quiz
           </Button>
           <div className="flex space-x-4">
