@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { collection, addDoc, query, where, getDocs, updateDoc, doc, deleteDoc, getDoc } from 'firebase/firestore';
+import { collection, addDoc, query, where, getDocs, updateDoc, doc, deleteDoc, getDoc, runTransaction, arrayRemove } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useAuth } from './useAuth';
 import { RecurringSession, Booking } from '../types/index';
@@ -124,43 +124,106 @@ export function useBookings() {
   };
 
   const cancelBooking = async (bookingId: string): Promise<void> => {
+    if (!user) {
+      toast.error('User not authenticated');
+      return;
+    }
+    const bookingRef = doc(db, 'bookings', bookingId);
     try {
-      await updateDoc(doc(db, 'bookings', bookingId), {
-        status: 'cancelled'
-      });
-      // Increase remaining capacity only if booking was confirmed
-      const bookingDoc = await getDoc(doc(db, 'bookings', bookingId));
-      const bookingData = bookingDoc.data();
-      if (bookingData && bookingData.status === 'confirmed') {
-        const sessionRef = doc(db, 'sessions', bookingData.sessionId);
-        const sessionDoc = await getDoc(sessionRef);
-        const sessionData = sessionDoc.data();
-        if (sessionData) {
-          const dateKey = bookingData.scheduledDate;
-          const updatedBookings = {
-            ...sessionData.bookings,
-            [dateKey]: {
-              ...sessionData.bookings[dateKey],
-              remainingCapacity: sessionData.bookings[dateKey].remainingCapacity + 1
-            }
-          };
-          await updateDoc(sessionRef, { bookings: updatedBookings });
+      await runTransaction(db, async (transaction) => {
+        const bookingDoc = await transaction.get(bookingRef);
+        if (!bookingDoc.exists()) {
+          throw new Error('Booking does not exist!');
         }
-      }
+        const bookingData = bookingDoc.data();
+        if (bookingData.status !== 'confirmed') {
+          throw new Error('Only confirmed bookings can be cancelled.');
+        }
+
+        // Update booking status to 'cancelled'
+        transaction.update(bookingRef, { status: 'cancelled' });
+
+        const sessionRef = doc(db, 'sessions', bookingData.sessionId);
+        const sessionDoc = await transaction.get(sessionRef);
+        if (!sessionDoc.exists()) {
+          throw new Error('Session does not exist!');
+        }
+        const sessionData = sessionDoc.data();
+
+        if (sessionData.bookings && sessionData.bookings[bookingData.scheduledDate]) {
+          const dateBooking = sessionData.bookings[bookingData.scheduledDate];
+
+          // Decrement remainingCapacity
+          const newRemainingCapacity = dateBooking.remainingCapacity + 1;
+          transaction.update(sessionRef, {
+            [`bookings.${bookingData.scheduledDate}.remainingCapacity`]: newRemainingCapacity
+          });
+
+          // Remove from confirmedBookings
+          const confirmedBookings = dateBooking.confirmedBookings.filter((b: any) => b.bookingId !== bookingId);
+          transaction.update(sessionRef, {
+            [`bookings.${bookingData.scheduledDate}.confirmedBookings`]: confirmedBookings
+          });
+        } else {
+          throw new Error('Booking date data does not exist in session.');
+        }
+      });
       toast.success('Booking cancelled successfully');
-    } catch (error) {
-      toast.error('Failed to cancel booking');
-      console.error(error);
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to cancel booking');
+      console.error('Transaction failure:', error);
     }
   };
 
   const deleteBooking = async (bookingId: string): Promise<void> => {
+    if (!user) {
+      toast.error('User not authenticated');
+      return;
+    }
+    const bookingRef = doc(db, 'bookings', bookingId);
     try {
-      await deleteDoc(doc(db, 'bookings', bookingId));
+      await runTransaction(db, async (transaction) => {
+        const bookingDoc = await transaction.get(bookingRef);
+        if (!bookingDoc.exists()) {
+          throw new Error('Booking does not exist!');
+        }
+        const bookingData = bookingDoc.data();
+
+        // If booking is confirmed, update session's remainingCapacity and confirmedBookings
+        if (bookingData.status === 'confirmed') {
+          const sessionRef = doc(db, 'sessions', bookingData.sessionId);
+          const sessionDoc = await transaction.get(sessionRef);
+          if (!sessionDoc.exists()) {
+            throw new Error('Session does not exist!');
+          }
+          const sessionData = sessionDoc.data();
+
+          if (sessionData.bookings && sessionData.bookings[bookingData.scheduledDate]) {
+            const dateBooking = sessionData.bookings[bookingData.scheduledDate];
+
+            // Decrement remainingCapacity
+            const newRemainingCapacity = dateBooking.remainingCapacity + 1;
+            transaction.update(sessionRef, {
+              [`bookings.${bookingData.scheduledDate}.remainingCapacity`]: newRemainingCapacity
+            });
+
+            // Remove from confirmedBookings
+            const confirmedBookings = dateBooking.confirmedBookings.filter((b: any) => b.bookingId !== bookingId);
+            transaction.update(sessionRef, {
+              [`bookings.${bookingData.scheduledDate}.confirmedBookings`]: confirmedBookings
+            });
+          } else {
+            throw new Error('Booking date data does not exist in session.');
+          }
+        }
+
+        // Delete the booking
+        transaction.delete(bookingRef);
+      });
       toast.success('Booking deleted successfully');
-    } catch (error) {
-      toast.error('Failed to delete booking');
-      console.error(error);
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to delete booking');
+      console.error('Transaction failure:', error);
     }
   };
   const currentDate = new Date();

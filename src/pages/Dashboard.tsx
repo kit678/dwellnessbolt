@@ -25,6 +25,7 @@ export default function Dashboard() {
   const { results } = useQuizStore();
 
   const [bookings, setBookings] = useState<Booking[]>([]);
+  // No changes needed here
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   const [profilePicModalOpen, setProfilePicModalOpen] = useState<boolean>(false);
   const [dialogMessage, setDialogMessage] = useState<string>('');
