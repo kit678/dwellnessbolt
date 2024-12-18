@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
-import { doc, getDoc } from 'firebase/firestore';
-import toast from 'react-hot-toast';
+import { doc as firebaseDoc, getDoc } from 'firebase/firestore';
+import { toast } from 'react-hot-toast';
 import { db } from '../lib/firebase';
 import { stripePromise } from '../lib/stripe';
 import { Dialog } from '../components/ui/Dialog';
@@ -10,9 +10,7 @@ import { Calendar, Clock, DollarSign, User } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { DateTime } from 'luxon';
 import { Booking } from '../types/index';
-
 import { logger } from '../utils/logger';
-const { bookSession } = useBookings();
 import OnboardingQuiz from '../components/OnboardingQuiz';
 import { useAuth } from '../hooks/useAuth';
 import { useQuizStore } from '@/store/quizStore';
@@ -23,7 +21,7 @@ logger.info('Dashboard component rendered', 'Dashboard');
 export default function Dashboard() {
   logger.info('Dashboard component mounted', 'Dashboard');
   const { user, loading: authLoading } = useAuth();
-  const { getUserBookings, cancelBooking, deleteBooking } = useBookings() as any;
+  const { getUserBookings, cancelBooking, deleteBooking, bookSession } = useBookings() as any;
   const { results } = useQuizStore();
 
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -320,7 +318,7 @@ export default function Dashboard() {
                     <button
                       onClick={async () => {
                         try {
-                          const sessionRef = doc(db, 'sessions', booking.sessionId);
+                          const sessionRef = firebaseDoc(db, 'sessions', booking.sessionId);
                           const sessionDoc = await getDoc(sessionRef);
                           const sessionData = sessionDoc.data();
                           const dateKey = booking.scheduledDate;
