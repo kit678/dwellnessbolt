@@ -1,4 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
+import { Dialog } from '@headlessui/react';
+import { m } from 'framer-motion';
+import { parseISO } from 'date-fns';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { Clock, Users, DollarSign } from 'lucide-react';
@@ -21,6 +24,7 @@ export default function BookingModal({
 }: BookingModalProps) {
   const { bookSession } = useBookings();
   const [selectedDate, setSelectedDate] = useState('');
+  const [loading, setLoading] = useState(false);
   const [remainingCapacity, setRemainingCapacity] = useState<number | null>(null);
 
   // Memoized available dates to prevent them from changing between renders
