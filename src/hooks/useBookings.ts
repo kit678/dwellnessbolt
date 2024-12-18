@@ -65,9 +65,8 @@ export function useBookings() {
         };
 
         await updateDoc(sessionRef, { bookings: updatedBookings });
+        await updateDoc(sessionRef, { bookings: updatedBookings });
       }
-
-      await updateDoc(sessionRef, { bookings: updatedBookings });
 
       console.log('Creating checkout session with:', {
         sessionId: session.id,
