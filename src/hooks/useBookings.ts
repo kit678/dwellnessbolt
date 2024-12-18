@@ -39,7 +39,7 @@ export function useBookings() {
       const sessionData = sessionDoc.data();
       const dateKey = scheduledDate;
 
-      if (sessionData && sessionData.bookings && sessionData.bookings[dateKey] && sessionData.bookings[dateKey].remainingCapacity <= 0) {
+      if (sessionData?.bookings?.[dateKey]?.remainingCapacity <= 0) {
         toast.error('No available slots for the selected date.');
         return;
       }
@@ -55,13 +55,17 @@ export function useBookings() {
       });
 
       // Update session capacity and bookings object
-      const updatedBookings = {
-        ...sessionData.bookings,
-        [dateKey]: {
-          confirmedBookings: arrayUnion({ userId: user.id, bookingId: bookingRef.id }),
-          remainingCapacity: sessionData.bookings[dateKey].remainingCapacity - 1
-        }
-      };
+      if (sessionData) {
+        const updatedBookings = {
+          ...sessionData.bookings,
+          [dateKey]: {
+            confirmedBookings: arrayUnion({ userId: user.id, bookingId: bookingRef.id }),
+            remainingCapacity: sessionData.bookings[dateKey].remainingCapacity - 1
+          }
+        };
+
+        await updateDoc(sessionRef, { bookings: updatedBookings });
+      }
 
       await updateDoc(sessionRef, { bookings: updatedBookings });
 
