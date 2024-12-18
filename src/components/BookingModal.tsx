@@ -76,7 +76,7 @@ export default function BookingModal({
         }
       } catch (error) {
         console.error('Error fetching remaining capacity:', error);
-        setRemainingCapacity(null);
+        console.error('Error fetching remaining capacity:', error);
       }
     };
 
