@@ -24,6 +24,7 @@ export default function BookingModal({
 }: BookingModalProps) {
   const { bookSession } = useBookings();
   const [selectedDate, setSelectedDate] = useState('');
+  const [loading, setLoading] = useState(false);
   const [remainingCapacity, setRemainingCapacity] = useState<number | null>(null);
 
   // Memoized available dates to prevent them from changing between renders
