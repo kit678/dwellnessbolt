@@ -142,7 +142,12 @@ export default function Dashboard() {
       {/* User Profile Section */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-8">
         <div className="flex items-center space-x-4">
-          <div className="bg-indigo-100 p-3 rounded-full">
+          <div className="bg-indigo-100 p-3 rounded-full overflow-hidden">
+            {user?.profile_pic ? (
+              <img src={user.profile_pic} alt="Profile" className="h-12 w-12 rounded-full" />
+            ) : (
+              <User className="h-6 w-6 text-indigo-600" />
+            )}
             <User className="h-6 w-6 text-indigo-600" />
           </div>
           <div>

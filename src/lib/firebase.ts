@@ -47,11 +47,14 @@ export const signInWithGoogle = async () => {
     const user = result.user;
     if (user) {
       const userRef = doc(db, 'users', user.uid);
+      const userDoc = await userRef.get();
+      const userData = userDoc.data();
+
       await setDoc(userRef, {
         uid: user.uid,
         email: user.email,
         displayName: user.displayName,
-        photoURL: user.photoURL, // Store the photo URL
+        profile_pic: userData?.profile_pic || user.photoURL, // Set profile_pic if it doesn't exist
         authProvider: 'google',
         createdAt: new Date().toISOString(),
       }, { merge: true });
