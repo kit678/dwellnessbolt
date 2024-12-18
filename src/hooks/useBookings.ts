@@ -54,18 +54,6 @@ export function useBookings() {
         scheduledDate
       });
 
-      // Update session capacity and bookings object
-      if (sessionData) {
-        const updatedBookings = {
-          ...sessionData.bookings,
-          [dateKey]: {
-            confirmedBookings: arrayUnion({ userId: user.id, bookingId: bookingRef.id }),
-            remainingCapacity: sessionData.bookings[dateKey].remainingCapacity - 1
-          }
-        };
-
-        await updateDoc(sessionRef, { bookings: updatedBookings });
-      }
 
       console.log('Creating checkout session with:', {
         sessionId: session.id,
@@ -140,10 +128,10 @@ export function useBookings() {
       await updateDoc(doc(db, 'bookings', bookingId), {
         status: 'cancelled'
       });
-      // Increase remaining capacity
+      // Increase remaining capacity only if booking was confirmed
       const bookingDoc = await getDoc(doc(db, 'bookings', bookingId));
       const bookingData = bookingDoc.data();
-      if (bookingData) {
+      if (bookingData && bookingData.status === 'confirmed') {
         const sessionRef = doc(db, 'sessions', bookingData.sessionId);
         const sessionDoc = await getDoc(sessionRef);
         const sessionData = sessionDoc.data();
@@ -169,25 +157,6 @@ export function useBookings() {
   const deleteBooking = async (bookingId: string): Promise<void> => {
     try {
       await deleteDoc(doc(db, 'bookings', bookingId));
-      // Increase remaining capacity
-      const bookingDoc = await getDoc(doc(db, 'bookings', bookingId));
-      const bookingData = bookingDoc.data();
-      if (bookingData) {
-        const sessionRef = doc(db, 'sessions', bookingData.sessionId);
-        const sessionDoc = await getDoc(sessionRef);
-        const sessionData = sessionDoc.data();
-        if (sessionData) {
-          const dateKey = bookingData.scheduledDate;
-          const updatedBookings = {
-            ...sessionData.bookings,
-            [dateKey]: {
-              ...sessionData.bookings[dateKey],
-              remainingCapacity: sessionData.bookings[dateKey].remainingCapacity + 1
-            }
-          };
-          await updateDoc(sessionRef, { bookings: updatedBookings });
-        }
-      }
       toast.success('Booking deleted successfully');
     } catch (error) {
       toast.error('Failed to delete booking');
