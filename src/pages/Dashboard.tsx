@@ -366,21 +366,23 @@ export default function Dashboard() {
         confirmText={dialogTitle === 'Cannot Cancel Booking' ? 'Ok' : 'Yes'}
         cancelText={dialogTitle === 'Cannot Cancel Booking' ? undefined : 'No'}
       />
-      <Dialog
-        isOpen={profilePicModalOpen}
-        title="Profile Picture"
-        message=""
-        onClose={() => setProfilePicModalOpen(false)}
-        confirmText="Close"
-      >
-        {user?.profile_pic && (
-          <img
-            src={`${user.profile_pic}?sz=200`}
-            alt="Profile Large"
-            className="w-full h-auto rounded-lg"
-          />
-        )}
-      </Dialog>
+      {profilePicModalOpen && (
+        <Dialog
+          isOpen={profilePicModalOpen}
+          title="Profile Picture"
+          message=""
+          onClose={() => setProfilePicModalOpen(false)}
+          confirmText="Close"
+        >
+          {user?.profile_pic && (
+            <img
+              src={`${user.profile_pic}?sz=200`}
+              alt="Profile Large"
+              className="w-full h-auto rounded-lg"
+            />
+          )}
+        </Dialog>
+      )}
     </div>
   );
 }
