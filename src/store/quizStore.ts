@@ -40,6 +40,7 @@ export const useQuizStore = create<QuizState>((set) => ({
   completedAt: null,
   setQuizCompleted: (completed) => set({ isCompleted: completed }),
   setQuizResults: (results) => {
+    set((state) => ({ isCompleted: !state.isCompleted })); // Toggle to force re-render
     logger.info('Quiz results updated in quizStore', 'quizStore');
     set({
       results: results.scores,
