@@ -1,6 +1,7 @@
 // src/lib/firebase.ts
 
 import { initializeApp, getApps } from 'firebase/app';
+import { logger } from '../utils/logger';
 import {
   getAuth,
   setPersistence,
