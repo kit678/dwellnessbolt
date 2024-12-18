@@ -1,4 +1,6 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../lib/firebase';
 import { Dialog } from '@headlessui/react';
 import { m } from 'framer-motion';
 import { Clock, Users, DollarSign } from 'lucide-react';
@@ -21,7 +23,8 @@ export default function BookingModal({
 }: BookingModalProps) {
   const { bookSession } = useBookings();
   const [selectedDate, setSelectedDate] = useState('');
-  const [, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [remainingCapacity, setRemainingCapacity] = useState<number | null>(null);
 
   // Memoized available dates to prevent them from changing between renders
   const computeAvailableDates = (recurringDays: number[]) => {
@@ -60,7 +63,26 @@ export default function BookingModal({
     return dates;
   }, [session]);
 
-  const handleContinueToPayment = async () => {
+  useEffect(() => {
+    const fetchRemainingCapacity = async () => {
+      if (!selectedDate) return;
+      try {
+        const sessionRef = doc(db, 'sessions', session.id);
+        const sessionDoc = await getDoc(sessionRef);
+        const sessionData = sessionDoc.data();
+        if (sessionData && sessionData.bookings && sessionData.bookings[selectedDate]) {
+          setRemainingCapacity(sessionData.bookings[selectedDate].remainingCapacity);
+        } else {
+          setRemainingCapacity(session.capacity);
+        }
+      } catch (error) {
+        console.error('Error fetching remaining capacity:', error);
+        setRemainingCapacity(null);
+      }
+    };
+
+    fetchRemainingCapacity();
+  }, [selectedDate, session.id, session.capacity]);
     if (!selectedDate) {
       toast.error('Please select a date');
       return;
@@ -119,7 +141,7 @@ export default function BookingModal({
                   <div className="flex items-center text-gray-600">
                     <Users className="h-5 w-5 mr-2" />
                     <span>
-                      {session.capacity - session.enrolled} spots available
+                      {remainingCapacity !== null ? `${remainingCapacity} spots available` : 'Loading...'}
                     </span>
                   </div>
                   <div className="flex items-center text-gray-600">
@@ -156,10 +178,10 @@ export default function BookingModal({
                 </button>
                 <button
                   onClick={handleContinueToPayment}
-                  disabled={!selectedDate}
+                  disabled={!selectedDate || remainingCapacity === 0}
                   className="flex-1 py-2 px-4 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50"
                 >
-                  Continue to Payment
+                  {remainingCapacity === 0 ? 'No availability' : 'Continue to Payment'}
                 </button>
               </div>
         </m.div>
