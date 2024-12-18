@@ -364,34 +364,13 @@ export function useAuth() {
 
       // Fetch or create user profile
       const userData = await userService.getUserProfile(userCredential.uid);
-      if (userData) {
-        setUser(userData);
+      const profilePic = userCredential.photoURL || userData?.profile_pic;
+      await userService.updateUserProfile(userCredential.uid, { profile_pic: profilePic });
+
+      const updatedUser = await userService.getUserProfile(userCredential.uid);
+      if (updatedUser) {
+        setUser(updatedUser);
         setIsAuthenticated(true);
-      } else {
-        // Create default user profile if it doesn't exist
-        const defaultUser: User = {
-          id: userCredential.uid,
-          uid: userCredential.uid,
-          email: userCredential.email || '',
-          displayName: userCredential.displayName || '',
-          name: userCredential.displayName || '',
-          role: 'user',
-          authProvider: 'google',
-          createdAt: new Date().toISOString(),
-          lastLoginAt: new Date().toISOString(),
-          quizCompleted: false,
-          dosha: null,
-          secondaryDosha: null,
-          quizResults: [],
-          lastQuizDate: null,
-          bookings: [],
-        };
-        await userService.updateUserProfile(userCredential.uid, defaultUser);
-        const updatedUser = await userService.getUserProfile(userCredential.uid);
-        if (updatedUser) {
-          setUser(updatedUser);
-          setIsAuthenticated(true);
-        }
       }
       toast.success('Successfully signed in with Google!');
       navigate('/dashboard'); // Navigate to dashboard after successful Google sign-in
