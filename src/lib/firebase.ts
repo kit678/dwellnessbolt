@@ -8,8 +8,7 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
 } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
-import { db } from './firebase';
+import { doc, setDoc, getFirestore } from 'firebase/firestore';
 import {
   initializeFirestore,
   persistentLocalCache,
@@ -30,12 +29,7 @@ const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
 console.log('Firebase initialized with config:', firebaseConfig);
 
 // Initialize Firestore
-const db = initializeFirestore(app, {
-  experimentalForceLongPolling: true,
-  localCache: persistentLocalCache({
-    tabManager: persistentMultipleTabManager(),
-  }),
-});
+const db = getFirestore(app);
 console.log('Firestore initialized with persistent local cache');
 
 // Initialize Auth
