@@ -47,7 +47,7 @@ export const signInWithGoogle = async () => {
     const user = result.user;
     if (user) {
       const userRef = doc(db, 'users', user.uid);
-      const userDoc = await userRef.get();
+      const userDoc = await getDoc(userRef);
       const userData = userDoc.data();
 
       await setDoc(userRef, {

@@ -148,7 +148,6 @@ export default function Dashboard() {
             ) : (
               <User className="h-6 w-6 text-indigo-600" />
             )}
-            <User className="h-6 w-6 text-indigo-600" />
           </div>
           <div>
             <h2 className="text-2xl font-bold text-gray-900">{user?.name}</h2>
