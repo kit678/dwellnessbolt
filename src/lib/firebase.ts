@@ -7,9 +7,8 @@ import {
   setPersistence,
   browserSessionPersistence,
   GoogleAuthProvider,
-  signInWithPopup,
 } from 'firebase/auth';
-import { doc, setDoc, getDoc, getFirestore } from 'firebase/firestore';
+import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
