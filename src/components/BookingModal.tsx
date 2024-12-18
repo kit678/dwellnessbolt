@@ -49,7 +49,7 @@ export default function BookingModal({
       currentDate.setDate(currentDate.getDate() + 1);
     }
 
-    currentDate.setDate(currentDate.getDate() + 1);
+    return dates;
   };
 
   const availableDates = useMemo(() => {
