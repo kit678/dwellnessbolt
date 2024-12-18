@@ -313,8 +313,32 @@ export default function Dashboard() {
                   </span>
                   {booking.status !== 'confirmed' && (
                     <button
-                      onClick={() => {
-                        // Logic to rebook or complete booking
+                      onClick={async () => {
+                        try {
+                          const sessionRef = doc(db, 'sessions', booking.sessionId);
+                          const sessionDoc = await getDoc(sessionRef);
+                          const sessionData = sessionDoc.data();
+                          const dateKey = booking.scheduledDate;
+
+                          if (sessionData?.bookings?.[dateKey]?.remainingCapacity > 0) {
+                            const sessionId = await bookSession(booking.session, booking.scheduledDate);
+                            if (sessionId) {
+                              const stripe = await stripePromise;
+                              const { error } = await stripe!.redirectToCheckout({ sessionId });
+                              if (error) {
+                                console.error('Stripe redirect error:', error);
+                                toast.error('Failed to redirect to payment');
+                              }
+                            } else {
+                              toast.error('Failed to create checkout session');
+                            }
+                          } else {
+                            toast.error('No slots available for the selected date. Please choose another date.');
+                          }
+                        } catch (error) {
+                          console.error('Error completing booking:', error);
+                          toast.error('Failed to complete booking');
+                        }
                       }}
                       className="px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 hover:bg-blue-200"
                     >
