@@ -21,7 +21,7 @@ export function useBookings() {
       // Check for existing confirmed booking for the same session and date to avoid double bookings
       const existingBookingsQuery = query(
         collection(db, 'bookings'),
-        where('userId', '==', user.id),
+        where('userId', '==', user.uid),
         where('sessionId', '==', session.id),
         where('scheduledDate', '==', scheduledDate),
         where('status', '==', 'confirmed')
@@ -46,7 +46,7 @@ export function useBookings() {
 
       // Create booking
       const bookingRef = await addDoc(collection(db, 'bookings'), {
-        userId: user.id,
+        userId: user.uid,
         sessionId: session.id,
         session,
         status: 'pending',
@@ -58,7 +58,7 @@ export function useBookings() {
       console.log('Creating checkout session with:', {
         sessionId: session.id,
         bookingId: bookingRef.id,
-        userId: user.id,
+        userId: user.uid,
         amount: session.price * 100,
       });
 
@@ -105,7 +105,7 @@ export function useBookings() {
       console.log('Querying bookings for user:', user.id);
       const bookingsQuery = query(
         collection(db, 'bookings'),
-        where('userId', '==', user.id)
+        where('userId', '==', user.uid)
       );
       const snapshot = await getDocs(bookingsQuery);
       const bookings: Booking[] = snapshot.docs.map(doc => ({
