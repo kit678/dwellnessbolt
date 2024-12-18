@@ -360,6 +360,7 @@ export function useAuth() {
       const userCredential = result.user;
 
       logger.info(`Google sign-in successful. User ID: ${userCredential.uid}`, 'useAuth');
+      console.log(`Google user photoURL: ${userCredential.photoURL}`);
 
       // Fetch or create user profile
       const userData = await userService.getUserProfile(userCredential.uid);
