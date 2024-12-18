@@ -16,6 +16,7 @@ const { bookSession } = useBookings();
 import OnboardingQuiz from '../components/OnboardingQuiz';
 import { useAuth } from '../hooks/useAuth';
 import { useQuizStore } from '@/store/quizStore';
+import { useBookings } from '@/hooks/useBookings';
 
 logger.info('Dashboard component rendered', 'Dashboard');
 
