@@ -46,7 +46,7 @@ export function useBookings() {
 
       // Create booking
       const bookingRef = await addDoc(collection(db, 'bookings'), {
-        userId: user.uid,
+        userId: user.id,
         sessionId: session.id,
         session,
         status: 'pending',
@@ -105,7 +105,7 @@ export function useBookings() {
       console.log('Querying bookings for user:', user.uid);
       const bookingsQuery = query(
         collection(db, 'bookings'),
-        where('userId', '==', user.uid)
+        where('userId', '==', user.id)
       );
       const snapshot = await getDocs(bookingsQuery);
       const bookings: Booking[] = snapshot.docs.map(doc => ({
