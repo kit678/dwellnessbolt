@@ -3,7 +3,6 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { toast } from 'react-hot-toast';
 import { stripePromise } from '../lib/stripe';
-import { useBookings } from '../hooks/useBookings';
 import { Dialog } from '../components/ui/Dialog';
 import { ProfilePicDialog } from '../components/ui/ProfilePicDialog';
 import { m } from 'framer-motion';
@@ -13,7 +12,7 @@ import { DateTime } from 'luxon';
 import { Booking } from '../types/index';
 
 import { logger } from '../utils/logger';
-import { useBookings } from '../hooks/useBookings';
+const { bookSession } = useBookings();
 import OnboardingQuiz from '../components/OnboardingQuiz';
 import { useAuth } from '../hooks/useAuth';
 import { useQuizStore } from '@/store/quizStore';
