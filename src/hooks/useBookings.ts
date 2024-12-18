@@ -102,10 +102,10 @@ export function useBookings() {
     }
 
     try {
-      console.log('Querying bookings for user:', user.uid);
+      console.log('Querying bookings for user:', user.id);
       const bookingsQuery = query(
         collection(db, 'bookings'),
-        where('userId', '==', user.uid)
+        where('userId', '==', user.id)
       );
       const snapshot = await getDocs(bookingsQuery);
       const bookings: Booking[] = snapshot.docs.map(doc => ({
