@@ -46,7 +46,7 @@ export const signInWithGoogle = async () => {
     const result = await signInWithPopup(auth, googleProvider);
     const user = result.user;
     if (user) {
-      console.log('Google user photoURL:', user.photoURL);
+      logger.info(`Google user photoURL: ${user.photoURL}`, 'Firebase');
       const userRef = doc(db, 'users', user.uid);
       const userDoc = await getDoc(userRef);
       const userData = userDoc.data();
