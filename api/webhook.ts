@@ -56,7 +56,10 @@ router.post(
         const metadata = session.metadata as { [key: string]: string };
         logger.debug(`Session metadata: ${JSON.stringify(metadata)}`, 'Webhook');
 
-        const { bookingId, userId, sessionTitle, sessionDate, sessionPrice } = metadata;
+        const { bookingId, userId } = metadata;
+        const sessionTitle = session.metadata?.sessionTitle || 'Session';
+        const sessionDate = session.metadata?.sessionDate || new Date().toISOString();
+        const sessionPrice = session.metadata?.sessionPrice || '0';
 
         if (!bookingId || !userId) {
           logger.error(

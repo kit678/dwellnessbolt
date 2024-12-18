@@ -14,7 +14,7 @@ const transporter = nodemailer.createTransport({
 export const sendBookingConfirmation = async (to: string, booking: any) => {
   try {
     const info = await transporter.sendMail({
-      from: '"WellnessHub" <admin@dwellness.club>',
+      from: '"Dwellness" <admin@dwellness.club>',
       to,
       subject: 'Booking Confirmation',
       html: `
