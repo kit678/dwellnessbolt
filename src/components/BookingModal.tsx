@@ -33,15 +33,18 @@ export default function BookingModal({
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
+    const sessionStartTime = new Date();
+    const [hours, minutes] = session.startTime.split(':').map(Number);
+    sessionStartTime.setHours(hours, minutes, 0, 0);
     let currentDate = new Date(today);
 
     while (dates.length < 4) {
-      currentDate.setDate(currentDate.getDate() + 1);
       const dayOfWeek = currentDate.getDay();
-
       if (recurringDays.includes(dayOfWeek)) {
-        const dateStr = format(currentDate, 'yyyy-MM-dd');
-        dates.push(dateStr);
+        if (currentDate > today || (currentDate.getTime() === today.getTime() && new Date() < sessionStartTime)) {
+          const dateStr = format(currentDate, 'yyyy-MM-dd');
+          dates.push(dateStr);
+        }
       }
     }
 
