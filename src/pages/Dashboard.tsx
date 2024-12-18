@@ -98,7 +98,8 @@ export default function Dashboard() {
         logger.info(`Attempting to fetch bookings for user: ${user}`, 'Dashboard');
         const userBookings = await getUserBookings();
         console.log('Fetched bookings:', userBookings);
-        console.log('Setting bookings state');
+        setBookings(userBookings);
+        console.log('Bookings state set:', userBookings);
         setHasFetched(true);
 
         if (user.quizCompleted) {
