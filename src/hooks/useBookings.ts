@@ -153,16 +153,16 @@ export function useBookings() {
         if (sessionData.bookings && sessionData.bookings[bookingData.scheduledDate]) {
           const dateBooking = sessionData.bookings[bookingData.scheduledDate];
 
-          // Recompute remainingCapacity based on confirmedBookings
-          const newRemainingCapacity = sessionData.capacity - confirmedBookings.length;
-          transaction.update(sessionRef, {
-            [`bookings.${bookingData.scheduledDate}.remainingCapacity`]: newRemainingCapacity
-          });
-
           // Remove from confirmedBookings
           const confirmedBookings = dateBooking.confirmedBookings.filter((b: any) => b.bookingId !== bookingId);
           transaction.update(sessionRef, {
             [`bookings.${bookingData.scheduledDate}.confirmedBookings`]: confirmedBookings
+          });
+    
+          // Recompute remainingCapacity based on confirmedBookings
+          const newRemainingCapacity = sessionData.capacity - confirmedBookings.length;
+          transaction.update(sessionRef, {
+            [`bookings.${bookingData.scheduledDate}.remainingCapacity`]: newRemainingCapacity
           });
         } else {
           throw new Error('Booking date data does not exist in session.');
@@ -201,16 +201,16 @@ export function useBookings() {
           if (sessionData.bookings && sessionData.bookings[bookingData.scheduledDate]) {
             const dateBooking = sessionData.bookings[bookingData.scheduledDate];
 
-            // Recompute remainingCapacity based on confirmedBookings
-            const newRemainingCapacity = sessionData.capacity - confirmedBookings.length;
-            transaction.update(sessionRef, {
-              [`bookings.${bookingData.scheduledDate}.remainingCapacity`]: newRemainingCapacity
-            });
-
             // Remove from confirmedBookings
             const confirmedBookings = dateBooking.confirmedBookings.filter((b: any) => b.bookingId !== bookingId);
             transaction.update(sessionRef, {
               [`bookings.${bookingData.scheduledDate}.confirmedBookings`]: confirmedBookings
+            });
+    
+            // Recompute remainingCapacity based on confirmedBookings
+            const newRemainingCapacity = sessionData.capacity - confirmedBookings.length;
+            transaction.update(sessionRef, {
+              [`bookings.${bookingData.scheduledDate}.remainingCapacity`]: newRemainingCapacity
             });
           } else {
             throw new Error('Booking date data does not exist in session.');
