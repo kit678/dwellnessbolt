@@ -1,4 +1,9 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../lib/firebase';
+import { toast } from 'react-hot-toast';
+import { stripePromise } from '../lib/stripe';
+import { useBookings } from '../hooks/useBookings';
 import { Dialog } from '../components/ui/Dialog';
 import { ProfilePicDialog } from '../components/ui/ProfilePicDialog';
 import { m } from 'framer-motion';
