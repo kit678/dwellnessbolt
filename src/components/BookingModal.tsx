@@ -46,7 +46,19 @@ export default function BookingModal({
     return dates;
   };
 
-  const availableDates = useMemo(() => computeAvailableDates(session.recurringDays || []), [session]);
+  const availableDates = useMemo(() => {
+    const dates = computeAvailableDates(session.recurringDays || []);
+    // Ensure bookings object has keys for all computed dates
+    dates.forEach(date => {
+      if (!session.bookings || !session.bookings[date]) {
+        session.bookings = {
+          ...session.bookings,
+          [date]: { confirmedBookings: [], remainingCapacity: session.capacity }
+        };
+      }
+    });
+    return dates;
+  }, [session]);
 
   const handleContinueToPayment = async () => {
     if (!selectedDate) {

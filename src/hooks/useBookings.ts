@@ -18,7 +18,7 @@ export function useBookings() {
       return;
     }
     try {
-      // Check for existing confirmed booking for the same session and date
+      // Check for existing confirmed booking for the same session and date to avoid double bookings
       const existingBookingsQuery = query(
         collection(db, 'bookings'),
         where('userId', '==', user.id),
@@ -54,11 +54,16 @@ export function useBookings() {
         scheduledDate
       });
 
-      // Update session capacity
-      await updateDoc(sessionRef, {
-        [`bookings.${dateKey}.confirmedBookings`]: arrayUnion({ userId: user.id, bookingId: bookingRef.id }),
-        [`bookings.${dateKey}.remainingCapacity`]: sessionData ? sessionData.bookings[dateKey].remainingCapacity - 1 : 0
-      });
+      // Update session capacity and bookings object
+      const updatedBookings = {
+        ...sessionData.bookings,
+        [dateKey]: {
+          confirmedBookings: arrayUnion({ userId: user.id, bookingId: bookingRef.id }),
+          remainingCapacity: sessionData.bookings[dateKey].remainingCapacity - 1
+        }
+      };
+
+      await updateDoc(sessionRef, { bookings: updatedBookings });
 
       console.log('Creating checkout session with:', {
         sessionId: session.id,
