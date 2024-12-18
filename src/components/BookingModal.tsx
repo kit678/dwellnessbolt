@@ -25,7 +25,7 @@ export default function BookingModal({
   const { bookSession } = useBookings();
   const [selectedDate, setSelectedDate] = useState('');
   const [loading, setLoading] = useState(false);
-  const [remainingCapacity, setRemainingCapacity] = useState<number | null>(null);
+  const [remainingCapacity, setRemainingCapacity] = useState<number>(session.capacity);
 
   const computeAvailableDates = (recurringDays: number[]) => {
     const dates: string[] = [];
@@ -142,7 +142,7 @@ export default function BookingModal({
               <div className="flex items-center text-gray-600">
                 <Users className="h-5 w-5 mr-2" />
                 <span>
-                  {remainingCapacity !== null ? `${remainingCapacity} spots available` : 'Loading...'}
+                  {selectedDate ? `${remainingCapacity} spots available` : `Max ${session.capacity} spots`}
                 </span>
               </div>
               <div className="flex items-center text-gray-600">
