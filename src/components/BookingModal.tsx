@@ -89,6 +89,11 @@ export default function BookingModal({
       return;
     }
 
+    if (remainingCapacity <= 0) {
+      toast.error('No slots available for the selected date. Please choose another date.');
+      return;
+    }
+
     setLoading(true);
     try {
       const sessionId = await bookSession(session, selectedDate);
