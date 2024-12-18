@@ -1,9 +1,7 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import toast from 'react-hot-toast';
-import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
-import { toast } from 'react-hot-toast';
 import { stripePromise } from '../lib/stripe';
 import { Dialog } from '../components/ui/Dialog';
 import { ProfilePicDialog } from '../components/ui/ProfilePicDialog';
