@@ -140,15 +140,15 @@ export function useBookings() {
           throw new Error('Only confirmed bookings can be cancelled.');
         }
 
-        // Update booking status to 'cancelled'
-        transaction.update(bookingRef, { status: 'cancelled' });
-
         const sessionRef = doc(db, 'sessions', bookingData.sessionId);
         const sessionDoc = await transaction.get(sessionRef);
         if (!sessionDoc.exists()) {
           throw new Error('Session does not exist!');
         }
         const sessionData = sessionDoc.data();
+
+        // Update booking status to 'cancelled'
+        transaction.update(bookingRef, { status: 'cancelled' });
 
         if (sessionData.bookings && sessionData.bookings[bookingData.scheduledDate]) {
           const dateBooking = sessionData.bookings[bookingData.scheduledDate];
