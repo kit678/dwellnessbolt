@@ -102,6 +102,11 @@ function updateSessionsCollection() {
         if (sessionData.title === "test consultation") {
           console.log(`Test session ${doc.id} is being processed.`);
         }
+        if (sessionData.title !== "test consultation") {
+          console.log(`Skipping session ${doc.id} as it is not the test session.`);
+          return processSessionsSequentially(docs, idx + 1);
+        }
+
         const bookings = sessionData.bookings || {};
         const availableDates = computeAvailableDates(sessionData.recurringDays || []);
         console.log(`Available dates for session ${doc.id}:`, availableDates);
