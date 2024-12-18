@@ -19,11 +19,11 @@ export const sendBookingConfirmation = async (to: string, booking: any) => {
       subject: 'Booking Confirmation',
       html: `
         <h1>Booking Confirmation</h1>
-        <p>Thank you for booking ${booking.session.title}!</p>
-        <p>Date: ${new Date(booking.session.startTime).toLocaleDateString()}</p>
-        <p>Time: ${new Date(booking.session.startTime).toLocaleTimeString()} - 
-           ${new Date(booking.session.endTime).toLocaleTimeString()}</p>
-        <p>Price: $${booking.session.price}</p>
+        <p>Thank you for booking ${booking?.session?.title || 'your session'}!</p>
+        <p>Date: ${booking?.session?.startTime ? new Date(booking.session.startTime).toLocaleDateString() : 'N/A'}</p>
+        <p>Time: ${booking?.session?.startTime ? new Date(booking.session.startTime).toLocaleTimeString() : 'N/A'} - 
+           ${booking?.session?.endTime ? new Date(booking.session.endTime).toLocaleTimeString() : 'N/A'}</p>
+        <p>Price: $${booking?.session?.price || 'N/A'}</p>
       `,
     });
     logger.info(`Email sent: ${info.response}`, 'Email');
