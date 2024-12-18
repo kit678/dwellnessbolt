@@ -99,6 +99,9 @@ function updateSessionsCollection() {
         }
 
         console.log(`Processing session ${doc.id} with data:`, sessionData);
+        if (sessionData.title === "test consultation") {
+          console.log(`Test session ${doc.id} is being processed.`);
+        }
         const bookings = sessionData.bookings || {};
         const availableDates = computeAvailableDates(sessionData.recurringDays || []);
         console.log(`Available dates for session ${doc.id}:`, availableDates);
