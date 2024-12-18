@@ -1,5 +1,8 @@
 import { useState, useMemo, useEffect } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
+import { Dialog } from '@headlessui/react';
+import { m } from 'framer-motion';
+import { parseISO } from 'date-fns';
 import { db } from '../lib/firebase';
 import { Clock, Users, DollarSign } from 'lucide-react';
 import { RecurringSession } from '../types/index.js';
@@ -19,7 +22,7 @@ export default function BookingModal({
   isOpen,
   onClose,
 }: BookingModalProps) {
-  const { bookSession } = useBookings();
+  const { bookSession, loading, setLoading } = useBookings();
   const [selectedDate, setSelectedDate] = useState('');
   const [remainingCapacity, setRemainingCapacity] = useState<number | null>(null);
 
@@ -81,6 +84,31 @@ export default function BookingModal({
     fetchRemainingCapacity();
   }, [selectedDate, session.id, session.capacity]);
   const handleContinueToPayment = async () => {
+    if (!selectedDate) {
+      toast.error('Please select a date');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const sessionId = await bookSession(session, selectedDate);
+      if (sessionId) {
+        const stripe = await stripePromise;
+        const { error } = await stripe!.redirectToCheckout({ sessionId });
+        if (error) {
+          console.error('Stripe redirect error:', error);
+          toast.error('Failed to redirect to payment');
+        }
+      } else {
+        toast.error('Failed to create checkout session');
+      }
+    } catch (error) {
+      console.error('Booking failed:', error);
+      toast.error('Failed to process booking');
+    } finally {
+      setLoading(false);
+    }
+  };
     if (!selectedDate) {
       toast.error('Please select a date');
       return;
