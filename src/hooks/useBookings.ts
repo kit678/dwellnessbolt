@@ -70,7 +70,7 @@ export function useBookings() {
         body: JSON.stringify({
           sessionId: session.id,
           bookingId: bookingRef.id,
-          userId: user.id,
+          userId: user.uid,
           amount: session.price * 100,
         }),
       });
@@ -102,7 +102,7 @@ export function useBookings() {
     }
 
     try {
-      console.log('Querying bookings for user:', user.id);
+      console.log('Querying bookings for user:', user.uid);
       const bookingsQuery = query(
         collection(db, 'bookings'),
         where('userId', '==', user.uid)
