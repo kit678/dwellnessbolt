@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
+import { Dialog } from '../components/ui/Dialog';
 import { ProfilePicDialog } from '../components/ui/ProfilePicDialog';
 import { m } from 'framer-motion';
 import { Calendar, Clock, DollarSign, User } from 'lucide-react';
