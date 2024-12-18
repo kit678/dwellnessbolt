@@ -140,6 +140,25 @@ export function useBookings() {
       await updateDoc(doc(db, 'bookings', bookingId), {
         status: 'cancelled'
       });
+      // Increase remaining capacity
+      const bookingDoc = await getDoc(doc(db, 'bookings', bookingId));
+      const bookingData = bookingDoc.data();
+      if (bookingData) {
+        const sessionRef = doc(db, 'sessions', bookingData.sessionId);
+        const sessionDoc = await getDoc(sessionRef);
+        const sessionData = sessionDoc.data();
+        if (sessionData) {
+          const dateKey = bookingData.scheduledDate;
+          const updatedBookings = {
+            ...sessionData.bookings,
+            [dateKey]: {
+              ...sessionData.bookings[dateKey],
+              remainingCapacity: sessionData.bookings[dateKey].remainingCapacity + 1
+            }
+          };
+          await updateDoc(sessionRef, { bookings: updatedBookings });
+        }
+      }
       toast.success('Booking cancelled successfully');
     } catch (error) {
       toast.error('Failed to cancel booking');
@@ -150,6 +169,25 @@ export function useBookings() {
   const deleteBooking = async (bookingId: string): Promise<void> => {
     try {
       await deleteDoc(doc(db, 'bookings', bookingId));
+      // Increase remaining capacity
+      const bookingDoc = await getDoc(doc(db, 'bookings', bookingId));
+      const bookingData = bookingDoc.data();
+      if (bookingData) {
+        const sessionRef = doc(db, 'sessions', bookingData.sessionId);
+        const sessionDoc = await getDoc(sessionRef);
+        const sessionData = sessionDoc.data();
+        if (sessionData) {
+          const dateKey = bookingData.scheduledDate;
+          const updatedBookings = {
+            ...sessionData.bookings,
+            [dateKey]: {
+              ...sessionData.bookings[dateKey],
+              remainingCapacity: sessionData.bookings[dateKey].remainingCapacity + 1
+            }
+          };
+          await updateDoc(sessionRef, { bookings: updatedBookings });
+        }
+      }
       toast.success('Booking deleted successfully');
     } catch (error) {
       toast.error('Failed to delete booking');
