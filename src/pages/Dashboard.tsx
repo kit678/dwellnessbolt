@@ -43,7 +43,7 @@ export default function Dashboard() {
   };
 
   const isDevelopment = useMemo(() => import.meta.env.VITE_NODE_ENV === 'development', []);
-  
+
   const handleDeleteBooking = useCallback(
     (bookingId: string) => {
       setDialogTitle('Delete Booking');
@@ -65,22 +65,24 @@ export default function Dashboard() {
       const isWithin24Hours = bookingDate - now < 24 * 60 * 60 * 1000;
       const isInPast = bookingDate < now;
 
-    if (isInPast || isWithin24Hours) {
-      setDialogTitle('Cannot Cancel Booking');
-      setDialogMessage('This booking cannot be canceled because it is either in the past or within 24 hours of the scheduled time.');
-      setDialogConfirmAction(() => () => setDialogOpen(false));
-      setDialogOpen(true);
-    } else {
-      setDialogTitle('Cancel Booking');
-      setDialogMessage('Are you sure you want to cancel this booking?');
-      setDialogConfirmAction(() => () => {
-        cancelBooking(booking.id);
-        setBookings((prevBookings) => prevBookings.filter(b => b.id !== booking.id));
-        setDialogOpen(false);
-      });
-      setDialogOpen(true);
-    }
-  }, [cancelBooking]);
+      if (isInPast || isWithin24Hours) {
+        setDialogTitle('Cannot Cancel Booking');
+        setDialogMessage('This booking cannot be canceled because it is either in the past or within 24 hours of the scheduled time.');
+        setDialogConfirmAction(() => () => setDialogOpen(false));
+        setDialogOpen(true);
+      } else {
+        setDialogTitle('Cancel Booking');
+        setDialogMessage('Are you sure you want to cancel this booking?');
+        setDialogConfirmAction(() => () => {
+          cancelBooking(booking.id);
+          setBookings((prevBookings) => prevBookings.filter(b => b.id !== booking.id));
+          setDialogOpen(false);
+        });
+        setDialogOpen(true);
+      }
+    },
+    [cancelBooking]
+  );
 
   useEffect(() => {
     if (!user) return;
@@ -137,6 +139,11 @@ export default function Dashboard() {
       </div>
     );
   }
+
+  // Attempt to enlarge the Google profile image if applicable
+  const enlargedProfilePicUrl = user?.profile_pic
+    ? user.profile_pic.replace('=s96-c', '=s400-c')
+    : '';
 
   return (
     <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
@@ -357,6 +364,7 @@ export default function Dashboard() {
         )}
       </div>
       <OnboardingQuiz isOpen={quizOpen} onClose={() => setQuizOpen(false)} onComplete={(_scores) => setQuizOpen(false)} />
+
       <Dialog
         isOpen={dialogOpen}
         title={dialogTitle}
@@ -366,6 +374,8 @@ export default function Dashboard() {
         confirmText={dialogTitle === 'Cannot Cancel Booking' ? 'Ok' : 'Yes'}
         cancelText={dialogTitle === 'Cannot Cancel Booking' ? undefined : 'No'}
       />
+
+      {/* Profile Pic Modal with only a close (X) button in top-right and enlarged image */}
       {profilePicModalOpen && (
         <Dialog
           isOpen={profilePicModalOpen}
@@ -378,9 +388,9 @@ export default function Dashboard() {
             >
               &times;
             </button>
-            {user?.profile_pic ? (
+            {enlargedProfilePicUrl ? (
               <img
-                src={user.profile_pic}
+                src={enlargedProfilePicUrl}
                 alt="Profile Large"
                 className="w-full h-auto rounded-lg"
               />
