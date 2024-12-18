@@ -56,7 +56,7 @@ export const signInWithGoogle = async () => {
         displayName: user.displayName,
         profile_pic: userData?.profile_pic || user.photoURL, // Set profile_pic if it doesn't exist
         authProvider: 'google',
-        createdAt: new Date().toISOString(),
+        createdAt: userData?.createdAt || new Date().toISOString(), // Preserve existing createdAt
       }, { merge: true });
     }
   } catch (error) {
