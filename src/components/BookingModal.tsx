@@ -46,6 +46,7 @@ export default function BookingModal({
           dates.push(dateStr);
         }
       }
+      currentDate.setDate(currentDate.getDate() + 1);
     }
 
     currentDate.setDate(currentDate.getDate() + 1);
