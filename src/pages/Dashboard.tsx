@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
-import { Dialog } from '../components/ui/Dialog';
+import { ProfilePicDialog } from '../components/ui/ProfilePicDialog';
 import { m } from 'framer-motion';
 import { Calendar, Clock, DollarSign, User } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
@@ -376,30 +376,11 @@ export default function Dashboard() {
       />
 
       {/* Profile Pic Modal with only a close (X) button in top-right and enlarged image */}
-      {profilePicModalOpen && (
-        <Dialog
-          isOpen={profilePicModalOpen}
-          onClose={() => setProfilePicModalOpen(false)}
-        >
-          <div className="relative">
-            <button
-              onClick={() => setProfilePicModalOpen(false)}
-              className="absolute top-0 right-0 mt-2 mr-2 text-gray-500 hover:text-gray-700"
-            >
-              &times;
-            </button>
-            {enlargedProfilePicUrl ? (
-              <img
-                src={enlargedProfilePicUrl}
-                alt="Profile Large"
-                className="w-full h-auto rounded-lg"
-              />
-            ) : (
-              <p className="text-center text-gray-600">No profile picture available</p>
-            )}
-          </div>
-        </Dialog>
-      )}
+      <ProfilePicDialog
+        isOpen={profilePicModalOpen}
+        imageUrl={enlargedProfilePicUrl}
+        onClose={() => setProfilePicModalOpen(false)}
+      />
     </div>
   );
 }
