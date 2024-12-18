@@ -89,23 +89,25 @@ export default function OnboardingQuiz({ isOpen, onClose, onComplete }: Onboardi
       const quizResults = calculateQuizResults(answers, user.uid);
     
       logger.info('Updating user profile with quiz results', 'OnboardingQuiz');
-      await updateUserProfile(user.uid, {
+      const updatedProfile = {
         quizCompleted: true,
-        dosha: quizResults.dominantDosha,
-        secondaryDosha: quizResults.secondaryDosha,
-        lastQuizDate: quizResults.completedAt,
+        dosha: quizResults.dominantDosha || '',
+        secondaryDosha: quizResults.secondaryDosha || '',
+        lastQuizDate: quizResults.completedAt || '',
         quizResults: [...(user.quizResults || []), {
-          id: quizResults.id,
-          userId: user.uid,
-          completedAt: quizResults.completedAt,
-          answers: quizResults.answers,
-          scores: quizResults.scores,
-          percentages: quizResults.percentages,
-          dominantDosha: quizResults.dominantDosha,
-          secondaryDosha: quizResults.secondaryDosha,
-          version: quizResults.version
+          id: quizResults.id || '',
+          userId: user.uid || '',
+          completedAt: quizResults.completedAt || '',
+          answers: quizResults.answers || [],
+          scores: quizResults.scores || { Vata: 0, Pitta: 0, Kapha: 0 },
+          percentages: quizResults.percentages || { Vata: 0, Pitta: 0, Kapha: 0 },
+          dominantDosha: quizResults.dominantDosha || '',
+          secondaryDosha: quizResults.secondaryDosha || '',
+          version: quizResults.version || '1.0.0'
         }]
-      });
+      };
+
+      await updateUserProfile(user.uid, updatedProfile);
       logger.info('Quiz results stored in database successfully', 'OnboardingQuiz');
 
       // Update quiz store
