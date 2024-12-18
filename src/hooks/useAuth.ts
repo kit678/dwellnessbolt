@@ -390,7 +390,6 @@ export function useAuth() {
       await signOut(auth);
       setUser(null);
       setIsAuthenticated(false);
-      toast.success('Logged out successfully.');
     } catch (error) {
       console.error('Logout error:', error);
       toast.error('Failed to log out. Please try again.');
