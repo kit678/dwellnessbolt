@@ -365,7 +365,9 @@ export function useAuth() {
       // Fetch or create user profile
       const userData = await userService.getUserProfile(userCredential.uid);
       const profilePic = userCredential.photoURL || userData?.profile_pic;
-      await userService.updateUserProfile(userCredential.uid, { profile_pic: profilePic });
+      if (!userData?.profile_pic) {
+        await userService.updateUserProfile(userCredential.uid, { profile_pic: profilePic });
+      }
 
       const updatedUser = await userService.getUserProfile(userCredential.uid);
       if (updatedUser) {
