@@ -153,8 +153,8 @@ export function useBookings() {
         if (sessionData.bookings && sessionData.bookings[bookingData.scheduledDate]) {
           const dateBooking = sessionData.bookings[bookingData.scheduledDate];
 
-          // Decrement remainingCapacity
-          const newRemainingCapacity = dateBooking.remainingCapacity + 1;
+          // Recompute remainingCapacity based on confirmedBookings
+          const newRemainingCapacity = sessionData.capacity - confirmedBookings.length;
           transaction.update(sessionRef, {
             [`bookings.${bookingData.scheduledDate}.remainingCapacity`]: newRemainingCapacity
           });
@@ -201,8 +201,8 @@ export function useBookings() {
           if (sessionData.bookings && sessionData.bookings[bookingData.scheduledDate]) {
             const dateBooking = sessionData.bookings[bookingData.scheduledDate];
 
-            // Decrement remainingCapacity
-            const newRemainingCapacity = dateBooking.remainingCapacity + 1;
+            // Recompute remainingCapacity based on confirmedBookings
+            const newRemainingCapacity = sessionData.capacity - confirmedBookings.length;
             transaction.update(sessionRef, {
               [`bookings.${bookingData.scheduledDate}.remainingCapacity`]: newRemainingCapacity
             });
