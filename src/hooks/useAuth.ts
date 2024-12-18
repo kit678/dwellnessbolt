@@ -107,7 +107,6 @@ export function useAuth() {
           if (!userData) {
             // Create default user profile if it doesn't exist
             const defaultUser: User = {
-              id: firebaseUser.uid,
               uid: firebaseUser.uid,
               email: firebaseUser.email || '',
               displayName: firebaseUser.displayName || '',
@@ -183,7 +182,6 @@ export function useAuth() {
       } else {
         // Create default user profile if it doesn't exist
         const defaultUser: User = {
-          id: userCredential.user.uid,
           uid: userCredential.user.uid,
           email: userCredential.user.email || '',
           displayName: userCredential.user.displayName || '',
