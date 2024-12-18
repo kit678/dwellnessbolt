@@ -64,7 +64,7 @@ export default function Dashboard() {
 
   const handleCancelBooking = useCallback(
     (booking: Booking) => {
-      const bookingDate = new Date(booking.scheduledDate).getTime();
+      const bookingDate = new Date(`${booking.scheduledDate}T${booking.session.startTime}`).getTime();
       const now = Date.now();
       const isWithin24Hours = bookingDate - now < 24 * 60 * 60 * 1000;
       const isInPast = bookingDate < now;
