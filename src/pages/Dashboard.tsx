@@ -99,7 +99,6 @@ export default function Dashboard() {
         const userBookings = await getUserBookings();
         console.log('Fetched bookings:', userBookings);
         console.log('Setting bookings state');
-        setBookings(userBookings);
         setHasFetched(true);
 
         if (user.quizCompleted) {
