@@ -6,7 +6,10 @@ import {
   setPersistence,
   browserSessionPersistence,
   GoogleAuthProvider,
+  signInWithPopup,
 } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
+import { db } from './firebase';
 import {
   initializeFirestore,
   persistentLocalCache,
@@ -48,6 +51,26 @@ if (typeof window !== 'undefined') {
       console.error('Error setting auth persistence:', error);
     });
 }
+
+export const signInWithGoogle = async () => {
+  try {
+    const result = await signInWithPopup(auth, googleProvider);
+    const user = result.user;
+    if (user) {
+      const userRef = doc(db, 'users', user.uid);
+      await setDoc(userRef, {
+        uid: user.uid,
+        email: user.email,
+        displayName: user.displayName,
+        photoURL: user.photoURL, // Store the photo URL
+        authProvider: 'google',
+        createdAt: new Date().toISOString(),
+      }, { merge: true });
+    }
+  } catch (error) {
+    console.error('Error signing in with Google:', error);
+  }
+};
 
 // Configure Google Provider
 const googleProvider = new GoogleAuthProvider();
