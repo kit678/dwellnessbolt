@@ -22,6 +22,7 @@ export default function Dashboard() {
 
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+  const [profilePicModalOpen, setProfilePicModalOpen] = useState<boolean>(false);
   const [dialogMessage, setDialogMessage] = useState<string>('');
   const [dialogTitle, setDialogTitle] = useState<string>('');
   const [dialogConfirmAction, setDialogConfirmAction] = useState<(() => void) | undefined>(undefined);
@@ -144,7 +145,12 @@ export default function Dashboard() {
         <div className="flex items-center space-x-4">
           <div className="bg-indigo-100 p-3 rounded-full overflow-hidden">
             {user?.profile_pic ? (
-              <img src={user.profile_pic} alt="Profile" className="h-12 w-12 rounded-full" />
+              <img
+                src={user.profile_pic}
+                alt="Profile"
+                className="h-12 w-12 rounded-full cursor-pointer"
+                onClick={() => setProfilePicModalOpen(true)}
+              />
             ) : (
               <User className="h-6 w-6 text-indigo-600" />
             )}
@@ -360,6 +366,21 @@ export default function Dashboard() {
         confirmText={dialogTitle === 'Cannot Cancel Booking' ? 'Ok' : 'Yes'}
         cancelText={dialogTitle === 'Cannot Cancel Booking' ? undefined : 'No'}
       />
+      <Dialog
+        isOpen={profilePicModalOpen}
+        title="Profile Picture"
+        message=""
+        onClose={() => setProfilePicModalOpen(false)}
+        confirmText="Close"
+      >
+        {user?.profile_pic && (
+          <img
+            src={`${user.profile_pic}?sz=200`}
+            alt="Profile Large"
+            className="w-full h-auto rounded-lg"
+          />
+        )}
+      </Dialog>
     </div>
   );
 }
