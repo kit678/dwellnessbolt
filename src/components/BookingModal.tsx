@@ -1,11 +1,9 @@
 import { useState, useMemo, useEffect } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
-import { Dialog } from '@headlessui/react';
-import { m } from 'framer-motion';
 import { Clock, Users, DollarSign } from 'lucide-react';
 import { RecurringSession } from '../types/index.js';
-import { format, parseISO } from 'date-fns';
+import { format } from 'date-fns';
 import { useBookings } from '../hooks/useBookings';
 import { stripePromise } from '../lib/stripe.js';
 import toast from 'react-hot-toast';
@@ -23,7 +21,6 @@ export default function BookingModal({
 }: BookingModalProps) {
   const { bookSession } = useBookings();
   const [selectedDate, setSelectedDate] = useState('');
-  const [loading, setLoading] = useState(false);
   const [remainingCapacity, setRemainingCapacity] = useState<number | null>(null);
 
   // Memoized available dates to prevent them from changing between renders
@@ -83,6 +80,7 @@ export default function BookingModal({
 
     fetchRemainingCapacity();
   }, [selectedDate, session.id, session.capacity]);
+  const handleContinueToPayment = async () => {
     if (!selectedDate) {
       toast.error('Please select a date');
       return;

@@ -62,6 +62,12 @@ export interface RecurringSession {
   price: number;
   specializedTopic?: string;
   recurringDays: number[];
+  bookings?: {
+    [date: string]: {
+      confirmedBookings: Array<{ userId: string; bookingId: string }>;
+      remainingCapacity: number;
+    };
+  };
 }
 
 export type SpecializedTopic = 
