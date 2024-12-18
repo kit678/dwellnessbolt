@@ -27,13 +27,12 @@ export default function BookingModal({
   const [loading, setLoading] = useState(false);
   const [remainingCapacity, setRemainingCapacity] = useState<number | null>(null);
 
-  // Memoized available dates to prevent them from changing between renders
   const computeAvailableDates = (recurringDays: number[]) => {
     const dates: string[] = [];
     if (recurringDays.length === 0) return dates;
 
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Set time to midnight
+    today.setHours(0, 0, 0, 0);
     let currentDate = new Date(today);
 
     while (dates.length < 4) {
@@ -41,7 +40,6 @@ export default function BookingModal({
       const dayOfWeek = currentDate.getDay();
 
       if (recurringDays.includes(dayOfWeek)) {
-        // Format date as 'yyyy-MM-dd' to ensure consistency
         const dateStr = format(currentDate, 'yyyy-MM-dd');
         dates.push(dateStr);
       }
@@ -84,6 +82,7 @@ export default function BookingModal({
 
     fetchRemainingCapacity();
   }, [selectedDate, session.id, session.capacity]);
+
   const handleContinueToPayment = async () => {
     if (!selectedDate) {
       toast.error('Please select a date');
@@ -126,66 +125,70 @@ export default function BookingModal({
           className="relative bg-white rounded-lg p-8 max-w-md w-full mx-4"
         >
           <Dialog.Title className="text-2xl font-bold text-gray-900 mb-4">
-            'Book Session'
+            Book Session
           </Dialog.Title>
 
-              <div className="space-y-4 mb-6">
-                <h3 className="text-xl font-semibold">{session.title}</h3>
-                <p className="text-gray-600">{session.description}</p>
+          <div className="space-y-4 mb-6">
+            <h3 className="text-xl font-semibold">{session.title}</h3>
+            <p className="text-gray-600">{session.description}</p>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="flex items-center text-gray-600">
-                    <Clock className="h-5 w-5 mr-2" />
-                    <span>
-                      {session.startTime} - {session.endTime} MST
-                    </span>
-                  </div>
-                  <div className="flex items-center text-gray-600">
-                    <Users className="h-5 w-5 mr-2" />
-                    <span>
-                      {remainingCapacity !== null ? `${remainingCapacity} spots available` : 'Loading...'}
-                    </span>
-                  </div>
-                  <div className="flex items-center text-gray-600">
-                    <DollarSign className="h-5 w-5 mr-2" />
-                    <span>${session.price}</span>
-                  </div>
-                </div>
-
-                <div className="mt-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Select Date
-                  </label>
-                  <select
-                    value={selectedDate}
-                    onChange={(e) => setSelectedDate(e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  >
-                    <option value="">Choose a date</option>
-                    {availableDates.map((dateStr) => (
-                      <option key={dateStr} value={dateStr}>
-                        {format(parseISO(dateStr), 'EEEE, MMMM d, yyyy')}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex items-center text-gray-600">
+                <Clock className="h-5 w-5 mr-2" />
+                <span>
+                  {session.startTime} - {session.endTime} MST
+                </span>
               </div>
-
-              <div className="flex space-x-4">
-                <button
-                  onClick={onClose}
-                  className="flex-1 py-2 px-4 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleContinueToPayment}
-                  disabled={!selectedDate || remainingCapacity === 0}
-                  className="flex-1 py-2 px-4 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50"
-                >
-                  {remainingCapacity === 0 ? 'No availability' : 'Continue to Payment'}
-                </button>
+              <div className="flex items-center text-gray-600">
+                <Users className="h-5 w-5 mr-2" />
+                <span>
+                  {remainingCapacity !== null ? `${remainingCapacity} spots available` : 'Loading...'}
+                </span>
               </div>
+              <div className="flex items-center text-gray-600">
+                <DollarSign className="h-5 w-5 mr-2" />
+                <span>${session.price}</span>
+              </div>
+            </div>
+
+            <div className="mt-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Select Date
+              </label>
+              <select
+                value={selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value)}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+              >
+                <option value="">Choose a date</option>
+                {availableDates.map((dateStr) => (
+                  <option key={dateStr} value={dateStr}>
+                    {format(parseISO(dateStr), 'EEEE, MMMM d, yyyy')}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="flex space-x-4">
+            <button
+              onClick={onClose}
+              className="flex-1 py-2 px-4 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleContinueToPayment}
+              disabled={!selectedDate || remainingCapacity === 0 || loading}
+              className="flex-1 py-2 px-4 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50"
+            >
+              {remainingCapacity === 0
+                ? 'No availability'
+                : loading
+                ? 'Processing...'
+                : 'Continue to Payment'}
+            </button>
+          </div>
         </m.div>
       </div>
     </Dialog>
