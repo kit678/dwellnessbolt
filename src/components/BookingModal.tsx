@@ -54,15 +54,29 @@ export default function BookingModal({
 
   const availableDates = useMemo(() => {
     const dates = computeAvailableDates(session.recurringDays || []);
+    const newBookings: { [key: string]: { confirmedBookings: any[]; remainingCapacity: number } } = {};
+
     // Ensure bookings object has keys for all computed dates
     dates.forEach(date => {
       if (!session.bookings || !session.bookings[date]) {
-        session.bookings = {
-          ...session.bookings,
-          [date]: { confirmedBookings: [], remainingCapacity: session.capacity }
-        };
+        newBookings[date] = { confirmedBookings: [], remainingCapacity: session.capacity };
       }
     });
+
+    // Update Firestore with new dates
+    if (Object.keys(newBookings).length > 0) {
+      const sessionRef = doc(db, 'sessions', session.id);
+      updateDoc(sessionRef, {
+        bookings: {
+          ...session.bookings,
+          ...newBookings
+        }
+      }).catch(error => {
+        console.error('Error updating session bookings:', error);
+        toast.error('Failed to update session bookings');
+      });
+    }
+
     return dates;
   }, [session]);
 
