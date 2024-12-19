@@ -5,29 +5,25 @@ import cors from 'cors';
 import stripeRouter from './stripe.js';
 import webhookRouter from './webhook.js';
 
-console.log('VITE_NODE_ENV:', process.env.VITE_NODE_ENV);
+console.log('NODE_ENV:', process.env.NODE_ENV);
 
 // Create the express app
 const app = express();
 
+// Mount the webhook route before other middleware to ensure raw body is available
+app.use('/api/webhook', webhookRouter);
 
-// Now it's safe to use JSON parsing for other routes
-app.use(express.json());
-
-// Mount other API routes after JSON parsing
-app.use('/api/stripe', stripeRouter);
-
-// You can mount other routes as needed
-// app.use('/other-routes', otherRouter);
-
+// Apply CORS middleware
 app.use(cors());
+
+// Apply JSON parsing middleware for other routes
 app.use(express.json());
 
 // Mount the Stripe routes
 app.use('/api/stripe', stripeRouter);
 
-// Mount the webhook route
-app.use('/api/webhook', webhookRouter);
+// You can mount other routes as needed
+// app.use('/other-routes', otherRouter);
 
 // Start the server
 const PORT = process.env.PORT || 5000;

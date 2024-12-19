@@ -2,21 +2,20 @@ import express from 'express';
 import Stripe from 'stripe';
 import { logger } from '../src/utils/logger.js';
 import { db } from '../src/lib/firebaseAdmin.js';
-import { getAuth } from 'firebase/auth';
 import { FieldValue } from 'firebase-admin/firestore';
 import { sendBookingConfirmation, sendBookingReminder } from '../src/lib/email.js';
 
 const router = express.Router();
 
-const isDevelopment = process.env.VITE_NODE_ENV === 'development';
+const isDevelopment = process.env.NODE_ENV === 'development';
 
 const stripeSecretKey = isDevelopment
-  ? process.env.VITE_STRIPE_TEST_SECRET_KEY!
-  : process.env.VITE_STRIPE_SECRET_KEY!;
+  ? process.env.STRIPE_TEST_SECRET_KEY!
+  : process.env.STRIPE_SECRET_KEY!;
 
 const endpointSecret = isDevelopment
-  ? process.env.VITE_STRIPE_TEST_WEBHOOK_SECRET!
-  : process.env.VITE_STRIPE_WEBHOOK_SECRET!;
+  ? process.env.STRIPE_TEST_WEBHOOK_SECRET!
+  : process.env.STRIPE_WEBHOOK_SECRET!;
 
 const stripe = new Stripe(stripeSecretKey, {
   apiVersion: '2023-10-16',
@@ -44,9 +43,7 @@ router.post(
         logger.error('Webhook signature verification failed.', err, 'Webhook');
         logger.debug(`Error details: ${err.message}`, 'Webhook');
       }
-      return res
-        .status(400)
-        .send(`Webhook Error: ${errorObj.message}`);
+      return res.status(400).send(`Webhook Error: ${errorObj.message}`);
     }
 
     // Handle the event
@@ -106,11 +103,18 @@ router.post(
             // Ensure the bookings object for the specific date exists
             if (!sessionData.bookings || !sessionData.bookings[dateKey]) {
               // Initialize bookings for the date with the current booking
-              transaction.set(sessionRef, {
-                [`bookings.${dateKey}.confirmedBookings`]: [{ userId, bookingId }],
-                [`bookings.${dateKey}.remainingCapacity`]: sessionData.capacity - 1,
-              }, { merge: true });
-              logger.debug(`Initialized bookings for dateKey ${dateKey} with bookingId ${bookingId}`, 'Webhook');
+              transaction.set(
+                sessionRef,
+                {
+                  [`bookings.${dateKey}.confirmedBookings`]: [{ userId, bookingId }],
+                  [`bookings.${dateKey}.remainingCapacity`]: sessionData.capacity - 1,
+                },
+                { merge: true }
+              );
+              logger.debug(
+                `Initialized bookings for dateKey ${dateKey} with bookingId ${bookingId}`,
+                'Webhook'
+              );
             } else {
               // Check if there is remaining capacity
               const remainingCapacity = sessionData.bookings[dateKey].remainingCapacity;
@@ -123,7 +127,10 @@ router.post(
                 [`bookings.${dateKey}.confirmedBookings`]: FieldValue.arrayUnion({ userId, bookingId }),
                 [`bookings.${dateKey}.remainingCapacity`]: FieldValue.increment(-1),
               });
-              logger.debug(`Updated bookings for dateKey ${dateKey} with bookingId ${bookingId}`, 'Webhook');
+              logger.debug(
+                `Updated bookings for dateKey ${dateKey} with bookingId ${bookingId}`,
+                'Webhook'
+              );
             }
           });
 
