@@ -105,7 +105,7 @@ router.post(
 
                   await sessionRef.update({
                     [`bookings.${dateKey}.confirmedBookings`]: confirmedBookings,
-                    [`bookings.${dateKey}.remainingCapacity`]: sessionData.capacity - confirmedBookings.length,
+                    [`bookings.${dateKey}.remainingCapacity`]: sessionData.bookings[dateKey].remainingCapacity - 1,
                   });
 
                   logger.info(
