@@ -25,7 +25,6 @@ export default function Dashboard() {
   const { results } = useQuizStore();
 
   const [bookings, setBookings] = useState<Booking[]>([]);
-  // No changes needed here
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   const [profilePicModalOpen, setProfilePicModalOpen] = useState<boolean>(false);
   const [dialogMessage, setDialogMessage] = useState<string>('');
@@ -65,11 +64,12 @@ export default function Dashboard() {
       });
       setDialogOpen(true);
     },
-    [deleteBooking]
+    [bookings, deleteBooking]
   );
 
   const handleCancelBooking = useCallback(
     (booking: Booking) => {
+      // Fixed template strings here
       const bookingDate = new Date(`${booking.scheduledDate}T${booking.session.startTime}`).getTime();
       const now = Date.now();
       const isWithin24Hours = bookingDate - now < 24 * 60 * 60 * 1000;
@@ -104,7 +104,7 @@ export default function Dashboard() {
     const fetchBookings = async () => {
       setLoading(true);
       try {
-        logger.info(`Attempting to fetch bookings for user: ${user}`, 'Dashboard');
+        logger.info(`Attempting to fetch bookings for user: ${JSON.stringify(user)}`, 'Dashboard');
         const userBookings = await getUserBookings();
         console.log('Fetched bookings:', userBookings);
         setBookings(userBookings);
@@ -128,8 +128,8 @@ export default function Dashboard() {
     }
 
     if (!hasFetched) {
-      logger.info(`Fetching bookings for user: ${user}`, 'Dashboard');
-      logger.info(`Dashboard mounted. User: ${user}`, 'Dashboard');
+      logger.info(`Fetching bookings for user: ${JSON.stringify(user)}`, 'Dashboard');
+      logger.info(`Dashboard mounted. User: ${JSON.stringify(user)}`, 'Dashboard');
       logger.info(`Quiz Results: ${JSON.stringify(results)}`, 'Dashboard');
       logger.info(`Latest Quiz Result: ${JSON.stringify(user.quizResults?.[user.quizResults.length - 1])}`, 'Dashboard');
       fetchBookings();
@@ -228,8 +228,8 @@ export default function Dashboard() {
                           paddingAngle={5}
                           dataKey="value"
                         >
-                          <Cell fill="#FF9F40" /> {/* Vata */}
-                          <Cell fill="#FF6B6B" /> {/* Pitta */}
+                          <Cell fill="#FF9F40" /> {/* Vata */} 
+                          <Cell fill="#FF6B6B" /> {/* Pitta */} 
                           <Cell fill="#4ECDC4" /> {/* Kapha */}
                         </Pie>
                         <Tooltip formatter={(value: string | number | (string | number)[]) => `${Math.round(Number(value))}%`} />
@@ -268,13 +268,18 @@ export default function Dashboard() {
                     )}
                     <div>
                       <p className="text-gray-600">Last Quiz Taken</p>
-                      <p className="text-lg">{new Date(user.lastQuizDate || '').toLocaleDateString('en-GB', {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}</p>
+                      <p className="text-lg">
+                        {user.lastQuizDate 
+                          ? new Date(user.lastQuizDate).toLocaleDateString('en-GB', {
+                              day: 'numeric',
+                              month: 'long',
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })
+                          : 'N/A'
+                        }
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -394,7 +399,8 @@ export default function Dashboard() {
                 </div>
                 <div className="flex items-center text-gray-600">
                   <Clock className="h-5 w-5 mr-2" />
-                  <span>Booked At: {formatDate(booking.bookedAt)} {formatTime(new Date(booking.bookedAt).toLocaleTimeString(), 'America/Denver', Intl.DateTimeFormat().resolvedOptions().timeZone)}</span>
+                  {/* Directly using toLocaleString for bookedAt to avoid format issues */}
+                  <span>Booked At: {new Date(booking.bookedAt).toLocaleString()}</span>
                 </div>
               </div>
             </m.div>
@@ -413,7 +419,6 @@ export default function Dashboard() {
         cancelText={dialogTitle === 'Cannot Cancel Booking' ? undefined : 'No'}
       />
 
-      {/* Profile Pic Modal with only a close (X) button in top-right and enlarged image */}
       <ProfilePicDialog
         isOpen={profilePicModalOpen}
         imageUrl={enlargedProfilePicUrl}
