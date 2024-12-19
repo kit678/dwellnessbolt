@@ -85,7 +85,11 @@ export default function Dashboard() {
         setDialogMessage('Are you sure you want to cancel this booking?');
         setDialogConfirmAction(() => () => {
           cancelBooking(booking.id);
-          setBookings((prevBookings) => prevBookings.filter(b => b.id !== booking.id));
+          setBookings((prevBookings) =>
+            prevBookings.map((b) =>
+              b.id === booking.id ? { ...b, status: 'cancelled' } : b
+            )
+          );
           setDialogOpen(false);
         });
         setDialogOpen(true);
