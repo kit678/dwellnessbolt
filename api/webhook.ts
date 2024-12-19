@@ -3,7 +3,7 @@ import Stripe from 'stripe';
 import { logger } from '../src/utils/logger.js';
 import { db } from '../src/lib/firebaseAdmin.js';
 import { getAuth } from 'firebase/auth';
-import { sendBookingConfirmation } from '../src/lib/email.js';
+import { sendBookingConfirmation, sendBookingReminder } from '../src/lib/email.js';
 
 const router = express.Router();
 
@@ -119,7 +119,7 @@ router.post(
               `Sending booking confirmation email to ${userData.email}`,
               'Webhook'
             );
-            const emailSent = await sendBookingConfirmation(userData.email, {
+            const emailSent = await sendBookingReminder(userData.email, {
               session: {
                 title: sessionTitle,
                 startTime: sessionDate,
