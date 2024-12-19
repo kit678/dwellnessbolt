@@ -137,7 +137,7 @@ export function useBookings() {
         }
         const bookingData = bookingDoc.data();
         if (bookingData.status !== 'confirmed') {
-          throw new Error('Only confirmed bookings can be cancelled.');
+          throw new Error('Cannot cancel a pending booking. Please delete it instead.');
         }
 
         const sessionRef = doc(db, 'sessions', bookingData.sessionId);
