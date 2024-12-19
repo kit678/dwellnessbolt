@@ -7,7 +7,7 @@ import { sendBookingConfirmation, sendBookingReminder } from '../src/lib/email.j
 
 const router = express.Router();
 
-const isDevelopment = process.env.NODE_ENV === 'development';
+const isDevelopment = process.env.VITE_NODE_ENV === 'development';
 
 const stripeSecretKey = isDevelopment
   ? process.env.VITE_STRIPE_TEST_SECRET_KEY!
