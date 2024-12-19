@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { Dialog } from '@headlessui/react';
 import { m } from 'framer-motion';
 import { parseISO } from 'date-fns';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { Clock, Users, DollarSign } from 'lucide-react';
 import { RecurringSession } from '../types/index.js';
@@ -71,7 +71,7 @@ export default function BookingModal({
           ...session.bookings,
           ...newBookings
         }
-      }).catch(error => {
+      }).catch((error: any) => {
         console.error('Error updating session bookings:', error);
         toast.error('Failed to update session bookings');
       });
