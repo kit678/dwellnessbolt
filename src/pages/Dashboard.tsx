@@ -363,7 +363,7 @@ export default function Dashboard() {
                       Complete Booking
                     </button>
                   )}
-                  {isDevelopment && (booking.status === 'cancelled' || booking.status === 'pending') && (
+                  {isDevelopment && booking.status !== 'confirmed' && (
                     <button
                       onClick={() => handleDeleteBooking(booking.id)}
                       className="px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800 hover:bg-gray-200"
@@ -371,7 +371,7 @@ export default function Dashboard() {
                       Trash
                     </button>
                   )}
-                  {booking.status === 'confirmed' && (
+                  {booking.status !== 'pending' && (
                     <button
                       onClick={() => handleCancelBooking(booking)}
                       className="px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800 hover:bg-red-200"
