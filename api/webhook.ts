@@ -105,11 +105,12 @@ router.post(
 
             // Ensure the bookings object for the specific date exists
             if (!sessionData.bookings || !sessionData.bookings[dateKey]) {
-              // Initialize bookings for the date if it doesn't exist
+              // Initialize bookings for the date with the current booking
               transaction.set(sessionRef, {
-                [`bookings.${dateKey}.confirmedBookings`]: [],
+                [`bookings.${dateKey}.confirmedBookings`]: [{ userId, bookingId }],
                 [`bookings.${dateKey}.remainingCapacity`]: sessionData.capacity - 1,
               }, { merge: true });
+              logger.debug(`Initialized bookings for dateKey ${dateKey} with bookingId ${bookingId}`, 'Webhook');
             } else {
               // Check if there is remaining capacity
               const remainingCapacity = sessionData.bookings[dateKey].remainingCapacity;
@@ -122,6 +123,7 @@ router.post(
                 [`bookings.${dateKey}.confirmedBookings`]: FieldValue.arrayUnion({ userId, bookingId }),
                 [`bookings.${dateKey}.remainingCapacity`]: FieldValue.increment(-1),
               });
+              logger.debug(`Updated bookings for dateKey ${dateKey} with bookingId ${bookingId}`, 'Webhook');
             }
           });
 
