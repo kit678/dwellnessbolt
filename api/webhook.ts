@@ -73,10 +73,33 @@ router.post(
         try {
           await db.runTransaction(async (transaction) => {
             const bookingRef = db.collection('bookings').doc(bookingId);
-            const bookingDoc = await transaction.get(bookingRef);
+            const sessionRef = db.collection('sessions').doc(sessionId);
 
+            // Perform all reads first
+            const bookingDoc = await transaction.get(bookingRef);
             if (!bookingDoc.exists) {
               throw new Error(`Booking ${bookingId} not found in Firestore.`);
+            }
+
+            const sessionDoc = await transaction.get(sessionRef);
+            if (!sessionDoc.exists) {
+              throw new Error(`Session ${sessionId} not found in Firestore.`);
+            }
+
+            const sessionData = sessionDoc.data();
+            if (!sessionData) {
+              throw new Error(`Session data is undefined for session ${sessionId}.`);
+            }
+
+            const dateKey = sessionDate;
+
+            // Check if there is remaining capacity
+            if (
+              !sessionData.bookings ||
+              !sessionData.bookings[dateKey] ||
+              sessionData.bookings[dateKey].remainingCapacity <= 0
+            ) {
+              throw new Error('No remaining capacity for the selected session date.');
             }
 
             // Update the booking status to confirmed and set paidAt
@@ -85,23 +108,8 @@ router.post(
               paidAt: new Date().toISOString(),
             });
 
-            const sessionRef = db.collection('sessions').doc(sessionId);
-            const sessionDoc = await transaction.get(sessionRef);
-
-            if (!sessionDoc.exists) {
-              throw new Error(`Session ${sessionId} not found in Firestore.`);
-            }
-
-            const sessionData = sessionDoc.data();
-
-            if (!sessionData) {
-              throw new Error(`Session data is undefined for session ${sessionId}.`);
-            }
-
-            const dateKey = sessionDate;
-
-            // Ensure the bookings object for the specific date exists
-            if (!sessionData.bookings || !sessionData.bookings[dateKey]) {
+            // Update the session's bookings
+            if (!sessionData.bookings[dateKey]) {
               // Initialize bookings for the date with the current booking
               transaction.set(
                 sessionRef,
@@ -116,12 +124,6 @@ router.post(
                 'Webhook'
               );
             } else {
-              // Check if there is remaining capacity
-              const remainingCapacity = sessionData.bookings[dateKey].remainingCapacity;
-              if (remainingCapacity <= 0) {
-                throw new Error('No remaining capacity for the selected session date.');
-              }
-
               // Update confirmedBookings and remainingCapacity atomically
               transaction.update(sessionRef, {
                 [`bookings.${dateKey}.confirmedBookings`]: FieldValue.arrayUnion({ userId, bookingId }),
