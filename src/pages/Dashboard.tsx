@@ -51,6 +51,11 @@ export default function Dashboard() {
 
   const handleDeleteBooking = useCallback(
     (bookingId: string) => {
+      const booking = bookings.find(b => b.id === bookingId);
+      if (booking?.status !== 'cancelled') {
+        toast.error('You must cancel the booking before trashing it.');
+        return;
+      }
       setDialogTitle('Delete Booking');
       setDialogMessage('Are you sure you want to delete this booking? This action cannot be undone.');
       setDialogConfirmAction(() => async () => {
