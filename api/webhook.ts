@@ -93,7 +93,31 @@ router.post(
                 `Booking ${bookingId} successfully updated to confirmed.`,
                 'Webhook'
               );
-            } catch (updateError: unknown) {
+              // Update session document with confirmed booking
+              const sessionRef = db.collection('sessions').doc(session.metadata.sessionId);
+              const sessionDoc = await sessionRef.get();
+              if (sessionDoc.exists) {
+                const sessionData = sessionDoc.data();
+                const dateKey = session.metadata.sessionDate;
+                const confirmedBookings = sessionData.bookings[dateKey]?.confirmedBookings || [];
+                confirmedBookings.push({ userId, bookingId });
+
+                await sessionRef.update({
+                  [`bookings.${dateKey}.confirmedBookings`]: confirmedBookings,
+                  [`bookings.${dateKey}.remainingCapacity`]: sessionData.capacity - confirmedBookings.length,
+                });
+
+                logger.info(
+                  `Session ${session.metadata.sessionId} updated with new booking.`,
+                  'Webhook'
+                );
+              } else {
+                logger.error(
+                  `Session ${session.metadata.sessionId} not found in Firestore.`,
+                  new Error(`Session ${session.metadata.sessionId} not found`),
+                  'Webhook'
+                );
+              }
               const updateErrObj = updateError instanceof Error
                 ? updateError
                 : new Error(String(updateError));
