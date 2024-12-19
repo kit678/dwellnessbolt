@@ -10,9 +10,6 @@ console.log('VITE_NODE_ENV:', process.env.VITE_NODE_ENV);
 // Create the express app
 const app = express();
 
-// IMPORTANT: Mount the webhook router BEFORE adding JSON parsing middleware.
-// The Stripe webhook route needs the raw body, so no JSON parsing should occur before it.
-app.use('/webhook', webhookRouter);
 
 // Now it's safe to use JSON parsing for other routes
 app.use(express.json());
