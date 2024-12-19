@@ -10,12 +10,12 @@ const router = express.Router();
 const isDevelopment = process.env.NODE_ENV === 'development';
 
 const stripeSecretKey = isDevelopment
-  ? process.env.STRIPE_TEST_SECRET_KEY!
-  : process.env.STRIPE_SECRET_KEY!;
+  ? process.env.VITE_STRIPE_TEST_SECRET_KEY!
+  : process.env.VITE_STRIPE_SECRET_KEY!;
 
 const endpointSecret = isDevelopment
-  ? process.env.STRIPE_TEST_WEBHOOK_SECRET!
-  : process.env.STRIPE_WEBHOOK_SECRET!;
+  ? process.env.VITE_STRIPE_TEST_WEBHOOK_SECRET!
+  : process.env.VITE_STRIPE_WEBHOOK_SECRET!;
 
 const stripe = new Stripe(stripeSecretKey, {
   apiVersion: '2023-10-16',
