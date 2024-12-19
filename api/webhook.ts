@@ -62,135 +62,119 @@ router.post(
         const sessionDate = metadata.sessionDate || new Date().toISOString();
         const sessionPrice = metadata.sessionPrice || '0';
 
-        if (!bookingId || !userId) {
+        if (!bookingId || !userId || !sessionId || !sessionDate) {
           logger.error(
-            'Missing bookingId or userId in session metadata',
-            new Error('Missing bookingId or userId'),
+            'Missing bookingId, userId, sessionId, or sessionDate in session metadata',
+            new Error('Missing required metadata fields'),
             'Webhook'
           );
           return res
             .status(400)
-            .send('Missing bookingId or userId in session metadata');
+            .send('Missing bookingId, userId, sessionId, or sessionDate in session metadata');
         }
 
         try {
+          await db.runTransaction(async (transaction) => {
+            const bookingRef = db.collection('bookings').doc(bookingId);
+            const bookingDoc = await transaction.get(bookingRef);
+
+            if (!bookingDoc.exists) {
+              throw new Error(`Booking ${bookingId} not found in Firestore.`);
+            }
+
+            // Update the booking status to confirmed and set paidAt
+            transaction.update(bookingRef, {
+              status: 'confirmed',
+              paidAt: new Date().toISOString(),
+            });
+
+            const sessionRef = db.collection('sessions').doc(sessionId);
+            const sessionDoc = await transaction.get(sessionRef);
+
+            if (!sessionDoc.exists) {
+              throw new Error(`Session ${sessionId} not found in Firestore.`);
+            }
+
+            const sessionData = sessionDoc.data();
+
+            if (!sessionData) {
+              throw new Error(`Session data is undefined for session ${sessionId}.`);
+            }
+
+            const dateKey = sessionDate;
+
+            // Ensure the bookings object for the specific date exists
+            if (!sessionData.bookings || !sessionData.bookings[dateKey]) {
+              // Initialize bookings for the date if it doesn't exist
+              transaction.set(sessionRef, {
+                [`bookings.${dateKey}.confirmedBookings`]: [],
+                [`bookings.${dateKey}.remainingCapacity`]: sessionData.capacity - 1,
+              }, { merge: true });
+            } else {
+              // Check if there is remaining capacity
+              const remainingCapacity = sessionData.bookings[dateKey].remainingCapacity;
+              if (remainingCapacity <= 0) {
+                throw new Error('No remaining capacity for the selected session date.');
+              }
+
+              // Update confirmedBookings and remainingCapacity atomically
+              transaction.update(sessionRef, {
+                [`bookings.${dateKey}.confirmedBookings`]: FieldValue.arrayUnion({ userId, bookingId }),
+                [`bookings.${dateKey}.remainingCapacity`]: FieldValue.increment(-1),
+              });
+            }
+          });
+
           logger.info(
-            `Updating booking status to confirmed for bookingId: ${bookingId}`,
+            `Booking ${bookingId} confirmed and session ${sessionId} updated successfully.`,
             'Webhook'
           );
-          // Use the user's credentials to update the booking
-          const bookingRef = db.collection('bookings').doc(bookingId);
 
-          // Fetch the booking document to ensure it exists
-          const bookingDoc = await bookingRef.get();
-          if (bookingDoc.exists) {
-            try {
-              // Update the booking status to confirmed
-              await bookingRef.update({
-                status: 'confirmed',
-                paidAt: new Date().toISOString(),
-              });
+          // Fetch user email outside the transaction
+          const userDoc = await db.collection('users').doc(userId).get();
+          const userData = userDoc.data();
+          if (userData && userData.email) {
+            logger.info(
+              `Sending booking confirmation email to ${userData.email}`,
+              'Webhook'
+            );
+            const emailSent = await sendBookingConfirmation(userData.email, {
+              session: {
+                title: sessionTitle,
+                startTime: sessionDate,
+                endTime: sessionDate,
+                price: sessionPrice,
+              },
+            });
+            if (emailSent) {
               logger.info(
-                `Booking ${bookingId} successfully updated to confirmed.`,
+                `Booking confirmation email successfully sent to ${userData.email}`,
                 'Webhook'
               );
-              // Update session document with confirmed booking
-              const sessionRef = db.collection('sessions').doc(metadata.sessionId);
-              const sessionDoc = await sessionRef.get();
-              if (sessionDoc.exists) {
-                const sessionData = sessionDoc.data();
-                if (sessionData) {
-                  const dateKey = metadata.sessionDate;
-                  const confirmedBookings = sessionData.bookings[dateKey]?.confirmedBookings || [];
-                  confirmedBookings.push({ userId, bookingId });
-
-                  await sessionRef.update({
-                    [`bookings.${dateKey}.confirmedBookings`]: FieldValue.arrayUnion({ userId, bookingId }),
-                    [`bookings.${dateKey}.remainingCapacity`]: FieldValue.increment(-1),
-                  });
-
-                  logger.info(
-                    `Session ${metadata.sessionId} updated with new booking.`,
-                    'Webhook'
-                  );
-                } else {
-                  logger.error(
-                    `Session data is undefined for session ${metadata.sessionId}.`,
-                    new Error(`Session data is undefined`),
-                    'Webhook'
-                  );
-                }
-              } else {
-                logger.error(
-                  `Session ${metadata.sessionId} not found in Firestore.`,
-                  new Error(`Session ${metadata.sessionId} not found`),
-                  'Webhook'
-                );
-              }
-            } catch (updateError: unknown) {
-              const updateErrObj = updateError instanceof Error
-                ? updateError
-                : new Error(String(updateError));
+            } else {
               logger.error(
-                'Error updating booking status to confirmed.',
-                updateErrObj,
+                `Failed to send booking confirmation email to ${userData.email}`,
+                new Error('Failed to send booking confirmation email'),
                 'Webhook'
               );
             }
           } else {
             logger.error(
-              `Booking ${bookingId} not found in Firestore.`,
-              new Error(`Booking ${bookingId} not found`),
+              'User data or email not found for booking confirmation email.',
+              new Error('No user email found'),
               'Webhook'
             );
           }
 
-            // Fetch user email
-            const userDoc = await db.collection('users').doc(userId).get();
-            const userData = userDoc.data();
-            if (userData && userData.email) {
-              logger.info(
-                `Sending booking confirmation email to ${userData.email}`,
-                'Webhook'
-              );
-              const emailSent = await sendBookingConfirmation(userData.email, {
-                session: {
-                  title: sessionTitle,
-                  startTime: sessionDate,
-                  endTime: sessionDate,
-                  price: sessionPrice,
-                },
-              });
-              if (emailSent) {
-                logger.info(
-                  `Booking confirmation email successfully sent to ${userData.email}`,
-                  'Webhook'
-                );
-              } else {
-                // Add an Error object here
-                logger.error(
-                  `Failed to send booking confirmation email to ${userData.email}`,
-                  new Error('Failed to send booking confirmation email'),
-                  'Webhook'
-                );
-              }
-            } else {
-              logger.error(
-                'User data or email not found for booking confirmation email.',
-                new Error('No user email found'),
-                'Webhook'
-              );
-            }
-
-            return res.json({ received: true });
-          } catch (error: unknown) {
-            const errObj = error instanceof Error ? error : new Error(String(error));
-            logger.error('Error updating booking or sending email:', errObj, 'Webhook');
-            if (error instanceof Error) {
-              logger.debug(`Error details: ${error.message}`, 'Webhook');
-            }
-            return res.status(500).json({ error: 'Internal Server Error' });
+          return res.json({ received: true });
+        } catch (error: unknown) {
+          const errObj = error instanceof Error ? error : new Error(String(error));
+          logger.error('Error updating booking or sending email:', errObj, 'Webhook');
+          if (error instanceof Error) {
+            logger.debug(`Error details: ${error.message}`, 'Webhook');
           }
+          return res.status(500).json({ error: 'Internal Server Error' });
+        }
 
       default:
         logger.info(`Unhandled event type ${event.type}`, 'Webhook');
