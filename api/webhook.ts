@@ -119,7 +119,7 @@ router.post(
               `Sending booking confirmation email to ${userData.email}`,
               'Webhook'
             );
-            const emailSent = await sendBookingReminder(userData.email, {
+            const emailSent = await sendBookingConfirmation(userData.email, {
               session: {
                 title: sessionTitle,
                 startTime: sessionDate,
