@@ -104,8 +104,8 @@ router.post(
                   confirmedBookings.push({ userId, bookingId });
 
                   await sessionRef.update({
-                    [`bookings.${dateKey}.confirmedBookings`]: confirmedBookings,
-                    [`bookings.${dateKey}.remainingCapacity`]: sessionData.bookings[dateKey].remainingCapacity - 1,
+                    [`bookings.${dateKey}.confirmedBookings`]: FieldValue.arrayUnion({ userId, bookingId }),
+                    [`bookings.${dateKey}.remainingCapacity`]: FieldValue.increment(-1),
                   });
 
                   logger.info(
