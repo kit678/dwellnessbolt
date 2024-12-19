@@ -3,6 +3,7 @@ import Stripe from 'stripe';
 import { logger } from '../src/utils/logger.js';
 import { db } from '../src/lib/firebaseAdmin.js';
 import { getAuth } from 'firebase/auth';
+import { FieldValue } from 'firebase-admin/firestore';
 import { sendBookingConfirmation, sendBookingReminder } from '../src/lib/email.js';
 
 const router = express.Router();
