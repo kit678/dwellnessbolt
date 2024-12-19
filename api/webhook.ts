@@ -57,9 +57,9 @@ router.post(
         logger.debug(`Session metadata: ${JSON.stringify(metadata)}`, 'Webhook');
 
         const { bookingId, userId } = metadata;
-        const sessionTitle = session.metadata?.sessionTitle || 'Session';
-        const sessionDate = session.metadata?.sessionDate || new Date().toISOString();
-        const sessionPrice = session.metadata?.sessionPrice || '0';
+        const sessionTitle = metadata.sessionTitle || 'Session';
+        const sessionDate = metadata.sessionDate || new Date().toISOString();
+        const sessionPrice = metadata.sessionPrice || '0';
 
         if (!bookingId || !userId) {
           logger.error(
@@ -94,30 +94,39 @@ router.post(
                 'Webhook'
               );
               // Update session document with confirmed booking
-              const sessionRef = db.collection('sessions').doc(session.metadata.sessionId);
+              const sessionRef = db.collection('sessions').doc(metadata.sessionId);
               const sessionDoc = await sessionRef.get();
               if (sessionDoc.exists) {
                 const sessionData = sessionDoc.data();
-                const dateKey = session.metadata.sessionDate;
-                const confirmedBookings = sessionData.bookings[dateKey]?.confirmedBookings || [];
-                confirmedBookings.push({ userId, bookingId });
+                if (sessionData) {
+                  const dateKey = metadata.sessionDate;
+                  const confirmedBookings = sessionData.bookings[dateKey]?.confirmedBookings || [];
+                  confirmedBookings.push({ userId, bookingId });
 
-                await sessionRef.update({
-                  [`bookings.${dateKey}.confirmedBookings`]: confirmedBookings,
-                  [`bookings.${dateKey}.remainingCapacity`]: sessionData.capacity - confirmedBookings.length,
-                });
+                  await sessionRef.update({
+                    [`bookings.${dateKey}.confirmedBookings`]: confirmedBookings,
+                    [`bookings.${dateKey}.remainingCapacity`]: sessionData.capacity - confirmedBookings.length,
+                  });
 
-                logger.info(
-                  `Session ${session.metadata.sessionId} updated with new booking.`,
-                  'Webhook'
-                );
+                  logger.info(
+                    `Session ${metadata.sessionId} updated with new booking.`,
+                    'Webhook'
+                  );
+                } else {
+                  logger.error(
+                    `Session data is undefined for session ${metadata.sessionId}.`,
+                    new Error(`Session data is undefined`),
+                    'Webhook'
+                  );
+                }
               } else {
                 logger.error(
-                  `Session ${session.metadata.sessionId} not found in Firestore.`,
-                  new Error(`Session ${session.metadata.sessionId} not found`),
+                  `Session ${metadata.sessionId} not found in Firestore.`,
+                  new Error(`Session ${metadata.sessionId} not found`),
                   'Webhook'
                 );
               }
+            } catch (updateError: unknown) {
               const updateErrObj = updateError instanceof Error
                 ? updateError
                 : new Error(String(updateError));
@@ -126,7 +135,6 @@ router.post(
                 updateErrObj,
                 'Webhook'
               );
-            }
           } else {
             logger.error(
               `Booking ${bookingId} not found in Firestore.`,
