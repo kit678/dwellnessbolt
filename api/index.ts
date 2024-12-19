@@ -11,7 +11,7 @@ console.log('VITE_NODE_ENV:', process.env.VITE_NODE_ENV);
 const app = express();
 
 // Mount the webhook route before other middleware to ensure raw body is available
-app.use('/api/webhook', webhookRouter);
+app.use('/webhook', webhookRouter);
 
 // Apply CORS middleware
 app.use(cors());
