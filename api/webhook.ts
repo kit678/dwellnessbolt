@@ -135,6 +135,7 @@ router.post(
                 updateErrObj,
                 'Webhook'
               );
+            }
           } else {
             logger.error(
               `Booking ${bookingId} not found in Firestore.`,
@@ -143,52 +144,52 @@ router.post(
             );
           }
 
-          // Fetch user email
-          const userDoc = await db.collection('users').doc(userId).get();
-          const userData = userDoc.data();
-          if (userData && userData.email) {
-            logger.info(
-              `Sending booking confirmation email to ${userData.email}`,
-              'Webhook'
-            );
-            const emailSent = await sendBookingConfirmation(userData.email, {
-              session: {
-                title: sessionTitle,
-                startTime: sessionDate,
-                endTime: sessionDate,
-                price: sessionPrice,
-              },
-            });
-            if (emailSent) {
+            // Fetch user email
+            const userDoc = await db.collection('users').doc(userId).get();
+            const userData = userDoc.data();
+            if (userData && userData.email) {
               logger.info(
-                `Booking confirmation email successfully sent to ${userData.email}`,
+                `Sending booking confirmation email to ${userData.email}`,
                 'Webhook'
               );
+              const emailSent = await sendBookingConfirmation(userData.email, {
+                session: {
+                  title: sessionTitle,
+                  startTime: sessionDate,
+                  endTime: sessionDate,
+                  price: sessionPrice,
+                },
+              });
+              if (emailSent) {
+                logger.info(
+                  `Booking confirmation email successfully sent to ${userData.email}`,
+                  'Webhook'
+                );
+              } else {
+                // Add an Error object here
+                logger.error(
+                  `Failed to send booking confirmation email to ${userData.email}`,
+                  new Error('Failed to send booking confirmation email'),
+                  'Webhook'
+                );
+              }
             } else {
-              // Add an Error object here
               logger.error(
-                `Failed to send booking confirmation email to ${userData.email}`,
-                new Error('Failed to send booking confirmation email'),
+                'User data or email not found for booking confirmation email.',
+                new Error('No user email found'),
                 'Webhook'
               );
             }
-          } else {
-            logger.error(
-              'User data or email not found for booking confirmation email.',
-              new Error('No user email found'),
-              'Webhook'
-            );
-          }
 
-          return res.json({ received: true });
-        } catch (error: unknown) {
-          const errObj = error instanceof Error ? error : new Error(String(error));
-          logger.error('Error updating booking or sending email:', errObj, 'Webhook');
-          if (error instanceof Error) {
-            logger.debug(`Error details: ${error.message}`, 'Webhook');
+            return res.json({ received: true });
+          } catch (error: unknown) {
+            const errObj = error instanceof Error ? error : new Error(String(error));
+            logger.error('Error updating booking or sending email:', errObj, 'Webhook');
+            if (error instanceof Error) {
+              logger.debug(`Error details: ${error.message}`, 'Webhook');
+            }
+            return res.status(500).json({ error: 'Internal Server Error' });
           }
-          return res.status(500).json({ error: 'Internal Server Error' });
-        }
 
       default:
         logger.info(`Unhandled event type ${event.type}`, 'Webhook');
