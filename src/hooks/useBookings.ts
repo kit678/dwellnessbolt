@@ -189,35 +189,11 @@ export function useBookings() {
         }
         const bookingData = bookingDoc.data();
 
-        // If booking is confirmed, update session's remainingCapacity and confirmedBookings
         if (bookingData.status === 'confirmed') {
-          const sessionRef = doc(db, 'sessions', bookingData.sessionId);
-          const sessionDoc = await transaction.get(sessionRef);
-          if (!sessionDoc.exists()) {
-            throw new Error('Session does not exist!');
-          }
-          const sessionData = sessionDoc.data();
-
-          if (sessionData.bookings && sessionData.bookings[bookingData.scheduledDate]) {
-            const dateBooking = sessionData.bookings[bookingData.scheduledDate];
-
-            // Remove from confirmedBookings
-            const confirmedBookings = dateBooking.confirmedBookings.filter((b: any) => b.bookingId !== bookingId);
-            transaction.update(sessionRef, {
-              [`bookings.${bookingData.scheduledDate}.confirmedBookings`]: confirmedBookings
-            });
-    
-            // Recompute remainingCapacity based on confirmedBookings
-            const newRemainingCapacity = sessionData.capacity - confirmedBookings.length;
-            transaction.update(sessionRef, {
-              [`bookings.${bookingData.scheduledDate}.remainingCapacity`]: newRemainingCapacity
-            });
-          } else {
-            throw new Error('Booking date data does not exist in session.');
-          }
+          throw new Error('Cannot delete a confirmed booking. Please cancel it first.');
         }
 
-        // Delete the booking
+        // Delete the booking if it's pending or cancelled
         transaction.delete(bookingRef);
       });
       toast.success('Booking deleted successfully');
