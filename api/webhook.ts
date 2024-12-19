@@ -109,31 +109,15 @@ router.post(
             });
 
             // Update the session's bookings
-            if (!sessionData.bookings[dateKey]) {
-              // Initialize bookings for the date with the current booking
-              transaction.set(
-                sessionRef,
-                {
-                  [`bookings.${dateKey}.confirmedBookings`]: [{ userId, bookingId }],
-                  [`bookings.${dateKey}.remainingCapacity`]: sessionData.capacity - 1,
-                },
-                { merge: true }
-              );
-              logger.debug(
-                `Initialized bookings for dateKey ${dateKey} with bookingId ${bookingId}`,
-                'Webhook'
-              );
-            } else {
-              // Update confirmedBookings and remainingCapacity atomically
-              transaction.update(sessionRef, {
-                [`bookings.${dateKey}.confirmedBookings`]: FieldValue.arrayUnion({ userId, bookingId }),
-                [`bookings.${dateKey}.remainingCapacity`]: FieldValue.increment(-1),
-              });
-              logger.debug(
-                `Updated bookings for dateKey ${dateKey} with bookingId ${bookingId}`,
-                'Webhook'
-              );
-            }
+            // Update confirmedBookings and remainingCapacity atomically
+            transaction.update(sessionRef, {
+              [`bookings.${dateKey}.confirmedBookings`]: FieldValue.arrayUnion({ userId, bookingId }),
+              [`bookings.${dateKey}.remainingCapacity`]: FieldValue.increment(-1),
+            });
+            logger.debug(
+              `Updated bookings for dateKey ${dateKey} with bookingId ${bookingId}`,
+              'Webhook'
+            );
           });
 
           logger.info(
