@@ -72,6 +72,14 @@ export function useBookings() {
           bookingId: bookingRef.id,
           userId: user.uid,
           amount: session.price * 100,
+          metadata: {
+            bookingId: bookingRef.id,
+            userId: user.uid,
+            sessionId: session.id,
+            sessionDate: scheduledDate,
+            sessionTitle: session.title,
+            sessionPrice: session.price.toString(),
+          },
         }),
       });
 
