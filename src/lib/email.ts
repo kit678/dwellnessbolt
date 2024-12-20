@@ -20,10 +20,12 @@ export const sendBookingConfirmation = async (to: string, booking: any) => {
       html: `
         <h1>Booking Confirmation</h1>
         <p>Thank you for booking ${booking?.session?.title || 'your session'}!</p>
-        <p>Date: ${booking?.session?.startTime ? new Date(booking.session.startTime).toLocaleDateString() : 'N/A'}</p>
-        <p>Time: ${booking?.session?.startTime ? new Date(booking.session.startTime).toLocaleTimeString() : 'N/A'} - 
-           ${booking?.session?.endTime ? new Date(booking.session.endTime).toLocaleTimeString() : 'N/A'}</p>
+        <p>Date: ${booking?.session?.startTime ? new Date(booking.session.startTime).toLocaleDateString('en-US', { timeZone: 'America/Denver' }) : 'N/A'}</p>
+        <p>Time: ${booking?.session?.startTime ? new Date(booking.session.startTime).toLocaleTimeString('en-US', { timeZone: 'America/Denver' }) : 'N/A'} - 
+           ${booking?.session?.endTime ? new Date(booking.session.endTime).toLocaleTimeString('en-US', { timeZone: 'America/Denver' }) : 'N/A'} MST</p>
         <p>Price: $${booking?.session?.price || 'N/A'}</p>
+        <p>Description: ${booking?.session?.description || 'N/A'}</p>
+        <p>Specialized Topic: ${booking?.session?.specializedTopic || 'N/A'}</p>
       `,
     });
     logger.info(`Email sent: ${info.response}`, 'Email');
