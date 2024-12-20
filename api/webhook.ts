@@ -109,10 +109,13 @@ router.post(
             });
 
             // Update the session's bookings
-            // Update confirmedBookings and remainingCapacity atomically
+            // Ensure confirmedBookings and remainingCapacity are updated correctly
+            const updatedConfirmedBookings = sessionData.bookings[dateKey].confirmedBookings || [];
+            updatedConfirmedBookings.push({ userId, bookingId });
+
             transaction.update(sessionRef, {
-              [`bookings.${dateKey}.confirmedBookings`]: FieldValue.arrayUnion({ userId, bookingId }),
-              [`bookings.${dateKey}.remainingCapacity`]: FieldValue.increment(-1),
+              [`bookings.${dateKey}.confirmedBookings`]: updatedConfirmedBookings,
+              [`bookings.${dateKey}.remainingCapacity`]: sessionData.bookings[dateKey].remainingCapacity - 1,
             });
             logger.debug(
               `Updated bookings for dateKey ${dateKey} with bookingId ${bookingId}`,
