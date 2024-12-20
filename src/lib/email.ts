@@ -22,7 +22,8 @@ export const sendBookingConfirmation = async (to: string, booking: any) => {
           <h1 style="color: #4A90E2;">Booking Confirmation</h1>
           <p style="font-size: 16px;">Thank you for booking <strong>${booking?.session?.title || 'your session'}</strong>!</p>
           <p style="font-size: 16px;">Here are your booking details:</p>
-          <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+          <img src="${booking?.session?.image || ''}" alt="Session Image" style="width: 100%; height: auto; border-radius: 10px; margin-bottom: 20px;" />
+          <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
             <tr>
               <td style="padding: 10px; border: 1px solid #ddd;">Date</td>
               <td style="padding: 10px; border: 1px solid #ddd;">${booking?.scheduledDate || 'N/A'}</td>
