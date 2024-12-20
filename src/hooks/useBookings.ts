@@ -67,7 +67,7 @@ export function useBookings() {
         session,
         status: 'pending',
         bookedAt: new Date().toISOString(),
-        scheduledDate: scheduledDate
+        scheduledDate: scheduledDate.split('T')[0] // Store only the date part
       });
 
       // Create new Stripe checkout session
