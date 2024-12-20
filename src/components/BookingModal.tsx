@@ -186,6 +186,7 @@ export default function BookingModal({
                   const date = e.target.value;
                   setSelectedDate(date);
                   logger.info(`Selected date set in BookingModal: ${date}`, 'BookingModal');
+                  logger.debug(`Selected date: ${date}`, 'BookingModal');
                 }}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
               >

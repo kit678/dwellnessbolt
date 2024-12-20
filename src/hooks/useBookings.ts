@@ -62,6 +62,7 @@ export function useBookings() {
         return existingBooking.data().stripeSessionId;
       }
 
+      logger.debug(`Creating new booking with scheduledDate: ${scheduledDate}`, 'useBookings');
       // Create new booking
       const bookingRef = await addDoc(collection(db, 'bookings'), {
         userId: user.uid,
