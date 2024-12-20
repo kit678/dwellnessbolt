@@ -114,6 +114,7 @@ export default function BookingModal({
 
     setLoading(true);
     try {
+      logger.info(`Passing selectedDate to bookSession: ${selectedDate}`, 'BookingModal');
       const sessionId = await bookSession(session, selectedDate);
       if (sessionId) {
         const stripe = await stripePromise;
@@ -180,7 +181,11 @@ export default function BookingModal({
               </label>
               <select
                 value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
+                onChange={(e) => {
+                  const date = e.target.value;
+                  setSelectedDate(date);
+                  logger.info(`Selected date set in BookingModal: ${date}`, 'BookingModal');
+                }}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
               >
                 <option value="">Choose a date</option>

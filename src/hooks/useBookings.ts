@@ -17,7 +17,7 @@ export function useBookings() {
       toast.error('Please log in to book a session');
       return;
     }
-    try {
+    logger.info(`Received scheduledDate in bookSession: ${scheduledDate}`, 'useBookings');
       // Check for existing confirmed booking for the same session and date to avoid double bookings
       const existingBookingsQuery = query(
         collection(db, 'bookings'),
@@ -67,7 +67,9 @@ export function useBookings() {
         session,
         status: 'pending',
         bookedAt: new Date().toISOString(),
-        scheduledDate: scheduledDate.split('T')[0] // Store only the date part
+        const dateOnly = scheduledDate.split('T')[0];
+        logger.info(`Storing scheduledDate in Firestore: ${dateOnly}`, 'useBookings');
+        scheduledDate: dateOnly // Store only the date part
       });
 
       // Create new Stripe checkout session
