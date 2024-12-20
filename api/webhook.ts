@@ -55,19 +55,25 @@ router.post(
         logger.debug(`Session metadata: ${JSON.stringify(metadata)}`, 'Webhook');
 
         const { bookingId, userId, sessionId } = metadata;
-        const sessionTitle = metadata.sessionTitle || 'Session';
-        const sessionDate = metadata.sessionDate;
-        const sessionPrice = metadata.sessionPrice || '0';
-
-        if (!bookingId || !userId || !sessionId || !sessionDate) {
+        if (!bookingId || !userId || !sessionId) {
           logger.error(
-            'Missing bookingId, userId, sessionId, or sessionDate in session metadata',
+            'Missing bookingId, userId, or sessionId in session metadata',
             new Error('Missing required metadata fields'),
             'Webhook'
           );
           return res
             .status(400)
-            .send('Missing bookingId, userId, sessionId, or sessionDate in session metadata');
+            .send('Missing bookingId, userId, or sessionId in session metadata');
+        }
+
+        // Fetch session details from Firestore
+        const sessionDoc = await db.collection('sessions').doc(sessionId).get();
+        if (!sessionDoc.exists) {
+          throw new Error(`Session ${sessionId} not found in Firestore.`);
+        }
+        const sessionData = sessionDoc.data();
+        if (!sessionData) {
+          throw new Error(`Session data is undefined for session ${sessionId}.`);
         }
 
         try {
@@ -138,10 +144,12 @@ router.post(
             );
             const emailSent = await sendBookingConfirmation(userData.email, {
               session: {
-                title: sessionTitle,
-                startTime: sessionDate,
-                endTime: sessionDate,
-                price: sessionPrice,
+                title: sessionData.title,
+                startTime: sessionData.startTime,
+                endTime: sessionData.endTime,
+                price: sessionData.price,
+                description: sessionData.description,
+                specializedTopic: sessionData.specializedTopic,
               },
             });
             if (emailSent) {
