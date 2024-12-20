@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { logger } from '../utils/logger';
 import { db } from '../lib/firebase';
-import { RecurringSession } from '../types';
+import { RecurringSession } from '../types/index';
 import toast from 'react-hot-toast';
 
 export function useSessions() {

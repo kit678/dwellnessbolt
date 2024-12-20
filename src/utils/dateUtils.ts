@@ -1,4 +1,4 @@
-import { SpecializedTopic } from '../types';
+import { SpecializedTopic } from '../types/index';
 
 export const getNextDayOccurrence = (dayIndex: number, hour: number, minute: number) => {
   const date = new Date();

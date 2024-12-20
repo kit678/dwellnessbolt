@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { User } from '../types';
+import { User } from '../types/index';
 import { userService } from '../services/userService';
 import { useAuthStore } from '../store/authStore';
 

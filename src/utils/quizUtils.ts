@@ -1,4 +1,4 @@
-import { QuizResult } from '../types';
+import { QuizResult } from '../types/index';
 
 export function calculateQuizResults(answers: number[], userId: string): QuizResult {
   // Calculate raw scores

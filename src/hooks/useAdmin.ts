@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { collection, addDoc, updateDoc, deleteDoc, doc, getDocs } from 'firebase/firestore';
 import { db } from '../lib/firebase';
-import { Session } from '../types';
+import { RecurringSession as Session } from '../types/index';
 import toast from 'react-hot-toast';
 
 export function useAdmin() {

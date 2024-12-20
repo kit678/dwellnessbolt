@@ -6,7 +6,7 @@ import { useAdmin } from '../hooks/useAdmin';
 import AdminCalendar from '../components/AdminCalendar';
 import Analytics from '../components/Analytics';
 import SessionForm from '../components/SessionForm';
-import { Session } from '../types';
+import { RecurringSession as Session } from '../types/index';
 import toast from 'react-hot-toast';
 
 export default function Admin() {

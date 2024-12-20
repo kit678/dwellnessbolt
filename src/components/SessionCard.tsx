@@ -1,7 +1,7 @@
 import React from 'react';
 import { m } from 'framer-motion';
 import { Calendar, Users, Clock, DollarSign } from 'lucide-react';
-import { RecurringSession } from '../types';
+import { RecurringSession } from '../types/index';
 import { formatRecurringSchedule } from '../utils/dateUtils';
 
 interface SessionCardProps {
