@@ -59,10 +59,12 @@ export function log(
   const callerInfo = getCallerInfo();
   const formattedMessage = formatMessage(level, message, component || callerInfo);
 
-  // Store log in localStorage
-  const logs = JSON.parse(localStorage.getItem('appLogs') || '[]');
-  logs.push(formattedMessage);
-  localStorage.setItem('appLogs', JSON.stringify(logs));
+  // Store log in localStorage if available
+  if (typeof window !== 'undefined' && window.localStorage) {
+    const logs = JSON.parse(localStorage.getItem('appLogs') || '[]');
+    logs.push(formattedMessage);
+    localStorage.setItem('appLogs', JSON.stringify(logs));
+  }
 
   switch (level) {
     case LogLevel.ERROR:
