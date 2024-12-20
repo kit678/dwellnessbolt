@@ -65,6 +65,7 @@ export function useBookings() {
       }
 
       logger.debug(`Creating new booking with scheduledDate: ${scheduledDate}`, 'useBookings');
+      logger.info(`Inserting booking document with userId: ${user.uid}, sessionId: ${session.id}, scheduledDate: ${scheduledDate}`, 'useBookings');
       // Create new booking
       const bookingRef = await addDoc(collection(db, 'bookings'), {
         userId: user.uid,
