@@ -395,7 +395,7 @@ export default function Dashboard() {
                 </div>
                 <div className="flex items-center text-gray-600">
                   <DollarSign className="h-5 w-5 mr-2" />
-                  <span>${booking.session.price}</span>
+                  <span>USD {booking.session.price}</span>
                 </div>
                 <div className="flex items-center text-gray-600">
                   <Clock className="h-5 w-5 mr-2" />
