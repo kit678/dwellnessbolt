@@ -46,7 +46,7 @@ export interface Booking {
   userId: string;
   sessionId: string;
   session: RecurringSession;
-  status: 'confirmed' | 'cancelled';
+  status: 'confirmed' | 'cancelled' | 'pending';
   bookedAt: string;
   scheduledDate: string;
 }
