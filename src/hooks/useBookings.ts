@@ -51,7 +51,7 @@ export function useBookings() {
         session,
         status: 'pending',
         bookedAt: new Date().toISOString(),
-        scheduledDate
+        scheduledDate: scheduledDate
       });
 
 

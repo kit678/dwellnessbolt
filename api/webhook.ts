@@ -56,7 +56,7 @@ router.post(
 
         const { bookingId, userId, sessionId } = metadata;
         const sessionTitle = metadata.sessionTitle || 'Session';
-        const sessionDate = metadata.sessionDate || new Date().toISOString();
+        const sessionDate = metadata.sessionDate;
         const sessionPrice = metadata.sessionPrice || '0';
 
         if (!bookingId || !userId || !sessionId || !sessionDate) {
