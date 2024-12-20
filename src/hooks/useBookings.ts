@@ -44,7 +44,23 @@ export function useBookings() {
         return;
       }
 
-      // Create booking
+      // Check for existing pending booking
+      const pendingBookingsQuery = query(
+        collection(db, 'bookings'),
+        where('userId', '==', user.uid),
+        where('sessionId', '==', session.id),
+        where('scheduledDate', '==', scheduledDate),
+        where('status', '==', 'pending')
+      );
+      const pendingBookingsSnapshot = await getDocs(pendingBookingsQuery);
+
+      if (!pendingBookingsSnapshot.empty) {
+        const existingBooking = pendingBookingsSnapshot.docs[0];
+        console.log('Reusing existing pending booking:', existingBooking.id);
+        return existingBooking.data().stripeSessionId;
+      }
+
+      // Create new booking
       const bookingRef = await addDoc(collection(db, 'bookings'), {
         userId: user.uid,
         sessionId: session.id,
@@ -54,23 +70,7 @@ export function useBookings() {
         scheduledDate: scheduledDate
       });
 
-
-      console.log('Creating checkout session with:', {
-        sessionId: session.id,
-        bookingId: bookingRef.id,
-        userId: user.uid,
-        amount: session.price * 100,
-      });
-
-      console.log('Creating checkout session with metadata:', {
-        bookingId: bookingRef.id,
-        userId: user.uid,
-        sessionId: session.id,
-        sessionDate: scheduledDate,
-        sessionTitle: session.title,
-        sessionPrice: session.price.toString(),
-      });
-
+      // Create new Stripe checkout session
       const response = await fetch('/api/stripe/create-checkout-session', {
         method: 'POST',
         headers: {
@@ -100,6 +100,10 @@ export function useBookings() {
 
       const data = await response.json();
       console.log('Checkout session created:', data);
+
+      // Update booking with Stripe session ID
+      await updateDoc(bookingRef, { stripeSessionId: data.sessionId });
+
       return data.sessionId;
 
     } catch (error) {
