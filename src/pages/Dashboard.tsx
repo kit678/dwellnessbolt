@@ -371,7 +371,7 @@ export default function Dashboard() {
                       Trash
                     </button>
                   )}
-                  {booking.status !== 'pending' && (
+                  {booking.status === 'confirmed' && (
                     <button
                       onClick={() => handleCancelBooking(booking)}
                       className="px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800 hover:bg-red-200"
