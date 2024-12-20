@@ -76,6 +76,16 @@ router.post(
           throw new Error(`Session data is undefined for session ${sessionId}.`);
         }
 
+        // Fetch booking details from Firestore
+        const bookingDoc = await db.collection('bookings').doc(bookingId).get();
+        if (!bookingDoc.exists) {
+          throw new Error(`Booking ${bookingId} not found in Firestore.`);
+        }
+        const bookingData = bookingDoc.data();
+        if (!bookingData) {
+          throw new Error(`Booking data is undefined for booking ${bookingId}.`);
+        }
+
         try {
           await db.runTransaction(async (transaction) => {
             const bookingRef = db.collection('bookings').doc(bookingId);
