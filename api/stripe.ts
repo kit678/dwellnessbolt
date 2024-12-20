@@ -18,6 +18,7 @@ router.post('/create-checkout-session', async (req, res) => {
   try {
     const { sessionId, bookingId, userId, amount } = req.body;
 
+    logger.info(`Creating Stripe checkout session with metadata: ${JSON.stringify(req.body.metadata)}`, 'Stripe');
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
