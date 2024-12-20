@@ -91,7 +91,7 @@ router.post(
               throw new Error(`Session data is undefined for session ${sessionId}.`);
             }
 
-            const dateKey = sessionDate;
+            const dateKey = sessionDate.split('T')[0]; // Ensure dateKey is in "YYYY-MM-DD" format
 
             // Check if there is remaining capacity
             if (
