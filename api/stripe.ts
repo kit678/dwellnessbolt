@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 import express, { Router } from 'express';
 import Stripe from 'stripe';
+import { logger } from '../src/utils/logger';
 const router: Router = express.Router();
 const stripeSecretKey =
   process.env.VITE_NODE_ENV === 'development'
