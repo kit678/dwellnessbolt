@@ -39,6 +39,9 @@ router.post('/create-checkout-session', async (req, res) => {
         bookingId,
         userId,
         sessionId,
+        sessionTitle: req.body.metadata.sessionTitle,
+        sessionDate: req.body.metadata.sessionDate,
+        sessionPrice: req.body.metadata.sessionPrice,
       },
     });
 
