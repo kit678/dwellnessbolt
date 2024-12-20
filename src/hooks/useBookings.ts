@@ -62,6 +62,15 @@ export function useBookings() {
         amount: session.price * 100,
       });
 
+      console.log('Creating checkout session with metadata:', {
+        bookingId: bookingRef.id,
+        userId: user.uid,
+        sessionId: session.id,
+        sessionDate: scheduledDate,
+        sessionTitle: session.title,
+        sessionPrice: session.price.toString(),
+      });
+
       const response = await fetch('/api/stripe/create-checkout-session', {
         method: 'POST',
         headers: {
