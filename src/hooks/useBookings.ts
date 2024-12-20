@@ -13,6 +13,7 @@ export function useBookings() {
 
   const bookSession = async (session: RecurringSession, scheduledDate: string) => {
     console.log('bookSession called with user:', user);
+    try {
     if (!user) {
       console.error('User or user ID is undefined');
       toast.error('Please log in to book a session');
@@ -113,7 +114,7 @@ export function useBookings() {
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   const getUserBookings = async (): Promise<Booking[]> => {
     setLoading(true);
@@ -224,11 +225,13 @@ export function useBookings() {
       console.error('Transaction failure:', error);
     }
   };
-  const currentDate = new Date();
-  const topics = ['Stress Management', 'Diabetes & Hypertension', 'Weight Loss', 'PCOS/Women\'s Health', 'Meditation & Breathwork', 'General Wellness Class'];
-  const startDate = new Date('2023-01-01'); // Example start date
-  const weeksSinceStart = Math.floor((currentDate.getTime() - startDate.getTime()) / (7 * 24 * 60 * 60 * 1000));
-  const getNextSpecializedTopic = () => topics[weeksSinceStart % topics.length];
+  const getNextSpecializedTopic = () => {
+    const currentDate = new Date();
+    const topics = ['Stress Management', 'Diabetes & Hypertension', 'Weight Loss', 'PCOS/Women\'s Health', 'Meditation & Breathwork', 'General Wellness Class'];
+    const startDate = new Date('2023-01-01'); // Example start date
+    const weeksSinceStart = Math.floor((currentDate.getTime() - startDate.getTime()) / (7 * 24 * 60 * 60 * 1000));
+    return topics[weeksSinceStart % topics.length];
+  };
 
   return {
     loading,

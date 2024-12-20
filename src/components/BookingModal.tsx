@@ -23,7 +23,7 @@ export default function BookingModal({
   isOpen,
   onClose,
 }: BookingModalProps) {
-  const { bookSession } = useBookings();
+  const { bookSession } = useBookings() as { bookSession: (session: RecurringSession, scheduledDate: string) => Promise<string | undefined> };
   const [selectedDate, setSelectedDate] = useState('');
   const [loading, setLoading] = useState(false);
   const [remainingCapacity, setRemainingCapacity] = useState<number>(session.capacity);
