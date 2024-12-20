@@ -10,6 +10,7 @@ import { format } from 'date-fns';
 import { useBookings } from '../hooks/useBookings';
 import { stripePromise } from '../lib/stripe.js';
 import toast from 'react-hot-toast';
+import { logger } from '../utils/logger';
 
 interface BookingModalProps {
   session: RecurringSession;

@@ -4,6 +4,7 @@ import { db } from '../lib/firebase';
 import { useAuth } from './useAuth';
 import { RecurringSession, Booking } from '../types/index';
 import toast from 'react-hot-toast';
+import { logger } from '../utils/logger';
 
 export function useBookings() {
   const { user } = useAuth();
@@ -67,9 +68,7 @@ export function useBookings() {
         session,
         status: 'pending',
         bookedAt: new Date().toISOString(),
-        const dateOnly = scheduledDate.split('T')[0];
-        logger.info(`Storing scheduledDate in Firestore: ${dateOnly}`, 'useBookings');
-        scheduledDate: dateOnly // Store only the date part
+        scheduledDate: scheduledDate.split('T')[0] // Store only the date part
       });
 
       // Create new Stripe checkout session
