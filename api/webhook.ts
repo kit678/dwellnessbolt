@@ -110,7 +110,7 @@ router.post(
 
             // Update the session's bookings
             // Ensure confirmedBookings and remainingCapacity are updated correctly
-            const dateBooking = sessionData.bookings[dateKey] || { confirmedBookings: [], remainingCapacity: sessionData.capacity };
+            const dateBooking = sessionData.bookings[dateKey];
             const updatedConfirmedBookings = [...dateBooking.confirmedBookings, { userId, bookingId }];
 
             transaction.update(sessionRef, {
