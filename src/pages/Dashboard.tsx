@@ -43,7 +43,7 @@ export default function Dashboard() {
   const formatTime = (timeString: string, fromTimeZone: string, toTimeZone: string) => {
     const date = DateTime.fromFormat(timeString, 'HH:mm', { zone: fromTimeZone });
     const zonedDate = date.setZone(toTimeZone);
-    return zonedDate.toFormat('h:mm a zzz');
+    return zonedDate.toFormat('h:mm a') + ' MST';
   };
 
   const isDevelopment = useMemo(() => import.meta.env.VITE_NODE_ENV === 'development', []);
