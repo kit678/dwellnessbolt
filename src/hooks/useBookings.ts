@@ -21,6 +21,7 @@ export function useBookings() {
     }
     logger.info(`Received scheduledDate in bookSession: ${scheduledDate}`, 'useBookings');
       // Check for existing confirmed booking for the same session and date to avoid double bookings
+      logger.debug(`Checking existing bookings for scheduledDate: ${scheduledDate}`, 'useBookings');
       const existingBookingsQuery = query(
         collection(db, 'bookings'),
         where('userId', '==', user.uid),
@@ -36,6 +37,7 @@ export function useBookings() {
       }
 
       // Check session capacity
+      logger.debug(`Checking session capacity for scheduledDate: ${scheduledDate}`, 'useBookings');
       const sessionRef = doc(db, 'sessions', session.id);
       const sessionDoc = await getDoc(sessionRef);
       const sessionData = sessionDoc.data();
