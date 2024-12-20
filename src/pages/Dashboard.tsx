@@ -51,7 +51,7 @@ export default function Dashboard() {
   const handleDeleteBooking = useCallback(
     (bookingId: string) => {
       const booking = bookings.find(b => b.id === bookingId);
-      if (booking?.status !== 'cancelled') {
+      if (booking?.status === 'confirmed') {
         toast.error('You must cancel the booking before trashing it.');
         return;
       }
