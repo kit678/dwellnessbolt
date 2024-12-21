@@ -4,6 +4,7 @@ import { logger } from '../src/utils/logger.js';
 import { db } from '../src/lib/firebaseAdmin.js';
 import { FieldValue } from 'firebase-admin/firestore';
 import { sendBookingConfirmation, sendBookingReminder } from '../src/lib/email.js';
+import { RecurringSession } from '../src/types/index.js';
 
 const router = express.Router();
 
