@@ -107,7 +107,7 @@ router.post(
               throw new Error(`Session data is undefined for session ${sessionId}.`);
             }
 
-            const dateKey = sessionData.scheduledDate.split('T')[0]; // Ensure dateKey is in "YYYY-MM-DD" format
+            const dateKey = bookingData.scheduledDate; // Use scheduledDate from booking data
 
             // Check if there is remaining capacity
             if (
