@@ -126,6 +126,9 @@ router.post(
             );
             const emailSent = await sendBookingConfirmation(userData.email, {
               session: bookingData.session,
+              scheduledDate: bookingData.scheduledDate,
+              status: bookingData.status,
+              bookedAt: bookingData.bookedAt,
             });
             if (emailSent) {
               logger.info(
