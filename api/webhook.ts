@@ -160,6 +160,7 @@ router.post(
                 price: sessionData.price,
                 description: sessionData.description,
                 specializedTopic: sessionData.specializedTopic,
+                image: sessionData.image,
               },
             });
             if (emailSent) {
