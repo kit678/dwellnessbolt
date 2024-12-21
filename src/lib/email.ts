@@ -30,8 +30,8 @@ export const sendBookingConfirmation = async (to: string, booking: any) => {
             </tr>
             <tr>
               <td style="padding: 10px; border: 1px solid #ddd;">Time</td>
-              <td style="padding: 10px; border: 1px solid #ddd;">${booking?.session?.startTime ? new Date(booking.session.startTime).toLocaleTimeString('en-US', { timeZone: 'America/Denver' }) : 'N/A'} - 
-                 ${booking?.session?.endTime ? new Date(booking.session.endTime).toLocaleTimeString('en-US', { timeZone: 'America/Denver' }) : 'N/A'} MST</td>
+              <td style="padding: 10px; border: 1px solid #ddd;">${booking?.session?.startTime || 'N/A'} MST - 
+                 ${booking?.session?.endTime || 'N/A'} MST</td>
             </tr>
             <tr>
               <td style="padding: 10px; border: 1px solid #ddd;">Price</td>
@@ -51,7 +51,7 @@ export const sendBookingConfirmation = async (to: string, booking: any) => {
             </tr>
             <tr>
               <td style="padding: 10px; border: 1px solid #ddd;">Booked At</td>
-              <td style="padding: 10px; border: 1px solid #ddd;">${booking?.bookedAt ? new Date(booking.bookedAt).toLocaleString('en-US', { timeZone: 'America/Denver' }) : 'N/A'}</td>
+              <td style="padding: 10px; border: 1px solid #ddd;">${booking?.bookedAt ? new Date(booking.bookedAt).toLocaleString() : 'N/A'}</td>
             </tr>
           </table>
           <p style="font-size: 16px; margin-top: 20px;">We look forward to seeing you!</p>
