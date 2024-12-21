@@ -87,6 +87,27 @@ router.post(
               throw new Error(`Booking ${bookingId} not found in Firestore.`);
             }
 
+            const sessionDoc = await transaction.get(sessionRef);
+            if (!sessionDoc.exists) {
+              throw new Error(`Session ${sessionId} not found in Firestore.`);
+            }
+            const sessionData = sessionDoc.data() as RecurringSession;
+
+            // Update booking status to 'confirmed'
+            transaction.update(bookingRef, { status: 'confirmed' });
+
+            // Update session bookings
+            const dateKey = bookingData.scheduledDate;
+            if (sessionData.bookings && sessionData.bookings[dateKey]) {
+              const dateBooking = sessionData.bookings[dateKey];
+              dateBooking.confirmedBookings.push({ userId, bookingId });
+              dateBooking.remainingCapacity -= 1;
+              transaction.update(sessionRef, {
+                [`bookings.${dateKey}`]: dateBooking,
+              });
+            } else {
+              throw new Error('Booking date data does not exist in session.');
+            }
           });
 
           logger.info(
@@ -103,15 +124,7 @@ router.post(
               'Webhook'
             );
             const emailSent = await sendBookingConfirmation(userData.email, {
-              session: {
-                title: sessionData.title,
-                startTime: sessionData.startTime,
-                endTime: sessionData.endTime,
-                price: sessionData.price,
-                description: sessionData.description,
-                specializedTopic: sessionData.specializedTopic,
-                image: sessionData.image,
-              },
+              session: bookingData.session,
             });
             if (emailSent) {
               logger.info(
