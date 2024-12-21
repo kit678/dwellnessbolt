@@ -66,16 +66,6 @@ router.post(
             .send('Missing bookingId, userId, or sessionId in session metadata');
         }
 
-        // Fetch session details from Firestore
-        const sessionDoc = await db.collection('sessions').doc(sessionId).get();
-        if (!sessionDoc.exists) {
-          throw new Error(`Session ${sessionId} not found in Firestore.`);
-        }
-        const sessionData = sessionDoc.data();
-        if (!sessionData) {
-          throw new Error(`Session data is undefined for session ${sessionId}.`);
-        }
-
         // Fetch booking details from Firestore
         const bookingDoc = await db.collection('bookings').doc(bookingId).get();
         if (!bookingDoc.exists) {
@@ -97,14 +87,9 @@ router.post(
               throw new Error(`Booking ${bookingId} not found in Firestore.`);
             }
 
-            const sessionDoc = await transaction.get(sessionRef);
-            if (!sessionDoc.exists) {
-              throw new Error(`Session ${sessionId} not found in Firestore.`);
-            }
-
-            const sessionData = sessionDoc.data();
+            const sessionData = bookingDoc.data()?.session;
             if (!sessionData) {
-              throw new Error(`Session data is undefined for session ${sessionId}.`);
+              throw new Error(`Session data is undefined in booking ${bookingId}.`);
             }
 
             const dateKey = bookingData.scheduledDate; // Use scheduledDate from booking data
