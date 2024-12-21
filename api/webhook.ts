@@ -87,7 +87,7 @@ router.post(
               throw new Error(`Booking ${bookingId} not found in Firestore.`);
             }
 
-            const sessionData = bookingDoc.data()?.session;
+            const sessionData = bookingData.session;
             if (!sessionData) {
               throw new Error(`Session data is undefined in booking ${bookingId}.`);
             }
