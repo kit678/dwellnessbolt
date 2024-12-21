@@ -87,41 +87,6 @@ router.post(
               throw new Error(`Booking ${bookingId} not found in Firestore.`);
             }
 
-            const sessionData = bookingData.session;
-            if (!sessionData) {
-              throw new Error(`Session data is undefined in booking ${bookingId}.`);
-            }
-
-            const dateKey = bookingData.scheduledDate; // Use scheduledDate from booking data
-
-            // Check if there is remaining capacity
-            if (
-              !sessionData.bookings ||
-              !sessionData.bookings[dateKey] ||
-              sessionData.bookings[dateKey].remainingCapacity <= 0
-            ) {
-              throw new Error('No remaining capacity for the selected session date.');
-            }
-
-            // Update the booking status to confirmed and set paidAt
-            transaction.update(bookingRef, {
-              status: 'confirmed',
-              paidAt: new Date().toISOString(),
-            });
-
-            // Update the session's bookings
-            // Ensure confirmedBookings and remainingCapacity are updated correctly
-            const dateBooking = sessionData.bookings[dateKey];
-            const updatedConfirmedBookings = [...dateBooking.confirmedBookings, { userId, bookingId }];
-
-            transaction.update(sessionRef, {
-              [`bookings.${dateKey}.confirmedBookings`]: updatedConfirmedBookings,
-              [`bookings.${dateKey}.remainingCapacity`]: dateBooking.remainingCapacity - 1,
-            });
-            logger.debug(
-              `Updated bookings for dateKey ${dateKey} with bookingId ${bookingId}`,
-              'Webhook'
-            );
           });
 
           logger.info(
