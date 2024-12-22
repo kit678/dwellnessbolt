@@ -55,7 +55,7 @@ export const sendBookingConfirmation = async (to: string, booking: any) => {
             </tr>
           </table>
           <p style="font-size: 16px; margin-top: 20px;">We look forward to seeing you!</p>
-          <p style="font-size: 16px;">Best regards,<br/>The WellnessBolt Team</p>
+          <p style="font-size: 16px;">Best regards,<br/>The Dwellness Club</p>
         </div>
       `,
     });
