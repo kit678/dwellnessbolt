@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { m } from 'framer-motion';
 import { Plus, Calendar as CalendarIcon, BarChart2, RefreshCw } from 'lucide-react';
 import { Dialog } from '@headlessui/react';
 import { useAdmin } from '../hooks/useAdmin';
-import AdminCalendar from '../components/AdminCalendar';
-import Analytics from '../components/Analytics';
-import SessionForm from '../components/SessionForm';
+const AdminCalendar = React.lazy(() => import('../components/AdminCalendar'));
+const Analytics = React.lazy(() => import('../components/Analytics'));
+const SessionForm = React.lazy(() => import('../components/SessionForm'));
 import { RecurringSession as Session } from '../types/index';
 import toast from 'react-hot-toast';
 
@@ -129,17 +129,19 @@ export default function Admin() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        {view === 'calendar' ? (
-          <AdminCalendar
-            sessions={sessions}
-            onSelectEvent={(session) => {
-              setSelectedSession(session);
-              setIsFormOpen(true);
-            }}
-          />
-        ) : (
-          analyticsData && <Analytics data={analyticsData} />
-        )}
+        <Suspense fallback={<div>Loading...</div>}>
+          {view === 'calendar' ? (
+            <AdminCalendar
+              sessions={sessions}
+              onSelectEvent={(session) => {
+                setSelectedSession(session);
+                setIsFormOpen(true);
+              }}
+            />
+          ) : (
+            analyticsData && <Analytics data={analyticsData} />
+          )}
+        </Suspense>
       </m.div>
 
       {/* Session Form Dialog */}
@@ -155,11 +157,13 @@ export default function Admin() {
             <Dialog.Title className="text-lg font-medium text-gray-900 mb-4">
               {selectedSession ? 'Edit Session' : 'New Session'}
             </Dialog.Title>
-            <SessionForm
-              onSubmit={handleSubmit}
-              initialData={selectedSession || undefined}
-              loading={loading}
-            />
+            <Suspense fallback={<div>Loading...</div>}>
+              <SessionForm
+                onSubmit={handleSubmit}
+                initialData={selectedSession || undefined}
+                loading={loading}
+              />
+            </Suspense>
             {selectedSession && (
               <button
                 onClick={() => handleDelete(selectedSession.id)}
