@@ -5,10 +5,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
 import Navbar from './components/Navbar';
 
-import Home from './pages/Home';
-import Playground from './pages/Playground';
-
-// Lazy load pages with explicit file extensions
+const Home = lazy(() => import('./pages/Home'));
+const Playground = lazy(() => import('./pages/Playground'));
 const Sessions = lazy(() => import('./pages/Sessions.tsx'));
 const Login = lazy(() => import('./pages/Login.tsx'));
 const Register = lazy(() => import('./pages/Register.tsx'));
