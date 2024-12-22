@@ -116,7 +116,13 @@ router.post(
             'Webhook'
           );
 
-          // Fetch user email outside the transaction
+          // Re-fetch booking data to ensure status is updated
+          const updatedBookingDoc = await db.collection('bookings').doc(bookingId).get();
+          const updatedBookingData = updatedBookingDoc.data();
+          if (!updatedBookingData) {
+            throw new Error(`Updated booking data is undefined for booking ${bookingId}.`);
+          }
+
           const userDoc = await db.collection('users').doc(userId).get();
           const userData = userDoc.data();
           if (userData && userData.email) {
@@ -125,10 +131,10 @@ router.post(
               'Webhook'
             );
             const emailSent = await sendBookingConfirmation(userData.email, {
-              session: bookingData.session,
-              scheduledDate: bookingData.scheduledDate,
-              status: bookingData.status,
-              bookedAt: bookingData.bookedAt,
+              session: updatedBookingData.session,
+              scheduledDate: updatedBookingData.scheduledDate,
+              status: updatedBookingData.status,
+              bookedAt: updatedBookingData.bookedAt,
             });
             if (emailSent) {
               logger.info(
