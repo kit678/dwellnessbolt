@@ -4,14 +4,14 @@ import { toast } from 'react-hot-toast';
 import { db } from '../lib/firebase';
 import { stripePromise } from '../lib/stripe';
 import { Dialog } from '../components/ui/Dialog';
-import { ProfilePicDialog } from '../components/ui/ProfilePicDialog';
+const ProfilePicDialog = React.lazy(() => import('../components/ui/ProfilePicDialog'));
 import { m } from 'framer-motion';
 import { Calendar, Clock, DollarSign, User } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { DateTime } from 'luxon';
 import { Booking } from '../types/index';
 import { logger } from '../utils/logger';
-import OnboardingQuiz from '../components/OnboardingQuiz';
+const OnboardingQuiz = React.lazy(() => import('../components/OnboardingQuiz'));
 import { useAuth } from '../hooks/useAuth';
 import { useQuizStore } from '@/store/quizStore';
 import { useBookings } from '@/hooks/useBookings';
@@ -407,7 +407,9 @@ export default function Dashboard() {
           ))
         )}
       </div>
-      <OnboardingQuiz isOpen={quizOpen} onClose={() => setQuizOpen(false)} onComplete={(_scores) => setQuizOpen(false)} />
+      <Suspense fallback={<LoadingSpinner />}>
+        <OnboardingQuiz isOpen={quizOpen} onClose={() => setQuizOpen(false)} onComplete={(_scores) => setQuizOpen(false)} />
+      </Suspense>
 
       <Dialog
         isOpen={dialogOpen}
@@ -419,11 +421,13 @@ export default function Dashboard() {
         cancelText={dialogTitle === 'Cannot Cancel Booking' ? undefined : 'No'}
       />
 
-      <ProfilePicDialog
-        isOpen={profilePicModalOpen}
-        imageUrl={enlargedProfilePicUrl}
-        onClose={() => setProfilePicModalOpen(false)}
-      />
+      <Suspense fallback={<LoadingSpinner />}>
+        <ProfilePicDialog
+          isOpen={profilePicModalOpen}
+          imageUrl={enlargedProfilePicUrl}
+          onClose={() => setProfilePicModalOpen(false)}
+        />
+      </Suspense>
     </div>
   );
 }
