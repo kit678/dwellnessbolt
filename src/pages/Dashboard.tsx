@@ -1,17 +1,23 @@
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import React, { useEffect, useState, useCallback, useMemo, Suspense } from 'react';
 import { doc as firebaseDoc, getDoc } from 'firebase/firestore';
 import { toast } from 'react-hot-toast';
 import { db } from '../lib/firebase';
 import { stripePromise } from '../lib/stripe';
 import { Dialog } from '../components/ui/Dialog';
-const ProfilePicDialog = React.lazy(() => import('../components/ui/ProfilePicDialog'));
+const ProfilePicDialog = React.lazy(() => import('../components/ui/ProfilePicDialog').then(module => ({ default: module.ProfilePicDialog })));
 import { m } from 'framer-motion';
+
+const LoadingSpinner = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600" />
+  </div>
+);
 import { Calendar, Clock, DollarSign, User } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { DateTime } from 'luxon';
 import { Booking } from '../types/index';
 import { logger } from '../utils/logger';
-const OnboardingQuiz = React.lazy(() => import('../components/OnboardingQuiz'));
+const OnboardingQuiz = React.lazy(() => import('../components/OnboardingQuiz').then(module => ({ default: module.OnboardingQuiz })));
 import { useAuth } from '../hooks/useAuth';
 import { useQuizStore } from '@/store/quizStore';
 import { useBookings } from '@/hooks/useBookings';
