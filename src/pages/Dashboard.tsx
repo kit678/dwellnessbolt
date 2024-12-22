@@ -17,7 +17,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { DateTime } from 'luxon';
 import { Booking } from '../types/index';
 import { logger } from '../utils/logger';
-const OnboardingQuiz = React.lazy(() => import('../components/OnboardingQuiz').then(module => ({ default: module.OnboardingQuiz })));
+const OnboardingQuiz = React.lazy(() => import('../components/OnboardingQuiz'));
 import { useAuth } from '../hooks/useAuth';
 import { useQuizStore } from '@/store/quizStore';
 import { useBookings } from '@/hooks/useBookings';
@@ -414,7 +414,7 @@ export default function Dashboard() {
         )}
       </div>
       <Suspense fallback={<LoadingSpinner />}>
-        <OnboardingQuiz isOpen={quizOpen} onClose={() => setQuizOpen(false)} onComplete={(_scores) => setQuizOpen(false)} />
+        <OnboardingQuiz isOpen={quizOpen} onClose={() => setQuizOpen(false)} onComplete={(_scores: { Vata: number; Pitta: number; Kapha: number }) => setQuizOpen(false)} />
       </Suspense>
 
       <Dialog
