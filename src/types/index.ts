@@ -1,4 +1,5 @@
 export interface QuizResult {
+  id: string;
   userId: string;
   completedAt: string;
   answers: number[];
