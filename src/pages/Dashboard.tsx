@@ -15,7 +15,7 @@ const LoadingSpinner = () => (
 import { Calendar, Clock, DollarSign, User } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { DateTime } from 'luxon';
-import { Booking } from '../types/index';
+import { Booking, QuizResult } from '../types/index';
 import { logger } from '../utils/logger';
 const OnboardingQuiz = React.lazy(() => import('../components/OnboardingQuiz'));
 import { useAuth } from '../hooks/useAuth';
@@ -417,7 +417,7 @@ export default function Dashboard() {
         <OnboardingQuiz
           isOpen={quizOpen}
           onClose={() => setQuizOpen(false)}
-          onComplete={(quizResults: QuizResult) => {
+          onComplete={(quizResults) => {
             setQuizOpen(false);
             if (user) {
               setUser({
