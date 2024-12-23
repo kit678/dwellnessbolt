@@ -417,19 +417,15 @@ export default function Dashboard() {
         <OnboardingQuiz
           isOpen={quizOpen}
           onClose={() => setQuizOpen(false)}
-          onComplete={(scores: { Vata: number; Pitta: number; Kapha: number }) => {
+          onComplete={(quizResults) => {
             setQuizOpen(false);
             if (user) {
-              const latestQuizResult = {
-                ...user.quizResults[user.quizResults.length - 1],
-                scores,
-              };
               setUser({
                 ...user,
-                dosha: latestQuizResult.dominantDosha,
-                secondaryDosha: latestQuizResult.secondaryDosha,
-                lastQuizDate: latestQuizResult.completedAt,
-                quizResults: [...user.quizResults, latestQuizResult],
+                dosha: quizResults.dominantDosha,
+                secondaryDosha: quizResults.secondaryDosha,
+                lastQuizDate: quizResults.completedAt,
+                quizResults: [...user.quizResults, quizResults],
               });
             }
           }}
