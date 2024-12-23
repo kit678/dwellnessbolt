@@ -15,7 +15,7 @@ const LoadingSpinner = () => (
 import { Calendar, Clock, DollarSign, User } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { DateTime } from 'luxon';
-import { Booking, QuizResult } from '../types/index';
+import { Booking } from '../types/index';
 import { logger } from '../utils/logger';
 const OnboardingQuiz = React.lazy(() => import('../components/OnboardingQuiz'));
 import { useAuth } from '../hooks/useAuth';
@@ -26,7 +26,7 @@ logger.info('Dashboard component rendered', 'Dashboard');
 
 export default function Dashboard() {
   logger.info('Dashboard component mounted', 'Dashboard');
-  const { user, loading: authLoading, setUser } = useAuth();
+  const { user, loading: authLoading, updateUserProfile } = useAuth();
   const { getUserBookings, cancelBooking, deleteBooking, bookSession } = useBookings() as any;
   const { results } = useQuizStore();
 
@@ -420,8 +420,7 @@ export default function Dashboard() {
           onComplete={(quizResults) => {
             setQuizOpen(false);
             if (user) {
-              setUser({
-                ...user,
+              updateUserProfile(user.uid, {
                 dosha: quizResults.dominantDosha,
                 secondaryDosha: quizResults.secondaryDosha,
                 lastQuizDate: quizResults.completedAt,
