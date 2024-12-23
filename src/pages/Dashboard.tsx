@@ -26,7 +26,7 @@ logger.info('Dashboard component rendered', 'Dashboard');
 
 export default function Dashboard() {
   logger.info('Dashboard component mounted', 'Dashboard');
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, setUser } = useAuth();
   const { getUserBookings, cancelBooking, deleteBooking, bookSession } = useBookings() as any;
   const { results } = useQuizStore();
 
@@ -417,7 +417,7 @@ export default function Dashboard() {
         <OnboardingQuiz
           isOpen={quizOpen}
           onClose={() => setQuizOpen(false)}
-          onComplete={(quizResults) => {
+          onComplete={(quizResults: QuizResult) => {
             setQuizOpen(false);
             if (user) {
               setUser({
