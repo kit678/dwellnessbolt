@@ -414,7 +414,26 @@ export default function Dashboard() {
         )}
       </div>
       <Suspense fallback={<LoadingSpinner />}>
-        <OnboardingQuiz isOpen={quizOpen} onClose={() => setQuizOpen(false)} onComplete={(_scores: { Vata: number; Pitta: number; Kapha: number }) => setQuizOpen(false)} />
+        <OnboardingQuiz
+          isOpen={quizOpen}
+          onClose={() => setQuizOpen(false)}
+          onComplete={(scores: { Vata: number; Pitta: number; Kapha: number }) => {
+            setQuizOpen(false);
+            if (user) {
+              const latestQuizResult = {
+                ...user.quizResults[user.quizResults.length - 1],
+                scores,
+              };
+              setUser({
+                ...user,
+                dosha: latestQuizResult.dominantDosha,
+                secondaryDosha: latestQuizResult.secondaryDosha,
+                lastQuizDate: latestQuizResult.completedAt,
+                quizResults: [...user.quizResults, latestQuizResult],
+              });
+            }
+          }}
+        />
       </Suspense>
 
       <Dialog
