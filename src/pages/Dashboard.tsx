@@ -417,14 +417,19 @@ export default function Dashboard() {
         <OnboardingQuiz
           isOpen={quizOpen}
           onClose={() => setQuizOpen(false)}
-          onComplete={(quizResults: QuizResult) => {
+          onComplete={(quizResults) => {
             setQuizOpen(false);
             if (user) {
+              const updatedQuizResults = {
+                Vata: quizResults.Vata,
+                Pitta: quizResults.Pitta,
+                Kapha: quizResults.Kapha,
+              };
               updateUserProfile(user.uid, {
-                dosha: quizResults.dominantDosha,
-                secondaryDosha: quizResults.secondaryDosha,
-                lastQuizDate: quizResults.completedAt,
-                quizResults: [...user.quizResults, quizResults],
+                dosha: updatedQuizResults.Vata > updatedQuizResults.Pitta && updatedQuizResults.Vata > updatedQuizResults.Kapha ? 'Vata' : updatedQuizResults.Pitta > updatedQuizResults.Kapha ? 'Pitta' : 'Kapha',
+                secondaryDosha: null, // Adjust logic as needed
+                lastQuizDate: new Date().toISOString(),
+                quizResults: [...user.quizResults, updatedQuizResults],
               });
             }
           }}
