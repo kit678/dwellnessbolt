@@ -15,7 +15,7 @@ const LoadingSpinner = () => (
 import { Calendar, Clock, DollarSign, User } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { DateTime } from 'luxon';
-import { Booking, QuizResult } from '../types/index';
+import { Booking } from '../types/index';
 import { logger } from '../utils/logger';
 const OnboardingQuiz = React.lazy(() => import('../components/OnboardingQuiz'));
 import { useAuth } from '../hooks/useAuth';
@@ -417,13 +417,23 @@ export default function Dashboard() {
         <OnboardingQuiz
           isOpen={quizOpen}
           onClose={() => setQuizOpen(false)}
-          onComplete={(quizResults) => {
+          onComplete={(quizScores) => {
             setQuizOpen(false);
             if (user) {
-              const updatedQuizResults = {
-                Vata: quizResults.Vata,
-                Pitta: quizResults.Pitta,
-                Kapha: quizResults.Kapha,
+              const quizResults: QuizResult = {
+                id: crypto.randomUUID(),
+                userId: user.uid,
+                completedAt: new Date().toISOString(),
+                answers: [], // Assuming answers are not available here
+                scores: quizScores,
+                percentages: {
+                  Vata: (quizScores.Vata / (quizScores.Vata + quizScores.Pitta + quizScores.Kapha)) * 100,
+                  Pitta: (quizScores.Pitta / (quizScores.Vata + quizScores.Pitta + quizScores.Kapha)) * 100,
+                  Kapha: (quizScores.Kapha / (quizScores.Vata + quizScores.Pitta + quizScores.Kapha)) * 100,
+                },
+                dominantDosha: quizScores.Vata > quizScores.Pitta && quizScores.Vata > quizScores.Kapha ? 'Vata' : quizScores.Pitta > quizScores.Kapha ? 'Pitta' : 'Kapha',
+                secondaryDosha: null, // Adjust logic as needed
+                version: '1.0.0',
               };
               updateUserProfile(user.uid, {
                 dosha: updatedQuizResults.Vata > updatedQuizResults.Pitta && updatedQuizResults.Vata > updatedQuizResults.Kapha ? 'Vata' : updatedQuizResults.Pitta > updatedQuizResults.Kapha ? 'Pitta' : 'Kapha',
