@@ -15,7 +15,7 @@ const LoadingSpinner = () => (
 import { Calendar, Clock, DollarSign, User } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { DateTime } from 'luxon';
-import { Booking } from '../types/index';
+import { Booking, QuizResult } from '../types/index';
 import { logger } from '../utils/logger';
 const OnboardingQuiz = React.lazy(() => import('../components/OnboardingQuiz'));
 import { useAuth } from '../hooks/useAuth';
@@ -420,7 +420,7 @@ export default function Dashboard() {
           onComplete={(quizScores) => {
             setQuizOpen(false);
             if (user) {
-              const quizResults: QuizResult = {
+              const quizResults = {
                 id: crypto.randomUUID(),
                 userId: user.uid,
                 completedAt: new Date().toISOString(),
@@ -436,10 +436,10 @@ export default function Dashboard() {
                 version: '1.0.0',
               };
               updateUserProfile(user.uid, {
-                dosha: updatedQuizResults.Vata > updatedQuizResults.Pitta && updatedQuizResults.Vata > updatedQuizResults.Kapha ? 'Vata' : updatedQuizResults.Pitta > updatedQuizResults.Kapha ? 'Pitta' : 'Kapha',
-                secondaryDosha: null, // Adjust logic as needed
-                lastQuizDate: new Date().toISOString(),
-                quizResults: [...user.quizResults, updatedQuizResults],
+                dosha: quizResults.dominantDosha,
+                secondaryDosha: quizResults.secondaryDosha,
+                lastQuizDate: quizResults.completedAt,
+                quizResults: [...user.quizResults, quizResults],
               });
             }
           }}
