@@ -70,10 +70,14 @@ export default function OnboardingQuiz({ isOpen, onClose, onComplete }: Onboardi
     }
   };
 
-  const handleSkip = () => {
+  const resetQuizState = () => {
     setSelectedOption(null);
     setCurrentQuestion(0);
     setAnswers([]);
+  };
+
+  const handleSkip = () => {
+    resetQuizState();
     onClose();
   };
 
@@ -118,9 +122,7 @@ export default function OnboardingQuiz({ isOpen, onClose, onComplete }: Onboardi
       onComplete(quizResults.scores);
     
       // Reset local state
-      setSelectedOption(null);
-      setCurrentQuestion(0);
-      setAnswers([]);
+      resetQuizState();
     
       // Close modal
       onClose();
@@ -141,10 +143,7 @@ export default function OnboardingQuiz({ isOpen, onClose, onComplete }: Onboardi
             variant="ghost"
             size="icon"
             className="absolute top-4 right-4 text-white hover:bg-indigo-400 hover:text-white"
-            onClick={() => {
-              handleSkip();
-              onClose();
-            }}
+            onClick={handleSkip}
           >
             <X className="h-6 w-6" />
           </Button>
