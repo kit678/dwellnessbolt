@@ -62,6 +62,7 @@ export interface RecurringSession {
   enrolled: number;
   price: number;
   specializedTopic?: string;
+  image?: string;
   recurringDays: number[];
   bookings?: {
     [date: string]: {

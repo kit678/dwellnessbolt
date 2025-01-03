@@ -31,11 +31,11 @@ const Playground: React.FC = () => {
       OnboardingQuiz: {
         isOpen: true,
         onClose: () => console.log('close'),
-        onComplete: (score) => console.log('score:', score)
+        onComplete: (score: { Vata: number; Pitta: number; Kapha: number }) => console.log('score:', score)
       }
     };
 
-    return <Component {...mockProps[selectedComponent]} />;
+    return <Component {...(mockProps[selectedComponent] as any)} />;
   };
 
   return (
